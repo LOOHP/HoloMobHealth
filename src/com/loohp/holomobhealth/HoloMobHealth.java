@@ -18,9 +18,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.loohp.holomobhealth.Debug.Debug;
+import com.loohp.holomobhealth.Listeners.Events;
 import com.loohp.holomobhealth.Metrics.Metrics;
+import com.loohp.holomobhealth.Utils.CitizensUtils;
 import com.loohp.holomobhealth.Utils.EntityTypeUtils;
 import com.loohp.holomobhealth.Utils.MetadataPacket;
+import com.loohp.holomobhealth.Utils.MythicMobsUtils;
+import com.loohp.holomobhealth.Utils.Updater;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -67,6 +71,15 @@ public class HoloMobHealth extends JavaPlugin {
 	
 	private static int startUpTaskId;
 	
+	public static boolean MythicHook = false;
+	public static boolean showMythicMobs = true;
+	
+	public static boolean CitizensHook = false;
+	public static boolean showCitizens = true;
+	
+	public static boolean UpdaterEnabled = true;
+	public static int UpdaterTaskID = -1;
+	
 	@Override
 	public void onEnable() {	
 		plugin = (Plugin)getServer().getPluginManager().getPlugin("HoloMobHealth");
@@ -86,7 +99,17 @@ public class HoloMobHealth extends JavaPlugin {
 		
 		protocolManager = ProtocolLibrary.getProtocolManager();
 		
-	    getCommand("holomobhealth").setExecutor(new Commands());    
+	    getCommand("holomobhealth").setExecutor(new Commands());
+	    
+	    if (Bukkit.getServer().getPluginManager().getPlugin("Citizens") != null) {
+	    	Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into Citizens!");
+	    	CitizensHook = true;
+		}
+	    
+	    if (Bukkit.getServer().getPluginManager().getPlugin("MythicMobs") != null) {
+	    	Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into MythicMobs!");
+	    	MythicHook = true;
+		}
 		
 	    if (getServer().getClass().getPackage().getName().contains("1_15_R1") == true) {
 	    	version = "1.15";
@@ -211,6 +234,18 @@ public class HoloMobHealth extends JavaPlugin {
 		    	}
 		    }.runTaskTimer(HoloMobHealth.plugin, 1, 100).getTaskId();
 		}
+		
+		HoloMobHealth.showCitizens = HoloMobHealth.plugin.getConfig().getBoolean("Hooks.Citizens.ShowNPCMobHealth");
+		
+		HoloMobHealth.showMythicMobs = HoloMobHealth.plugin.getConfig().getBoolean("Hooks.MythicMobs.ShowMythicMobsHealth");
+		
+		if (UpdaterTaskID >= 0) {
+			Bukkit.getScheduler().cancelTask(UpdaterTaskID);
+		}
+		HoloMobHealth.UpdaterEnabled = HoloMobHealth.plugin.getConfig().getBoolean("Updater.Enable");
+		if (UpdaterEnabled == true) {
+			Updater.updaterInterval();
+		}
 	}
 	
 	public static void getEntities() {
@@ -252,6 +287,16 @@ public class HoloMobHealth extends JavaPlugin {
 					for (Entity entity : HoloMobHealth.nearbyPlus10Entities.get(player)) {
 						if (HoloMobHealth.DisabledMobTypes.contains(entity.getType())) {
 							continue;
+						}
+						if (showCitizens == false && CitizensHook == true) {
+							if (CitizensUtils.isNPC(entity)) {
+								continue;
+							}
+						}
+						if (showMythicMobs == false && MythicHook == true) {
+							if (MythicMobsUtils.isMythicMob(entity)) {
+								continue;
+							}
 						}
 						if (entity.getCustomName() != null) {
 							if (!entity.getCustomName().equals("")) {
@@ -401,6 +446,16 @@ public class HoloMobHealth extends JavaPlugin {
 					for (Entity entity : HoloMobHealth.nearbyPlus10Entities.get(player)) {
 						if (HoloMobHealth.DisabledMobTypes.contains(entity.getType())) {
 							continue;
+						}
+						if (showCitizens == false && CitizensHook == true) {
+							if (CitizensUtils.isNPC(entity)) {
+								continue;
+							}
+						}
+						if (showMythicMobs == false && MythicHook == true) {
+							if (MythicMobsUtils.isMythicMob(entity)) {
+								continue;
+							}
 						}
 						if (entity.getCustomName() != null) {
 							if (!entity.getCustomName().equals("")) {

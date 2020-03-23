@@ -1,0 +1,82 @@
+Display:
+  #The text to display above the mob
+  #Placeholders:
+  #{Health_Rounded}
+  #{Max_Health_Rounded}
+  #{Health_1DB}
+  #{Max_Health_1DB}
+  #{Health_2DB}
+  #{Max_Health_2DB}
+  #{Health_Percentage}
+  #{Health_Percentage_1DB}
+  #{Health_Percentage_2DB}
+  #{Mob_Type}
+  #{Mob_Type_Or_Name}
+
+  #{DynamicColor}
+  #{ScaledSymbols}
+  Text: "&b{Mob_Type_Or_Name}: {DynamicColor}{Health_1DB}&f/{Max_Health_1DB}"
+
+  #Settings for the {DynamicColor} Placeholder
+  DynamicColorSettings:
+    #Color that represents more than 66.67% of health
+    HealthyColor: "&a"
+    #Color that represents between 33.33% and 66.67% of health
+    HalfColor: "&e"
+    #Color that represents below 33.33% of health
+    LowColor: "&c"
+  #Settings for the {ScaledSymbols} Placeholder
+  ScaledSymbolSettings:
+    #How many of these symbols are considered max health
+    Scale: 10
+    #Character used for hearts that represents remaining health
+    HealthyChar: "&c❤"
+    #Character used for hearts that represents remaining health
+    HalfChar: "&e❤"
+    #Character used for hearts that represents lost health
+    EmptyChar: "&7❤"
+
+Options:
+  #Health always visible when in range or only visible when the player is looking at the mob
+  AlwaysShow: true
+  #The range where health information is sent to the player
+  Range: 15
+  #Whether or not named mobs should so had their name replaced to show health
+  #The name is not actually replaced on the server side, only client side
+  #Does not work well with AlwaysShow set to false
+  ApplyToNamed: true
+  #Do not apply health to these mob types
+  #https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html
+  DisabledMobTypes: []
+  #Do not apply health to mob with these name
+  #The name has to be completely equal to this list including color codes
+  #Use "&" as color code
+  DisabledMobNamesAbsolute: []
+  #Do not apply health to mob with these name
+  #The name only has to contain these strings EXCLUDING color codes AND case
+  #Color codes are ignored
+  DisabledMobNamesContains: 
+    - PhantomShield
+  #Settings for an alternate way of showing health
+  DynamicHealthDisplay:
+    #Whether or not HoloMobHealth should only apply health display when the mob is under attack
+    Use: false
+    #How long should health be shown after the mob has been attack (in seconds)
+    Timeout: 3
+    #Should health be triggered only from attacks from players
+    OnlyPlayerTrigger: false
+
+Hooks:
+  Citizens:
+    #Whether HoloMobHealth should show health for citizens NPCs (applies to mobs only)
+    ShowNPCMobHealth: true
+  MythicMobs:
+    #Whether HoloMobHealth should show health for MythicMobs (applies to mobs only)
+    ShowMythicMobsHealth: true
+
+Messages:
+  ReloadPlugin: "&aHoloMobHealth has been reloaded!"
+  NoPermission: "&cYou do not have permission to use that command!"
+
+Updater:
+  Enable: true

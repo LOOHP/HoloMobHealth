@@ -27,11 +27,11 @@ import com.comphenix.protocol.ProtocolManager;
 import com.loohp.holomobhealth.Debug.Debug;
 import com.loohp.holomobhealth.Listeners.Events;
 import com.loohp.holomobhealth.Metrics.Metrics;
+import com.loohp.holomobhealth.Updater.Updater;
 import com.loohp.holomobhealth.Utils.CitizensUtils;
 import com.loohp.holomobhealth.Utils.EntityTypeUtils;
 import com.loohp.holomobhealth.Utils.MetadataPacket;
 import com.loohp.holomobhealth.Utils.MythicMobsUtils;
-import com.loohp.holomobhealth.Utils.Updater;
 
 import net.md_5.bungee.api.ChatColor;
 

@@ -12,8 +12,8 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Entity;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.loohp.holomobhealth.Updater.Updater;
 import com.loohp.holomobhealth.Utils.EntityTypeUtils;
-import com.loohp.holomobhealth.Utils.Updater;
 
 import net.md_5.bungee.api.ChatColor;
 

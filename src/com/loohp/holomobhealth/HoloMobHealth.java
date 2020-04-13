@@ -210,7 +210,7 @@ public class HoloMobHealth extends JavaPlugin {
 		if (HoloMobHealth.UseAlterHealth == false) {  			
 			sendHealth();
 		} else {    			
-		    sendAltHealth();
+		    sendAltHealth(); 
 		}
 		
 		HoloMobHealth.showCitizens = HoloMobHealth.plugin.getConfig().getBoolean("Hooks.Citizens.ShowNPCMobHealth");
@@ -469,10 +469,10 @@ public class HoloMobHealth extends JavaPlugin {
 								MetadataPacket.sendMetadataPacket(entity, display, HoloMobHealth.alwaysShow);
 							}
 						}
-					}.runTaskLater(HoloMobHealth.plugin, delay);
+					}.runTaskLaterAsynchronously(HoloMobHealth.plugin, delay);
 				}
 			}
-		}.runTaskTimer(HoloMobHealth.plugin, 0, 3).getTaskId();
+		}.runTaskTimerAsynchronously(HoloMobHealth.plugin, 0, 3).getTaskId();
 	}
 	
 	public static void sendHealth() {
@@ -637,9 +637,9 @@ public class HoloMobHealth extends JavaPlugin {
 								MetadataPacket.sendMetadataPacket(entity, display, HoloMobHealth.alwaysShow);
 							}
 						}
-					}.runTaskLater(HoloMobHealth.plugin, delay);
+					}.runTaskLaterAsynchronously(HoloMobHealth.plugin, delay);
 				}
 			}
-		}.runTaskTimer(HoloMobHealth.plugin, 0, 3).getTaskId();
+		}.runTaskTimerAsynchronously(HoloMobHealth.plugin, 0, 3).getTaskId();
 	}
 }

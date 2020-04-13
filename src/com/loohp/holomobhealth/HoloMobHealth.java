@@ -469,10 +469,10 @@ public class HoloMobHealth extends JavaPlugin {
 								MetadataPacket.sendMetadataPacket(entity, display, HoloMobHealth.alwaysShow);
 							}
 						}
-					}.runTaskLaterAsynchronously(HoloMobHealth.plugin, delay);
+					}.runTaskLater(HoloMobHealth.plugin, delay);
 				}
 			}
-		}.runTaskTimerAsynchronously(HoloMobHealth.plugin, 0, 3).getTaskId();
+		}.runTaskTimer(HoloMobHealth.plugin, 0, 4).getTaskId();
 	}
 	
 	public static void sendHealth() {
@@ -637,9 +637,9 @@ public class HoloMobHealth extends JavaPlugin {
 								MetadataPacket.sendMetadataPacket(entity, display, HoloMobHealth.alwaysShow);
 							}
 						}
-					}.runTaskLaterAsynchronously(HoloMobHealth.plugin, delay);
+					}.runTaskLater(HoloMobHealth.plugin, delay);
 				}
 			}
-		}.runTaskTimerAsynchronously(HoloMobHealth.plugin, 0, 3).getTaskId();
+		}.runTaskTimer(HoloMobHealth.plugin, 0, 4).getTaskId();
 	}
 }

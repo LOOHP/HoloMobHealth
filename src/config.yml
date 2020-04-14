@@ -7,6 +7,12 @@ Display:
   #{Max_Health_1DB}
   #{Health_2DB}
   #{Max_Health_2DB}
+  #{Health_Rounded_Commas}
+  #{Max_Health_Rounded_Commas}
+  #{Health_1DB_Commas}
+  #{Max_Health_1DB_Commas}
+  #{Health_2DB_Commas}
+  #{Max_Health_2DB_Commas}
   #{Health_Percentage}
   #{Health_Percentage_1DB}
   #{Health_Percentage_2DB}

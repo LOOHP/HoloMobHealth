@@ -18,7 +18,7 @@ public class Version implements Comparable<Version> {
 
     @Override 
     public int compareTo(Version that) {
-        if(that == null)
+        if (that == null)
             return 1;
         String[] thisParts = this.get().split("\\.");
         String[] thatParts = that.get().split("\\.");
@@ -28,9 +28,9 @@ public class Version implements Comparable<Version> {
                 Integer.parseInt(thisParts[i]) : 0;
             int thatPart = i < thatParts.length ?
                 Integer.parseInt(thatParts[i]) : 0;
-            if(thisPart < thatPart)
+            if (thisPart < thatPart)
                 return -1;
-            if(thisPart > thatPart)
+            if (thisPart > thatPart)
                 return 1;
         }
         return 0;
@@ -38,11 +38,11 @@ public class Version implements Comparable<Version> {
 
     @Override 
     public boolean equals(Object that) {
-        if(this == that)
+        if (this == that)
             return true;
-        if(that == null)
+        if (that == null)
             return false;
-        if(this.getClass() != that.getClass())
+        if (this.getClass() != that.getClass())
             return false;
         return this.compareTo((Version) that) == 0;
     }

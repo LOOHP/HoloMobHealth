@@ -23,7 +23,7 @@ public class Events implements Listener {
 	
 	@EventHandler
 	public void onPlayerAttack(EntityDamageByEntityEvent event) {
-		if (HoloMobHealth.AltOnlyPlayer == false) {
+		if (!HoloMobHealth.AltOnlyPlayer) {
 			return;
 		}
 		if (!event.getDamager().getType().equals(EntityType.PLAYER)) {

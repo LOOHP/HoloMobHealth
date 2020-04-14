@@ -263,8 +263,10 @@ public class HoloMobHealth extends JavaPlugin {
 			}
 			Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {
 				for (Player player : Bukkit.getOnlinePlayers()) {
-					if (player.getLocation().distanceSquared(entity.getLocation()) <= ((range + 10) * (range + 10))) {
-						return;
+					if (player.getWorld().equals(entity.getWorld())) {
+						if (player.getLocation().distanceSquared(entity.getLocation()) <= ((range + 10) * (range + 10))) {
+							return;
+						}
 					}
 				}
 				nearbyEntities.remove(entity);

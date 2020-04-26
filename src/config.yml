@@ -77,7 +77,7 @@ Options:
   #Enable EXPERIEMENTAL multi-line mob name tag
   #Note that it is a bit more performance heavy
   #Y-Offset is measured in Steps, accept only integers, experiment with the numbers to find one that is suitable for you
-  #Name match is in Regex, be careful with speical meta characters
+  #Name match is in Regex, be careful with special meta characters
   MultiLine: 
     Enable: false
     MasterYOffset: 0

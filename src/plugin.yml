@@ -1,6 +1,6 @@
 name: HoloMobHealth
 author: loohp
-version: 1.4.3
+version: 1.5.0
 main: com.loohp.holomobhealth.HoloMobHealth
 description: Show Mob Health with packets
 softdepend: [MythicMobs, Citizens]
@@ -20,6 +20,12 @@ permissions:
   holomobhealth.use:
     description: Allows you to use see health bars
     default: true
+  holomobhealth.toggle:
+    description: Allows you to toggle health display for yourself
+    default: true
+  holomobhealth.toggle.others:
+    description: Allows you to toggle health display for others
+    default: op
   holomobhealth.update:
     description: Allows you to recieve update notifications
     default: op

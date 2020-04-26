@@ -21,7 +21,9 @@ Display:
 
   #{DynamicColor}
   #{ScaledSymbols}
-  Text: "&b{Mob_Type_Or_Name}: {DynamicColor}{Health_1DB}&f/{Max_Health_1DB}"
+  #Only one line is allowed (Unless you enabled EXPERIMENTAL multi-line)
+  Text: 
+    - "&b{Mob_Type_Or_Name}: {DynamicColor}{Health_1DB}&f/{Max_Health_1DB}"
 
   #Settings for the {DynamicColor} Placeholder
   DynamicColorSettings:
@@ -72,6 +74,17 @@ Options:
     #Should health be triggered only from attacks from players
     OnlyPlayerTrigger: false
 
+  #Enable EXPERIEMENTAL multi-line mob name tag
+  #Note that it is a bit more performance heavy
+  #Y-Offset is measured in Steps, accept only integers, experiment with the numbers to find one that is suitable for you
+  #Name match is in Regex, be careful with speical meta characters
+  MultiLine: 
+    Enable: false
+    MasterYOffset: 0
+    Special:
+      - "Name:^Special Name:2"
+      - "Type:ENDERMITE:1"
+
 Hooks:
   Citizens:
     #Whether HoloMobHealth should show health for citizens NPCs (applies to mobs only)
@@ -83,6 +96,20 @@ Hooks:
 Messages:
   ReloadPlugin: "&aHoloMobHealth has been reloaded!"
   NoPermission: "&cYou do not have permission to use that command!"
+  PlayersOnly: "&cThis can only be ran as a player!"
+  PlayerNotFound: "&cThat player is not online!"
+  ToggleDisplayOn: "&aEnabled Mob Health Display!"
+  ToggleDisplayOff: "&cDisabled Mob Health Display! Rejoin to see changes!"
+
+Database:
+  #Player data storage type, MYSQL or SQLITE
+  Type: SQLITE
+  MYSQL:
+    Host: localhost
+    Port: 3306
+    Database: InteractionVisualizer
+    Username: mysql
+    Password: password
 
 Updater:
   Enable: true

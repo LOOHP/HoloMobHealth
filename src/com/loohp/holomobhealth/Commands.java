@@ -10,8 +10,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.loohp.holomobhealth.Database.Database;
 import com.loohp.holomobhealth.Updater.Updater;
 import com.loohp.holomobhealth.Utils.EntityTypeUtils;
 
@@ -57,6 +59,41 @@ public class Commands implements CommandExecutor, TabCompleter {
 			return true;
 		}
 		
+		if (args[0].equalsIgnoreCase("toggle")) {
+			if (sender.hasPermission("holomobhealth.toggle")) {
+				if (args.length == 1 || args[1].toLowerCase().equals(sender.getName().toLowerCase())) {
+					if (sender instanceof Player) {
+						Player player = (Player) sender;
+						if (Database.toggle(player)) {
+							sender.sendMessage(HoloMobHealth.ToggleDisplayOn);
+						} else {
+							sender.sendMessage(HoloMobHealth.ToggleDisplayOff);
+						}
+					} else {
+						sender.sendMessage(HoloMobHealth.PlayersOnly);
+					}
+				} else {
+					if (sender.hasPermission("holomobhealth.toggle.others")) {
+						Player player = Bukkit.getPlayer(args[1]);
+						if (player != null) {
+							if (Database.toggle(player)) {
+								sender.sendMessage(HoloMobHealth.ToggleDisplayOn);
+							} else {
+								sender.sendMessage(HoloMobHealth.ToggleDisplayOff);
+							}
+						} else {
+							sender.sendMessage(HoloMobHealth.PlayersNotFound);
+						}
+					} else {
+						sender.sendMessage(HoloMobHealth.NoPermission);
+					}
+				}
+			} else {
+				sender.sendMessage(HoloMobHealth.NoPermission);
+			}
+			return true;
+		}
+		
 		if (args[0].equalsIgnoreCase("update")) {
 			if (sender.hasPermission("holomobhealth.update")) {
 				sender.sendMessage(ChatColor.AQUA + "[HoloMobHealth] HoloMobHealth written by LOOHP!");
@@ -88,14 +125,47 @@ public class Commands implements CommandExecutor, TabCompleter {
 			return tab;
 		}
 		
-		if (args.length <= 1) {
+		switch (args.length) {
+		case 0:
 			if (sender.hasPermission("holomobhealth.reload")) {
 				tab.add("reload");
+			}
+			if (sender.hasPermission("holomobhealth.toggle")) {
+				tab.add("toggle");
 			}
 			if (sender.hasPermission("holomobhealth.update")) {
 				tab.add("update");
 			}
 			return tab;
+		case 1:
+			if (sender.hasPermission("holomobhealth.reload")) {
+				if ("reload".startsWith(args[0].toLowerCase())) {
+					tab.add("reload");
+				}
+			}
+			if (sender.hasPermission("holomobhealth.toggle")) {
+				if ("toggle".startsWith(args[0].toLowerCase())) {
+					tab.add("toggle");
+				}
+			}
+			if (sender.hasPermission("holomobhealth.update")) {
+				if ("update".startsWith(args[0].toLowerCase())) {
+					tab.add("update");
+				}
+			}
+			return tab;
+		case 2:
+			if (sender.hasPermission("holomobhealth.toggle")) {
+				if (args[0].equalsIgnoreCase("toggle")) {
+					if (sender.hasPermission("holomobhealth.toggle.others")) {
+						for (Player player : Bukkit.getOnlinePlayers()) {
+							if (player.getName().toLowerCase().startsWith(args[1].toLowerCase())) {
+								tab.add(player.getName());
+							}
+						}
+					}
+				}
+			}
 		}
 		return tab;
 	}

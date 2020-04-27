@@ -1,12 +1,18 @@
 package com.loohp.holomobhealth.Utils;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.entity.LivingEntity;
 
 import com.loohp.holomobhealth.HoloMobHealth;
 
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.TranslatableComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 
 public class ParsePlaceholders {
 	
@@ -73,10 +79,6 @@ public class ParsePlaceholders {
 			double health = (double) Math.round((entity.getHealth() / (double) entity.getMaxHealth()) * 10000) / (double) 10;
 			text = text.replace("{Health_Percentage_2DB}", String.valueOf(health));
 		}
-		if (text.contains("{Mob_Type}")) {
-			String type = EntityTypeUtils.getMinecraftName(entity);
-			text = text.replace("{Mob_Type}", type);
-		}
 		if (text.contains("{DynamicColor}")) {
 			double healthpercentage = (entity.getHealth() / entity.getMaxHealth());
 			String symbol = "";
@@ -111,18 +113,69 @@ public class ParsePlaceholders {
 		}
 		
 		text = ChatColor.translateAlternateColorCodes('&', text);
-		
-		if (text.contains("{Mob_Type_Or_Name}")) {
-			String name = "";
-			if (entity.getCustomName() != null) {
-				name = ChatColor.RESET + entity.getCustomName();
-			}
-			if (name.equals("")) {
-				name = ChatColor.translateAlternateColorCodes('&', EntityTypeUtils.getMinecraftName(entity));
-			}
-			text = text.replace("{Mob_Type_Or_Name}", String.valueOf(name));
+		List<String> sections = new ArrayList<String>();
+		String[] parts = text.split("\\{Mob_Type_Or_Name\\}");
+		if (text.startsWith("{Mob_Type_Or_Name}")) {
+			sections.add("{Mob_Type_Or_Name}");
 		}
-		return text;
+		for (int i = 0; i < parts.length; i++) {
+			String each = parts[i];
+			String[] partsparts = each.split("\\{Mob_Type\\}");
+			if (each.startsWith("{Mob_Type}")) {
+				sections.add("{Mob_Type}");
+			}
+			for (int u = 0; u < partsparts.length; u++) {
+				String eacheach = partsparts[u];
+				sections.add(eacheach);
+				if (u < partsparts.length - 1 || each.endsWith("{Mob_Type}")) {
+					sections.add("{Mob_Type}");
+				}
+			}
+			if (i < parts.length - 1 || text.endsWith("{Mob_Type_Or_Name}")) {
+				sections.add("{Mob_Type_Or_Name}");
+			}
+		}
+		
+		List<BaseComponent> baselist = new ArrayList<BaseComponent>();
+		String lastColor = "";
+		for (String section : sections) {
+			if (section.equals("{Mob_Type}")) {
+				if (!HoloMobHealth.version.contains("legacy")) {
+					TranslatableComponent textcomp = new TranslatableComponent(EntityTypeUtils.getMinecraftLangName(entity));
+					textcomp = (TranslatableComponent) ChatColorUtils.applyColor(textcomp, lastColor);
+					baselist.add(textcomp);
+				} else {
+					TextComponent textcomp = new TextComponent(EntityTypeUtils.getMinecraftLangName(entity));
+					baselist.add(textcomp);
+				}
+			} else if (section.equals("{Mob_Type_Or_Name}")) {
+				if (entity.getCustomName() != null && !entity.getCustomName().equals("")) {
+					TextComponent textcomp = new TextComponent(ChatColor.RESET + entity.getCustomName());
+					baselist.add(textcomp);
+				} else {
+					if (!HoloMobHealth.version.contains("legacy")) {
+						TranslatableComponent textcomp = new TranslatableComponent(EntityTypeUtils.getMinecraftLangName(entity));
+						textcomp = (TranslatableComponent) ChatColorUtils.applyColor(textcomp, lastColor);
+						baselist.add(textcomp);
+					} else {
+						TextComponent textcomp = new TextComponent(EntityTypeUtils.getMinecraftLangName(entity));
+						baselist.add(textcomp);
+					}
+				}
+			} else {
+				TextComponent textcomp = new TextComponent(section);
+				baselist.add(textcomp);
+			}
+			lastColor = ChatColorUtils.getLastColors(section);
+		}
+		
+		TextComponent product = new TextComponent("");
+		for (int i = 0; i < baselist.size(); i++) {
+			BaseComponent each = baselist.get(i);
+			product.addExtra(each);
+		}	
+		
+		return ComponentSerializer.toString(product);
 	}
 
 }

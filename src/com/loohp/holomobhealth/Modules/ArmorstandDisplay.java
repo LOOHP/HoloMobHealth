@@ -24,6 +24,8 @@ import com.loohp.holomobhealth.Utils.MythicMobsUtils;
 import com.loohp.holomobhealth.Utils.ParsePlaceholders;
 
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 
 public class ArmorstandDisplay {
 	
@@ -92,7 +94,7 @@ public class ArmorstandDisplay {
 					}
 					if (EntityTypeUtils.getMobList().contains(entity.getType())) { 
 						if ((!inRange.contains(entity)) || (!HoloMobHealth.altShowHealth.containsKey(entity))) {
-							String name = entity.getCustomName();							
+							String name = entity.getCustomName() != null && !entity.getCustomName().equals("") ? ComponentSerializer.toString(new TextComponent(entity.getCustomName())) : "";
 							boolean visible = entity.isCustomNameVisible();
 							MetadataPacket.sendMetadataPacket(entity, name, visible);
 							MultilineStands multi = mapping.remove(entity.getUniqueId());
@@ -106,7 +108,7 @@ public class ArmorstandDisplay {
 						if (!HoloMobHealth.applyToNamed) {
 							if (entity.getCustomName() != null) {
 								if (!entity.getCustomName().equals("")) {
-									String name = entity.getCustomName();							
+									String name = entity.getCustomName() != null && !entity.getCustomName().equals("") ? ComponentSerializer.toString(new TextComponent(entity.getCustomName())) : "";
 									boolean visible = entity.isCustomNameVisible();
 									MetadataPacket.sendMetadataPacket(entity, name, visible);
 									MultilineStands multi = mapping.remove(entity.getUniqueId());
@@ -194,7 +196,7 @@ public class ArmorstandDisplay {
 					}
 					if (EntityTypeUtils.getMobList().contains(entity.getType())) { 
 						if (!inRange.contains(entity)) {
-							String name = entity.getCustomName();							
+							String name = entity.getCustomName() != null && !entity.getCustomName().equals("") ? ComponentSerializer.toString(new TextComponent(entity.getCustomName())) : "";
 							boolean visible = entity.isCustomNameVisible();
 							MetadataPacket.sendMetadataPacket(entity, name, visible);
 							MultilineStands multi = mapping.remove(entity.getUniqueId());
@@ -208,7 +210,7 @@ public class ArmorstandDisplay {
 						if (!HoloMobHealth.applyToNamed) {
 							if (entity.getCustomName() != null) {
 								if (!entity.getCustomName().equals("")) {
-									String name = entity.getCustomName();
+									String name = entity.getCustomName() != null && !entity.getCustomName().equals("") ? ComponentSerializer.toString(new TextComponent(entity.getCustomName())) : "";
 									boolean visible = entity.isCustomNameVisible();
 									MetadataPacket.sendMetadataPacket(entity, name, visible);
 									MultilineStands multi = mapping.remove(entity.getUniqueId());

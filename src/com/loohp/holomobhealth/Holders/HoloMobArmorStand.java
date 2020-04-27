@@ -12,16 +12,12 @@ public class HoloMobArmorStand {
 	UUID uuid;
 	EntityType type;
 	Location location;
-	String customName;
-	boolean custonNameVisible;
 	int mountId;
 	
 	public HoloMobArmorStand(Location location, EntityType type, int mountId) {
 		this.id = (int) (Math.random() * Integer.MAX_VALUE);
 		this.uuid = UUID.randomUUID();
 		this.location = location.clone();
-		this.customName = "";
-		this.custonNameVisible = false;
 		this.mountId = mountId;
 		this.type = type;
 	}
@@ -71,20 +67,6 @@ public class HoloMobArmorStand {
 	
 	public int getEntityId() {
 		return id;
-	}
-
-	public void setCustomName(String customName) {
-		this.customName = customName;
-	}
-	public String getCustomName() {
-		return customName;
-	}
-	
-	public void setCustomNameVisible(boolean bool) {
-		this.custonNameVisible = bool;
-	}	
-	public boolean isCustomNameVisible() {
-		return custonNameVisible;
 	}
 
 }

@@ -50,7 +50,6 @@ public class MultilineStands {
 		int mountId = entity.getEntityId();
 		for (int i = 0; i < HoloMobHealth.DisplayText.size() + offset; i++) {
 			HoloMobArmorStand stand = new HoloMobArmorStand(standloc, EntityType.ARMOR_STAND, mountId);
-			stand.setCustomName("");
 			mountId = stand.getEntityId();
 			if (offset - 1 < i) {
 				stands.add(stand);

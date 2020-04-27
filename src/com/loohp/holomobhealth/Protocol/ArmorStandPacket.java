@@ -26,6 +26,8 @@ import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.Holders.HoloMobArmorStand;
 import com.loohp.holomobhealth.Holders.HoloMobCache;
 
+import net.md_5.bungee.chat.ComponentSerializer;
+
 public class ArmorStandPacket implements Listener {
 	
 	private static ProtocolManager protocolManager = HoloMobHealth.protocolManager;
@@ -33,7 +35,7 @@ public class ArmorStandPacket implements Listener {
 	public static Set<HoloMobArmorStand> active = new HashSet<HoloMobArmorStand>();
 	private static HashMap<Integer, HoloMobCache> cache = new HashMap<Integer, HoloMobCache>();
 	
-	public static void sendArmorStandSpawn(Collection<? extends Player> players, HoloMobArmorStand entity, String name, boolean visible) {
+	public static void sendArmorStandSpawn(Collection<? extends Player> players, HoloMobArmorStand entity, String json, boolean visible) {
 		if (players.isEmpty()) {
 			return;
 		}
@@ -64,7 +66,7 @@ public class ArmorStandPacket implements Listener {
 		
 		PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
 		packet2.getIntegers().write(0, entity.getEntityId());	
-        WrappedDataWatcher wpw = buildWarppedDataWatcher(entity, name, visible);
+        WrappedDataWatcher wpw = buildWarppedDataWatcher(entity, json, visible);
         packet2.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
         
         PacketContainer packet3 = protocolManager.createPacket(PacketType.Play.Server.MOUNT);
@@ -82,20 +84,20 @@ public class ArmorStandPacket implements Listener {
 		}
 	}
 	
-	public static void updateArmorStand(Collection<? extends Player> players, HoloMobArmorStand entity, String name, boolean visible) {
+	public static void updateArmorStand(Collection<? extends Player> players, HoloMobArmorStand entity, String json, boolean visible) {
 		if (players.isEmpty()) {
 			return;
 		}
 		HoloMobCache hmc = cache.get(entity.getEntityId());
 		if (hmc != null) {
-			if (hmc.getCustomName().equals(name) && hmc.getCustomNameVisible() == visible) {
+			if (hmc.getCustomName().equals(json) && hmc.getCustomNameVisible() == visible) {
 				return;
 			}
 		}
 			
 		PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
 		packet2.getIntegers().write(0, entity.getEntityId());	
-        WrappedDataWatcher wpw = buildWarppedDataWatcher(entity, name, visible);
+        WrappedDataWatcher wpw = buildWarppedDataWatcher(entity, json, visible);
         packet2.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
         
         try {
@@ -106,7 +108,7 @@ public class ArmorStandPacket implements Listener {
 			e.printStackTrace();
 		}
         
-        cache.put(entity.getEntityId(), new HoloMobCache(name, visible));
+        cache.put(entity.getEntityId(), new HoloMobCache(json, visible));
 	}
 	
 	public static void removeArmorStand(Collection<? extends Player> players, HoloMobArmorStand entity, boolean removeFromActive) {
@@ -129,7 +131,8 @@ public class ArmorStandPacket implements Listener {
 		}
 	}
 	
-	private static WrappedDataWatcher buildWarppedDataWatcher(HoloMobArmorStand entity, String name, boolean visible) {
+	private static WrappedDataWatcher buildWarppedDataWatcher(HoloMobArmorStand entity, String entityNameJson, boolean visible) {
+		String json = (entityNameJson == null || entityNameJson.equals("")) ? null : (ComponentSerializer.parse(entityNameJson)[0].toPlainText().equals("") ? null : entityNameJson);
 		WrappedDataWatcher watcher = new WrappedDataWatcher(); 
 	    
 		if (entity.getType().equals(EntityType.ARMOR_STAND)) {
@@ -137,19 +140,19 @@ public class ArmorStandPacket implements Listener {
 			if (HoloMobHealth.version.contains("OLD")) {
 				watcher.setObject(0, bitmask);
 			} else {
-				watcher.setObject(new WrappedDataWatcherObject(0, WrappedDataWatcher.Registry.get(Byte.class)), bitmask);
+				watcher.setObject(new WrappedDataWatcherObject(0, Registry.get(Byte.class)), bitmask);
 			}
 			
-		    if (name != null && !name.equals("")) {
+			if (json != null) {
 		    	if (HoloMobHealth.version.contains("OLD")) {
-			    	watcher.setObject(2, name);
+			    	watcher.setObject(2, json);
 		    	} else if (HoloMobHealth.version.contains("legacy")) {
 			    	Serializer serializer = Registry.get(String.class);
 			    	WrappedDataWatcherObject object = new WrappedDataWatcherObject(2, serializer);
-			    	watcher.setObject(object, name);
+			    	watcher.setObject(object, json);
 			    } else {
-			    	Optional<?> opt = Optional.of(WrappedChatComponent.fromChatMessage(name)[0].getHandle());
-			    	watcher.setObject(new WrappedDataWatcherObject(2, WrappedDataWatcher.Registry.getChatComponentSerializer(true)), opt);
+			    	Optional<?> opt = Optional.of(WrappedChatComponent.fromJson(json).getHandle());
+			    	watcher.setObject(new WrappedDataWatcherObject(2, Registry.getChatComponentSerializer(true)), opt);
 			    }
 		    } else {
 		    	if (HoloMobHealth.version.contains("OLD")) {
@@ -160,7 +163,7 @@ public class ArmorStandPacket implements Listener {
 			    	watcher.setObject(object, "");
 			    } else {
 			    	Optional<?> opt = Optional.empty();
-			    	watcher.setObject(new WrappedDataWatcherObject(2, WrappedDataWatcher.Registry.getChatComponentSerializer(true)), opt);
+			    	watcher.setObject(new WrappedDataWatcherObject(2, Registry.getChatComponentSerializer(true)), opt);
 			    }
 		    }
 		    
@@ -168,18 +171,18 @@ public class ArmorStandPacket implements Listener {
 		    	watcher.setObject(3, (byte) (visible ? 1 : 0));
 		    	watcher.setObject(5, (byte) 1);
 		    } else {
-		    	watcher.setObject(new WrappedDataWatcherObject(3, WrappedDataWatcher.Registry.get(Boolean.class)), (name == null || name.equals("")) ? false : visible);
-		    	watcher.setObject(new WrappedDataWatcherObject(5, WrappedDataWatcher.Registry.get(Boolean.class)), true);
+		    	watcher.setObject(new WrappedDataWatcherObject(3, Registry.get(Boolean.class)), json != null ? ((ComponentSerializer.parse(json)[0].toPlainText().equals("")) ? false : visible) : false);
+		    	watcher.setObject(new WrappedDataWatcherObject(5, Registry.get(Boolean.class)), true);
 		    }
 		    
 		    byte standbitmask = 0x01 | 0x10;	
 	
 		    if (HoloMobHealth.version.equals("1.15")) {
-		    	watcher.setObject(new WrappedDataWatcherObject(14, WrappedDataWatcher.Registry.get(Byte.class)), standbitmask);
+		    	watcher.setObject(new WrappedDataWatcherObject(14, Registry.get(Byte.class)), standbitmask);
 		    } else if (HoloMobHealth.version.equals("1.14")) {
-		    	watcher.setObject(new WrappedDataWatcherObject(13, WrappedDataWatcher.Registry.get(Byte.class)), standbitmask);
+		    	watcher.setObject(new WrappedDataWatcherObject(13, Registry.get(Byte.class)), standbitmask);
 		    } else if (!HoloMobHealth.version.contains("OLD")) {
-				watcher.setObject(new WrappedDataWatcherObject(11, WrappedDataWatcher.Registry.get(Byte.class)), standbitmask);
+				watcher.setObject(new WrappedDataWatcherObject(11, Registry.get(Byte.class)), standbitmask);
 			} else {
 				watcher.setObject(10, standbitmask);
 			}
@@ -188,21 +191,21 @@ public class ArmorStandPacket implements Listener {
 			if (HoloMobHealth.version.contains("OLD")) {
 				watcher.setObject(0, bitmask);
 			} else {
-				watcher.setObject(new WrappedDataWatcherObject(0, WrappedDataWatcher.Registry.get(Byte.class)), bitmask);
+				watcher.setObject(new WrappedDataWatcherObject(0, Registry.get(Byte.class)), bitmask);
 			}
 			
 			if (!HoloMobHealth.version.contains("OLD")) {
-		    	watcher.setObject(new WrappedDataWatcherObject(4, WrappedDataWatcher.Registry.get(Boolean.class)), true);
+		    	watcher.setObject(new WrappedDataWatcherObject(4, Registry.get(Boolean.class)), true);
 			} else {
 				watcher.setObject(4, (byte) 1);
 			}
 	
 		    if (HoloMobHealth.version.equals("1.15")) {
-		    	watcher.setObject(new WrappedDataWatcherObject(15, WrappedDataWatcher.Registry.get(Boolean.class)), true);
+		    	watcher.setObject(new WrappedDataWatcherObject(15, Registry.get(Boolean.class)), true);
 		    } else if (HoloMobHealth.version.equals("1.14")) {
-		    	watcher.setObject(new WrappedDataWatcherObject(14, WrappedDataWatcher.Registry.get(Boolean.class)), true);
+		    	watcher.setObject(new WrappedDataWatcherObject(14, Registry.get(Boolean.class)), true);
 		    } else if (!HoloMobHealth.version.contains("OLD")) {
-				watcher.setObject(new WrappedDataWatcherObject(12, WrappedDataWatcher.Registry.get(Boolean.class)), true);
+				watcher.setObject(new WrappedDataWatcherObject(12, Registry.get(Boolean.class)), true);
 			} else {
 				watcher.setObject(10, (byte) 1);
 			}

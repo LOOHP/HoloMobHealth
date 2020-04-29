@@ -218,10 +218,12 @@ public class ArmorStandPacket implements Listener {
 	public void onJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		for (HoloMobArmorStand entity : active) {
-			if (entity.getLocation().distanceSquared(player.getLocation()) <= (HoloMobHealth.range + 2) * (HoloMobHealth.range + 2)) {
-				Collection<Player> players = new ArrayList<Player>();
-				players.add(player);
-				sendArmorStandSpawn(players, entity, "", false);
+			if (entity.getWorld().equals(player.getWorld())) {
+				if (entity.getLocation().distanceSquared(player.getLocation()) <= (HoloMobHealth.range + 2) * (HoloMobHealth.range + 2)) {
+					Collection<Player> players = new ArrayList<Player>();
+					players.add(player);
+					sendArmorStandSpawn(players, entity, "", false);
+				}
 			}
 		}
 	}

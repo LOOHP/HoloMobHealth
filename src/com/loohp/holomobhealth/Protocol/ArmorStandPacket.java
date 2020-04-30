@@ -235,7 +235,6 @@ public class ArmorStandPacket implements Listener {
 						Collection<Player> players = new ArrayList<Player>();
 						players.add(player);
 						Bukkit.getScheduler().runTask(HoloMobHealth.plugin, () -> sendArmorStandSpawn(players, entity, "", false));
-						Bukkit.getConsoleSender().sendMessage(entity.getEntityId() + "->" + entity.getMountId());
 						if (cache.get(entity.getEntityId()) != null) {
 							Bukkit.getScheduler().runTask(HoloMobHealth.plugin, () -> updateArmorStand(players, entity, cache.get(entity.getEntityId()).getCustomName(), cache.get(entity.getEntityId()).getCustomNameVisible(), true));
 						}

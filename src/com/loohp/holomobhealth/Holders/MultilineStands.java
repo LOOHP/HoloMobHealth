@@ -70,9 +70,6 @@ public class MultilineStands {
 	private void gc() {
 		gctask = Bukkit.getScheduler().runTaskTimerAsynchronously(HoloMobHealth.plugin, () -> {
 			if (!entity.isValid()) {
-				for (HoloMobArmorStand stand : stands) {
-					Bukkit.getScheduler().runTask(HoloMobHealth.plugin, () -> ArmorStandPacket.removeArmorStand(Bukkit.getOnlinePlayers(), stand, true));
-				}
 				remove();
 			}
 		}, 0, 15).getTaskId();
@@ -115,6 +112,9 @@ public class MultilineStands {
 	}
 	
 	public void remove() {
+		for (HoloMobArmorStand stand : eachentity) {
+			Bukkit.getScheduler().runTask(HoloMobHealth.plugin, () -> ArmorStandPacket.removeArmorStand(Bukkit.getOnlinePlayers(), stand, true));
+		}
 		Bukkit.getScheduler().cancelTask(gctask);
 	}
 

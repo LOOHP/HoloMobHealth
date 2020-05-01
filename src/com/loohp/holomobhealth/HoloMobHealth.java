@@ -145,6 +145,7 @@ public class HoloMobHealth extends JavaPlugin {
 		
 		if (armorStandMode) {
 			getServer().getPluginManager().registerEvents(new ArmorStandPacket(), plugin);
+			ArmorStandPacket.update();
 		}
 		
 		BoundingBoxUtils.setup();

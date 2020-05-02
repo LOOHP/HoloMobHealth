@@ -16,71 +16,73 @@ import net.md_5.bungee.chat.ComponentSerializer;
 
 public class ParsePlaceholders {
 	
-	@SuppressWarnings("deprecation")
 	public static String parse(LivingEntity entity, String text) {
-		DecimalFormat formatter = new DecimalFormat("#,###.00");	
+		double health = entity.getHealth();
+		@SuppressWarnings("deprecation")
+		double maxhealth = entity.getMaxHealth();
+		double percentage = (health / maxhealth) * 100;
 		if (text.contains("{Health_Rounded_Commas}")) {
-			long health = Math.round(entity.getHealth());	
+			DecimalFormat formatter = new DecimalFormat("#,###");
 			text = text.replace("{Health_Rounded_Commas}", String.valueOf(formatter.format(health)));
 		}
 		if (text.contains("{Max_Health_Rounded_Commas}")) {
-			long health = Math.round(entity.getMaxHealth());
-			text = text.replace("{Max_Health_Rounded_Commas}", String.valueOf(formatter.format(health)));
+			DecimalFormat formatter = new DecimalFormat("#,###");
+			text = text.replace("{Max_Health_Rounded_Commas}", String.valueOf(formatter.format(maxhealth)));
 		}
-		if (text.contains("{Health_1DB_Commas}")) {
-			double health = (double) Math.round(entity.getHealth() * (double) 10) / (double) 10;
-			text = text.replace("{Health_1DB_Commas}", String.valueOf(formatter.format(health)));
+		if (text.contains("{Health_1DP_Commas}")) {
+			DecimalFormat formatter = new DecimalFormat("#,###.0");
+			text = text.replace("{Health_1DP_Commas}", String.valueOf(formatter.format(health)));
 		}
-		if (text.contains("{Max_Health_1DB_Commas}")) {
-			double health = (double) Math.round(entity.getMaxHealth() * (double) 10) / (double) 10;
-			text = text.replace("{Max_Health_1DB_Commas}", String.valueOf(formatter.format(health)));
+		if (text.contains("{Max_Health_1DP_Commas}")) {
+			DecimalFormat formatter = new DecimalFormat("#,###.0");
+			text = text.replace("{Max_Health_1DP_Commas}", String.valueOf(formatter.format(maxhealth)));
 		}
-		if (text.contains("{Health_2DB_Commas}")) {
-			double health = (double) Math.round(entity.getHealth() * (double) 10) / (double) 10;
-			text = text.replace("{Health_2DB_Commas}", String.valueOf(formatter.format(health)));
+		if (text.contains("{Health_2DP_Commas}")) {
+			DecimalFormat formatter = new DecimalFormat("#,###.00");
+			text = text.replace("{Health_2DP_Commas}", String.valueOf(formatter.format(health)));
 		}
-		if (text.contains("{Max_Health_2DB_Commas}")) {
-			double health = (double) Math.round(entity.getMaxHealth() * (double) 10) / (double) 10;
-			text = text.replace("{Max_Health_2DB_Commas}", String.valueOf(formatter.format(health)));
+		if (text.contains("{Max_Health_2DP_Commas}")) {
+			DecimalFormat formatter = new DecimalFormat("#,###.00");
+			text = text.replace("{Max_Health_2DP_Commas}", String.valueOf(formatter.format(maxhealth)));
 		}		
 		if (text.contains("{Health_Rounded}")) {
-			long health = Math.round(entity.getHealth());
-			text = text.replace("{Health_Rounded}", String.valueOf(health));
+			DecimalFormat formatter = new DecimalFormat("#");
+			text = text.replace("{Health_Rounded}", String.valueOf(formatter.format(health)));
 		}
 		if (text.contains("{Max_Health_Rounded}")) {
-			long health = Math.round(entity.getMaxHealth());
-			text = text.replace("{Max_Health_Rounded}", String.valueOf(health));
+			DecimalFormat formatter = new DecimalFormat("#");
+			text = text.replace("{Max_Health_Rounded}", String.valueOf(formatter.format(maxhealth)));
 		}
-		if (text.contains("{Health_1DB}")) {
-			double health = (double) Math.round(entity.getHealth() * (double) 10) / (double) 10;
-			text = text.replace("{Health_1DB}", String.valueOf(health));
+		if (text.contains("{Health_1DP}")) {
+			DecimalFormat formatter = new DecimalFormat("#.0");
+			text = text.replace("{Health_1DP}", String.valueOf(formatter.format(health)));
 		}
-		if (text.contains("{Max_Health_1DB}")) {
-			double health = (double) Math.round(entity.getMaxHealth() * (double) 10) / (double) 10;
-			text = text.replace("{Max_Health_1DB}", String.valueOf(health));
+		if (text.contains("{Max_Health_1DP}")) {
+			DecimalFormat formatter = new DecimalFormat("#.0");
+			text = text.replace("{Max_Health_1DP}", String.valueOf(formatter.format(maxhealth)));
 		}
-		if (text.contains("{Health_2DB}")) {
-			double health = (double) Math.round(entity.getHealth() * (double) 10) / (double) 10;
-			text = text.replace("{Health_2DB}", String.valueOf(health));
+		if (text.contains("{Health_2DP}")) {
+			DecimalFormat formatter = new DecimalFormat("#.00");
+			text = text.replace("{Health_2DP}", String.valueOf(formatter.format(health)));
 		}
-		if (text.contains("{Max_Health_2DB}")) {
-			double health = (double) Math.round(entity.getMaxHealth() * (double) 10) / (double) 10;
-			text = text.replace("{Max_Health_2DB}", String.valueOf(health));
+		if (text.contains("{Max_Health_2DP}")) {
+			DecimalFormat formatter = new DecimalFormat("#.00");
+			text = text.replace("{Max_Health_2DP}", String.valueOf(formatter.format(maxhealth)));
 		}
 		if (text.contains("{Health_Percentage}")) {
-			long health = Math.round((entity.getHealth() / (double) entity.getMaxHealth()) * 100);
-			text = text.replace("{Health_Percentage}", String.valueOf(health));
+			DecimalFormat formatter = new DecimalFormat("#");
+			text = text.replace("{Health_Percentage}", String.valueOf(formatter.format(percentage)));
 		}
-		if (text.contains("{Health_Percentage_1DB}")) {
-			double health = (double) Math.round((entity.getHealth() / (double) entity.getMaxHealth()) * 1000) / (double) 10;
-			text = text.replace("{Health_Percentage_1DB}", String.valueOf(health));
+		if (text.contains("{Health_Percentage_1DP}")) {
+			DecimalFormat formatter = new DecimalFormat("#.0");
+			text = text.replace("{Health_Percentage_1DP}", String.valueOf(formatter.format(percentage)));
 		}
-		if (text.contains("{Health_Percentage_2DB}")) {
-			double health = (double) Math.round((entity.getHealth() / (double) entity.getMaxHealth()) * 10000) / (double) 10;
-			text = text.replace("{Health_Percentage_2DB}", String.valueOf(health));
+		if (text.contains("{Health_Percentage_2DP}")) {
+			DecimalFormat formatter = new DecimalFormat("#.00");
+			text = text.replace("{Health_Percentage_2DP}", String.valueOf(formatter.format(percentage)));
 		}
 		if (text.contains("{DynamicColor}")) {
-			double healthpercentage = (entity.getHealth() / entity.getMaxHealth());
+			double healthpercentage = percentage;
 			String symbol = "";
 			if (healthpercentage < 0.33) {
 				symbol = HoloMobHealth.LowColor;
@@ -93,7 +95,7 @@ public class ParsePlaceholders {
 		}
 		if (text.contains("{ScaledSymbols}")) {
 			String symbol = "";
-			double healthpercentagescaled = (entity.getHealth() / entity.getMaxHealth()) * (double) HoloMobHealth.heartScale;
+			double healthpercentagescaled = percentage * (double) HoloMobHealth.heartScale;
 			double i = 1;
 			for (i = 1; i < healthpercentagescaled; i = i + 1) {
 				symbol = symbol + HoloMobHealth.HealthyChar;

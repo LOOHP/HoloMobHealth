@@ -1,7 +1,6 @@
 package com.loohp.holomobhealth.Protocol;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
@@ -45,7 +45,7 @@ public class ArmorStandPacket implements Listener {
 	public static Set<HoloMobArmorStand> active = Collections.newSetFromMap(Collections.synchronizedMap(new LinkedHashMap<HoloMobArmorStand, Boolean>()));
 	private static HashMap<Integer, HoloMobCache> cache = new HashMap<Integer, HoloMobCache>();
 	
-	public static ConcurrentHashMap<Player, List<HoloMobArmorStand>> playerStatus = new ConcurrentHashMap<Player, List<HoloMobArmorStand>>();
+	public static ConcurrentHashMap<Player, CopyOnWriteArrayList<HoloMobArmorStand>> playerStatus = new ConcurrentHashMap<Player, CopyOnWriteArrayList<HoloMobArmorStand>>();
 	
 	public static void update() {
 		Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
@@ -53,6 +53,19 @@ public class ArmorStandPacket implements Listener {
 				List<HoloMobArmorStand> activeList = playerStatus.get(player);
 				if (activeList == null) {
 					continue;
+				}
+				
+				List<Player> playerList = new LinkedList<Player>();
+				playerList.add(player);
+				
+				for (HoloMobArmorStand entity : activeList) {
+					if (entity.getWorld().equals(player.getWorld()) && entity.getLocation().distanceSquared(player.getLocation()) <= 4096) {
+						if (active.contains(entity)) {							
+							continue;
+						}
+						
+						removeArmorStand(playerList, entity, false);
+					}
 				}
 				
 				for (HoloMobArmorStand entity : active) {
@@ -64,8 +77,6 @@ public class ArmorStandPacket implements Listener {
 							continue;
 						}
 						
-						List<Player> playerList = new LinkedList<Player>();
-						playerList.add(player);
 						sendArmorStandSpawn(playerList, entity, "", false);
 						updateArmorStand(playerList, entity, "", false);
 					}
@@ -175,13 +186,14 @@ public class ArmorStandPacket implements Listener {
 		cache.remove(entity.getEntityId());
 		
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-			players.forEach((each) -> playerStatus.get(each).remove(entity));
+			List<Player> playersInRange = players.stream().filter(each -> (each.getWorld().equals(entity.getWorld())) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.range * HoloMobHealth.range))).collect(Collectors.toList());
+			playersInRange.forEach((each) -> playerStatus.get(each).remove(entity));
 			PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
 			packet1.getIntegerArrays().write(0, new int[]{entity.getEntityId()});
 			
 			Bukkit.getScheduler().runTask(plugin, () -> {
 				try {
-					for (Player player : players) {
+					for (Player player : playersInRange) {
 						protocolManager.sendServerPacket(player, packet1);
 					}
 				} catch (InvocationTargetException e) {
@@ -276,12 +288,12 @@ public class ArmorStandPacket implements Listener {
 	
 	@EventHandler
 	public void onJoin(PlayerJoinEvent event) {
-		playerStatus.put(event.getPlayer(), new ArrayList<HoloMobArmorStand>());
+		playerStatus.put(event.getPlayer(), new CopyOnWriteArrayList<HoloMobArmorStand>());
 	}
 	
 	@EventHandler
 	public void onWorldChange(PlayerChangedWorldEvent event) {
-		playerStatus.put(event.getPlayer(), new ArrayList<HoloMobArmorStand>());
+		playerStatus.put(event.getPlayer(), new CopyOnWriteArrayList<HoloMobArmorStand>());
 	}
 	
 	@EventHandler

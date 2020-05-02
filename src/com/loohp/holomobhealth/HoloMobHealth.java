@@ -1,5 +1,6 @@
 package com.loohp.holomobhealth;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -16,10 +18,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.PacketContainer;
 import com.loohp.holomobhealth.Database.Database;
 import com.loohp.holomobhealth.Debug.Debug;
+import com.loohp.holomobhealth.Holders.HoloMobArmorStand;
 import com.loohp.holomobhealth.Listeners.Events;
 import com.loohp.holomobhealth.Metrics.Metrics;
 import com.loohp.holomobhealth.Modules.ArmorstandDisplay;
@@ -175,9 +180,9 @@ public class HoloMobHealth extends JavaPlugin {
             }
         }));
 	    
-	    getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "HoloMobHealth has been Enabled!");
+	    getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "[HoloMobHealth] HoloMobHealth has been Enabled!");
 	    
-	    Bukkit.getScheduler().runTaskLater(this, () -> {
+	    Bukkit.getScheduler().runTask(this, () -> {
 			for (Player player : Bukkit.getOnlinePlayers()) {
 				Bukkit.getScheduler().runTaskAsynchronously(HoloMobHealth.plugin, () -> {
 					if (!Database.playerExists(player)) {
@@ -186,13 +191,42 @@ public class HoloMobHealth extends JavaPlugin {
 					Database.loadPlayer(player);
 				});
 			}
-		}, 100);
+			
+			if (armorStandMode) {
+				for (Player player : Bukkit.getOnlinePlayers()) {
+					ArmorStandPacket.playerStatus.put(player, new CopyOnWriteArrayList<HoloMobArmorStand>());
+				}
+			}
+		});
 		
 	}
 
 	@Override
 	public void onDisable() {		
-		getServer().getConsoleSender().sendMessage(ChatColor.RED + "HoloMobHealth has been Disabled!");
+		if (!Bukkit.getOnlinePlayers().isEmpty()) {
+			if (armorStandMode) {
+				getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "[HoloMobHealth] Plugin reload detected, attempting to despawn all visual entities. If anything went wrong, please restart! (Reloads are always not recommended)");
+				int [] entityIdArray = new int[ArmorStandPacket.active.size()];
+				int i = 0;
+				for (HoloMobArmorStand stand : ArmorStandPacket.active) {
+					entityIdArray[i] = stand.getEntityId();
+					i++;
+				}
+				
+				PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
+				packet1.getIntegerArrays().write(0, entityIdArray);
+				
+				try {
+					for (Player player : Bukkit.getOnlinePlayers()) {
+						protocolManager.sendServerPacket(player, packet1);
+					}
+				} catch (InvocationTargetException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		getServer().getConsoleSender().sendMessage(ChatColor.RED + "[HoloMobHealth] HoloMobHealth has been Disabled!");
 	}
 	
 	@SuppressWarnings("deprecation")

@@ -3,12 +3,14 @@ package com.loohp.holomobhealth.Updater;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.util.Scanner;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 import com.loohp.holomobhealth.HoloMobHealth;
 
@@ -18,34 +20,35 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
-public class Updater {
+public class Updater implements Listener {
 	
-	public static void updaterInterval() {
-		HoloMobHealth.UpdaterTaskID = new BukkitRunnable() {
-			public void run() {
-				int minute = LocalDateTime.now().getMinute();
-				if (minute == 0 || minute == 30) {
+	@EventHandler
+	public void onJoin(PlayerJoinEvent event) {
+		Bukkit.getScheduler().runTaskLaterAsynchronously(HoloMobHealth.plugin, () -> {
+			if (HoloMobHealth.UpdaterEnabled) {
+				Player player = event.getPlayer();
+				if (player.hasPermission("interactivechat.update")) {
 					String version = Updater.checkUpdate();
 					if (!version.equals("latest")) {
-						Updater.sendUpdateMessage(version);
+						Updater.sendUpdateMessage(player, version);
 					}
 				}
 			}
-		}.runTaskTimerAsynchronously(HoloMobHealth.plugin, 500, 600).getTaskId();
+		}, 100);
 	}
 	
-	public static void sendUpdateMessage(String version) {
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (player.hasPermission("holomobhealth.update")) {
-				player.sendMessage(ChatColor.YELLOW + "[HoloMobHealth] A new version is available on SpigotMC: " + version);
-				TextComponent url = new TextComponent(ChatColor.GOLD + "https://www.spigotmc.org/resources/75975");
-				url.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.AQUA + "Click me!").create()));
-				url.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/resources/75975"));
-				player.spigot().sendMessage(url);
-			}
+	public static void sendUpdateMessage(CommandSender sender, String version) {
+		if (sender instanceof Player) {
+			Player player = (Player) sender;
+			player.sendMessage(ChatColor.YELLOW + "[HoloMobHealth] A new version is available on SpigotMC: " + version);
+			TextComponent url = new TextComponent(ChatColor.GOLD + "https://www.spigotmc.org/resources/75975");
+			url.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.AQUA + "Click me!").create()));
+			url.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/resources/75975"));
+			player.spigot().sendMessage(url);
+		} else {
+			sender.sendMessage(ChatColor.YELLOW + "[HoloMobHealth] A new version is available on SpigotMC: " + version);
+			sender.sendMessage(ChatColor.GOLD + "Download: https://www.spigotmc.org/resources/75975");
 		}
-		Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[HoloMobHealth] A new version is available on SpigotMC: " + version);
-		Bukkit.getConsoleSender().sendMessage(ChatColor.GOLD + "Download: https://www.spigotmc.org/resources/75975");
 	}
 
     public static String checkUpdate() {

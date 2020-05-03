@@ -104,7 +104,7 @@ public class Commands implements CommandExecutor, TabCompleter {
 						if (version.equals("latest")) {
 							sender.sendMessage(ChatColor.GREEN + "[HoloMobHealth] You are running the latest version!");
 						} else {
-							Updater.sendUpdateMessage(version);
+							Updater.sendUpdateMessage(sender, version);
 						}
 					}
 				}.runTaskAsynchronously(HoloMobHealth.plugin);

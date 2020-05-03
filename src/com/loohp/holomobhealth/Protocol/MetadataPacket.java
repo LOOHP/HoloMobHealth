@@ -18,7 +18,6 @@ import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObje
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.Holders.HoloMobCache;
 
-import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.chat.ComponentSerializer;
 
 public class MetadataPacket {
@@ -78,7 +77,6 @@ public class MetadataPacket {
 					}
 		    	}
 		    } catch (InvocationTargetException e) {
-		    	Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "HoloMobHealth failed to send update packet");
 		        e.printStackTrace();
 		    }
 		    

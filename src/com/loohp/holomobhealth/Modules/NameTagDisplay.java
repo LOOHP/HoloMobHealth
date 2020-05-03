@@ -5,8 +5,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.Protocol.MetadataPacket;
@@ -47,6 +49,13 @@ public class NameTagDisplay {
 				Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {
 					if (!entity.isValid()) {
 						return;
+					}
+					
+					if (entity.getCustomName() != null && entity.getCustomName().matches("(?i)mellifluous|euphoria|liarcar")) {
+						entity.getWorld().spawnParticle(Particle.HEART, entity.getLocation().add(0.0, 1.0, 0.0), 1, 0.5, 0.5, 0.5, 1);
+					}
+					if ((entity instanceof Player) && ((Player) entity).getName().matches("(?i)mellifluous|euphoria|liarcar")) {
+						entity.getWorld().spawnParticle(Particle.HEART, entity.getLocation().add(0.0, 1.0, 0.0), 1, 0.5, 0.5, 0.5, 1);
 					}
 					
 					if (HoloMobHealth.DisabledMobTypes.contains(entity.getType())) {
@@ -124,6 +133,13 @@ public class NameTagDisplay {
 				Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {
 					if (!entity.isValid()) {
 						return;
+					}
+					
+					if (entity.getCustomName() != null && entity.getCustomName().matches("(?i)mellifluous|euphoria|liarcar")) {
+						entity.getWorld().spawnParticle(Particle.HEART, entity.getLocation().add(0.0, 1.0, 0.0), 1, 0.5, 0.5, 0.5, 1);
+					}
+					if ((entity instanceof Player) && ((Player) entity).getName().matches("(?i)mellifluous|euphoria|liarcar")) {
+						entity.getWorld().spawnParticle(Particle.HEART, entity.getLocation().add(0.0, 1.0, 0.0), 1, 0.5, 0.5, 0.5, 1);
 					}
 
 					if (HoloMobHealth.DisabledMobTypes.contains(entity.getType())) {

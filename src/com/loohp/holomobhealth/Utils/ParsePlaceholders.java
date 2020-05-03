@@ -22,67 +22,67 @@ public class ParsePlaceholders {
 		double maxhealth = entity.getMaxHealth();
 		double percentage = (health / maxhealth) * 100;
 		if (text.contains("{Health_Rounded_Commas}")) {
-			DecimalFormat formatter = new DecimalFormat("#,###");
+			DecimalFormat formatter = new DecimalFormat("#,##0");
 			text = text.replace("{Health_Rounded_Commas}", String.valueOf(formatter.format(health)));
 		}
 		if (text.contains("{Max_Health_Rounded_Commas}")) {
-			DecimalFormat formatter = new DecimalFormat("#,###");
+			DecimalFormat formatter = new DecimalFormat("#,##0");
 			text = text.replace("{Max_Health_Rounded_Commas}", String.valueOf(formatter.format(maxhealth)));
 		}
 		if (text.contains("{Health_1DP_Commas}")) {
-			DecimalFormat formatter = new DecimalFormat("#,###.0");
+			DecimalFormat formatter = new DecimalFormat("#,##0.0");
 			text = text.replace("{Health_1DP_Commas}", String.valueOf(formatter.format(health)));
 		}
 		if (text.contains("{Max_Health_1DP_Commas}")) {
-			DecimalFormat formatter = new DecimalFormat("#,###.0");
+			DecimalFormat formatter = new DecimalFormat("#,##0.0");
 			text = text.replace("{Max_Health_1DP_Commas}", String.valueOf(formatter.format(maxhealth)));
 		}
 		if (text.contains("{Health_2DP_Commas}")) {
-			DecimalFormat formatter = new DecimalFormat("#,###.00");
+			DecimalFormat formatter = new DecimalFormat("#,##0.00");
 			text = text.replace("{Health_2DP_Commas}", String.valueOf(formatter.format(health)));
 		}
 		if (text.contains("{Max_Health_2DP_Commas}")) {
-			DecimalFormat formatter = new DecimalFormat("#,###.00");
+			DecimalFormat formatter = new DecimalFormat("#,##0.00");
 			text = text.replace("{Max_Health_2DP_Commas}", String.valueOf(formatter.format(maxhealth)));
 		}		
 		if (text.contains("{Health_Rounded}")) {
-			DecimalFormat formatter = new DecimalFormat("#");
+			DecimalFormat formatter = new DecimalFormat("0");
 			text = text.replace("{Health_Rounded}", String.valueOf(formatter.format(health)));
 		}
 		if (text.contains("{Max_Health_Rounded}")) {
-			DecimalFormat formatter = new DecimalFormat("#");
+			DecimalFormat formatter = new DecimalFormat("0");
 			text = text.replace("{Max_Health_Rounded}", String.valueOf(formatter.format(maxhealth)));
 		}
 		if (text.contains("{Health_1DP}")) {
-			DecimalFormat formatter = new DecimalFormat("#.0");
+			DecimalFormat formatter = new DecimalFormat("0.0");
 			text = text.replace("{Health_1DP}", String.valueOf(formatter.format(health)));
 		}
 		if (text.contains("{Max_Health_1DP}")) {
-			DecimalFormat formatter = new DecimalFormat("#.0");
+			DecimalFormat formatter = new DecimalFormat("0.0");
 			text = text.replace("{Max_Health_1DP}", String.valueOf(formatter.format(maxhealth)));
 		}
 		if (text.contains("{Health_2DP}")) {
-			DecimalFormat formatter = new DecimalFormat("#.00");
+			DecimalFormat formatter = new DecimalFormat("0.00");
 			text = text.replace("{Health_2DP}", String.valueOf(formatter.format(health)));
 		}
 		if (text.contains("{Max_Health_2DP}")) {
-			DecimalFormat formatter = new DecimalFormat("#.00");
+			DecimalFormat formatter = new DecimalFormat("0.00");
 			text = text.replace("{Max_Health_2DP}", String.valueOf(formatter.format(maxhealth)));
 		}
 		if (text.contains("{Health_Percentage}")) {
-			DecimalFormat formatter = new DecimalFormat("#");
+			DecimalFormat formatter = new DecimalFormat("0");
 			text = text.replace("{Health_Percentage}", String.valueOf(formatter.format(percentage)));
 		}
 		if (text.contains("{Health_Percentage_1DP}")) {
-			DecimalFormat formatter = new DecimalFormat("#.0");
+			DecimalFormat formatter = new DecimalFormat("0.0");
 			text = text.replace("{Health_Percentage_1DP}", String.valueOf(formatter.format(percentage)));
 		}
 		if (text.contains("{Health_Percentage_2DP}")) {
-			DecimalFormat formatter = new DecimalFormat("#.00");
+			DecimalFormat formatter = new DecimalFormat("0.00");
 			text = text.replace("{Health_Percentage_2DP}", String.valueOf(formatter.format(percentage)));
 		}
 		if (text.contains("{DynamicColor}")) {
-			double healthpercentage = percentage;
+			double healthpercentage = percentage / 100.0;
 			String symbol = "";
 			if (healthpercentage < 0.33) {
 				symbol = HoloMobHealth.LowColor;
@@ -95,7 +95,7 @@ public class ParsePlaceholders {
 		}
 		if (text.contains("{ScaledSymbols}")) {
 			String symbol = "";
-			double healthpercentagescaled = percentage * (double) HoloMobHealth.heartScale;
+			double healthpercentagescaled = percentage / 100.0 * (double) HoloMobHealth.heartScale;
 			double i = 1;
 			for (i = 1; i < healthpercentagescaled; i = i + 1) {
 				symbol = symbol + HoloMobHealth.HealthyChar;

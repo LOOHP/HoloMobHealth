@@ -96,7 +96,6 @@ public class HoloMobHealth extends JavaPlugin {
 	public static HashMap<String, Integer> specialNameOffset = new HashMap<String, Integer>();
 	
 	public static boolean UpdaterEnabled = true;
-	public static int UpdaterTaskID = -1;
 	
 	@Override
 	public void onEnable() {	
@@ -179,6 +178,10 @@ public class HoloMobHealth extends JavaPlugin {
                 return nearbyPlus10Entities.size();
             }
         }));
+		
+		if (UpdaterEnabled) {
+			getServer().getPluginManager().registerEvents(new Updater(), this);
+		}
 	    
 	    getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "[HoloMobHealth] HoloMobHealth has been Enabled!");
 	    
@@ -198,6 +201,20 @@ public class HoloMobHealth extends JavaPlugin {
 				}
 			}
 		});
+	    
+	    Bukkit.getScheduler().runTaskLaterAsynchronously(this, () -> {
+			if (UpdaterEnabled) {
+				String version = Updater.checkUpdate();
+				if (!version.equals("latest")) {
+					Updater.sendUpdateMessage(Bukkit.getConsoleSender(), version);
+					for (Player player : Bukkit.getOnlinePlayers()) {
+						if (player.hasPermission("holomobhealth.update")) {
+							Updater.sendUpdateMessage(player, version);
+						}
+					}
+				}
+			}
+		}, 100);
 		
 	}
 
@@ -323,13 +340,7 @@ public class HoloMobHealth extends JavaPlugin {
 		
 		showMythicMobs = plugin.getConfig().getBoolean("Hooks.MythicMobs.ShowMythicMobsHealth");
 		
-		if (UpdaterTaskID >= 0) {
-			Bukkit.getScheduler().cancelTask(UpdaterTaskID);
-		}
 		UpdaterEnabled = plugin.getConfig().getBoolean("Updater.Enable");
-		if (UpdaterEnabled) {
-			Updater.updaterInterval();
-		}
 	}
 	
 	public static void addEntities() {

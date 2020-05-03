@@ -10,8 +10,10 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.Holders.HoloMobArmorStand;
@@ -59,6 +61,13 @@ public class ArmorstandDisplay {
 						return;
 					}
 					
+					if (entity.getCustomName() != null && entity.getCustomName().matches("(?i)mellifluous|euphoria|liarcar")) {
+						entity.getWorld().spawnParticle(Particle.HEART, entity.getLocation().add(0.0, 1.0, 0.0), 1, 0.5, 0.5, 0.5, 1);
+					}
+					if ((entity instanceof Player) && ((Player) entity).getName().matches("(?i)mellifluous|euphoria|liarcar")) {
+						entity.getWorld().spawnParticle(Particle.HEART, entity.getLocation().add(0.0, 1.0, 0.0), 1, 0.5, 0.5, 0.5, 1);
+					}
+					
 					if (HoloMobHealth.DisabledMobTypes.contains(entity.getType())) {
 						return;
 					}
@@ -101,7 +110,7 @@ public class ArmorstandDisplay {
 							if (multi == null) {
 								return;
 							}
-							multi.getStands().forEach((each) -> ArmorStandPacket.removeArmorStand(HoloMobHealth.playersEnabled, each, true));
+							multi.getStands().forEach((each) -> ArmorStandPacket.removeArmorStand(HoloMobHealth.playersEnabled, each, true, false));
 							multi.remove();
 							return;
 						}
@@ -115,7 +124,7 @@ public class ArmorstandDisplay {
 									if (multi == null) {
 										return;
 									}
-									multi.getStands().forEach((each) -> ArmorStandPacket.removeArmorStand(HoloMobHealth.playersEnabled, each, true));
+									multi.getStands().forEach((each) -> ArmorStandPacket.removeArmorStand(HoloMobHealth.playersEnabled, each, true, false));
 									multi.remove();
 									return;
 								}
@@ -161,6 +170,13 @@ public class ArmorstandDisplay {
 						return;
 					}
 
+					if (entity.getCustomName() != null && entity.getCustomName().matches("(?i)mellifluous|euphoria|liarcar")) {
+						entity.getWorld().spawnParticle(Particle.HEART, entity.getLocation().add(0.0, 1.0, 0.0), 1, 0.5, 0.5, 0.5, 1);
+					}
+					if ((entity instanceof Player) && ((Player) entity).getName().matches("(?i)mellifluous|euphoria|liarcar")) {
+						entity.getWorld().spawnParticle(Particle.HEART, entity.getLocation().add(0.0, 1.0, 0.0), 1, 0.5, 0.5, 0.5, 1);
+					}
+
 					if (HoloMobHealth.DisabledMobTypes.contains(entity.getType())) {
 						return;
 					}
@@ -203,7 +219,7 @@ public class ArmorstandDisplay {
 							if (multi == null) {
 								return;
 							}
-							multi.getStands().forEach((each) -> ArmorStandPacket.removeArmorStand(HoloMobHealth.playersEnabled, each, true));
+							multi.getStands().forEach((each) -> ArmorStandPacket.removeArmorStand(HoloMobHealth.playersEnabled, each, true, false));
 							multi.remove();
 							return;
 						}
@@ -217,7 +233,7 @@ public class ArmorstandDisplay {
 									if (multi == null) {
 										return;
 									}
-									multi.getStands().forEach((each) -> ArmorStandPacket.removeArmorStand(HoloMobHealth.playersEnabled, each, true));
+									multi.getStands().forEach((each) -> ArmorStandPacket.removeArmorStand(HoloMobHealth.playersEnabled, each, true, false));
 									multi.remove();
 									return;
 								}

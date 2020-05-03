@@ -59,12 +59,8 @@ public class ArmorStandPacket implements Listener {
 				playerList.add(player);
 				
 				for (HoloMobArmorStand entity : activeList) {
-					if (entity.getWorld().equals(player.getWorld()) && entity.getLocation().distanceSquared(player.getLocation()) <= 4096) {
-						if (active.contains(entity)) {							
-							continue;
-						}
-						
-						removeArmorStand(playerList, entity, false);
+					if (!entity.getWorld().equals(player.getWorld()) || entity.getLocation().distanceSquared(player.getLocation()) > ((HoloMobHealth.range + 10) * (HoloMobHealth.range + 10))) {						
+						removeArmorStand(playerList, entity, false, true);
 					}
 				}
 				
@@ -175,7 +171,7 @@ public class ArmorStandPacket implements Listener {
         cache.put(entity.getEntityId(), new HoloMobCache(json, visible));
 	}
 	
-	public static void removeArmorStand(Collection<? extends Player> players, HoloMobArmorStand entity, boolean removeFromActive) {
+	public static void removeArmorStand(Collection<? extends Player> players, HoloMobArmorStand entity, boolean removeFromActive, boolean bypassFilter) {
 		if (players.isEmpty()) {
 			return;
 		}
@@ -186,7 +182,7 @@ public class ArmorStandPacket implements Listener {
 		cache.remove(entity.getEntityId());
 		
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-			List<Player> playersInRange = players.stream().filter(each -> (each.getWorld().equals(entity.getWorld())) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.range * HoloMobHealth.range))).collect(Collectors.toList());
+			List<Player> playersInRange = bypassFilter ? players.stream().collect(Collectors.toList()) : players.stream().filter(each -> (each.getWorld().equals(entity.getWorld())) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.range * HoloMobHealth.range))).collect(Collectors.toList());
 			playersInRange.forEach((each) -> playerStatus.get(each).remove(entity));
 			PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
 			packet1.getIntegerArrays().write(0, new int[]{entity.getEntityId()});

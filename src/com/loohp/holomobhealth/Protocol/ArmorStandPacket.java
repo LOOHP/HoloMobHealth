@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
@@ -45,12 +44,12 @@ public class ArmorStandPacket implements Listener {
 	public static Set<HoloMobArmorStand> active = Collections.newSetFromMap(Collections.synchronizedMap(new LinkedHashMap<HoloMobArmorStand, Boolean>()));
 	private static HashMap<Integer, HoloMobCache> cache = new HashMap<Integer, HoloMobCache>();
 	
-	public static ConcurrentHashMap<Player, CopyOnWriteArrayList<HoloMobArmorStand>> playerStatus = new ConcurrentHashMap<Player, CopyOnWriteArrayList<HoloMobArmorStand>>();
+	public static ConcurrentHashMap<Player, Set<HoloMobArmorStand>> playerStatus = new ConcurrentHashMap<Player, Set<HoloMobArmorStand>>();
 	
 	public static void update() {
 		Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
 			for (Player player : Bukkit.getOnlinePlayers()) {
-				List<HoloMobArmorStand> activeList = playerStatus.get(player);
+				Set<HoloMobArmorStand> activeList = playerStatus.get(player);
 				if (activeList == null) {
 					continue;
 				}
@@ -59,7 +58,7 @@ public class ArmorStandPacket implements Listener {
 				playerList.add(player);
 				
 				for (HoloMobArmorStand entity : activeList) {
-					if (!entity.getWorld().equals(player.getWorld()) || entity.getLocation().distanceSquared(player.getLocation()) > ((HoloMobHealth.range + 10) * (HoloMobHealth.range + 10))) {						
+					if (!entity.getWorld().equals(player.getWorld()) || entity.getLocation().distanceSquared(player.getLocation()) > ((HoloMobHealth.range + 1) * (HoloMobHealth.range + 1))) {						
 						removeArmorStand(playerList, entity, false, true);
 					}
 				}
@@ -284,12 +283,12 @@ public class ArmorStandPacket implements Listener {
 	
 	@EventHandler
 	public void onJoin(PlayerJoinEvent event) {
-		playerStatus.put(event.getPlayer(), new CopyOnWriteArrayList<HoloMobArmorStand>());
+		playerStatus.put(event.getPlayer(), Collections.newSetFromMap(new ConcurrentHashMap<HoloMobArmorStand, Boolean>()));
 	}
 	
 	@EventHandler
 	public void onWorldChange(PlayerChangedWorldEvent event) {
-		playerStatus.put(event.getPlayer(), new CopyOnWriteArrayList<HoloMobArmorStand>());
+		playerStatus.put(event.getPlayer(), Collections.newSetFromMap(new ConcurrentHashMap<HoloMobArmorStand, Boolean>()));
 	}
 	
 	@EventHandler

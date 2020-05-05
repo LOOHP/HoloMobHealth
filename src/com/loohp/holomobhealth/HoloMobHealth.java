@@ -2,6 +2,7 @@ package com.loohp.holomobhealth;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -197,7 +198,7 @@ public class HoloMobHealth extends JavaPlugin {
 			
 			if (armorStandMode) {
 				for (Player player : Bukkit.getOnlinePlayers()) {
-					ArmorStandPacket.playerStatus.put(player, new CopyOnWriteArrayList<HoloMobArmorStand>());
+					ArmorStandPacket.playerStatus.put(player, Collections.newSetFromMap(new ConcurrentHashMap<HoloMobArmorStand, Boolean>()));
 				}
 			}
 		});

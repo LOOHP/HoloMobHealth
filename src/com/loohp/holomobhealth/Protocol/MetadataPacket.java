@@ -3,6 +3,8 @@ package com.loohp.holomobhealth.Protocol;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -28,13 +30,14 @@ public class MetadataPacket {
 		String json = (entityNameJson == null || entityNameJson.equals("")) ? null : (ComponentSerializer.parse(entityNameJson)[0].toPlainText().equals("") ? null : entityNameJson);
 		Bukkit.getScheduler().runTask(HoloMobHealth.plugin, () -> {
 			
+			Set<Player> playersInRange = HoloMobHealth.playersEnabled.stream().filter(each -> (each.getWorld().equals(entity.getWorld())) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.range * HoloMobHealth.range))).collect(Collectors.toSet());
 			HoloMobCache hmc = cache.get(entity.getEntityId());
 			if (hmc != null) {
-				if (hmc.getCustomName().equals(json == null ? "" : json) && hmc.getCustomNameVisible() == visible) {
+				if (hmc.getCustomName().equals(json == null ? "" : json) && hmc.getCustomNameVisible() == visible && hmc.getPlayers().equals(playersInRange)) {
 					return;
 				}
 			}
-			
+
 			PacketContainer packet = HoloMobHealth.protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
 			
 			packet.getIntegers().write(0, entity.getEntityId()); //Set packet's entity id
@@ -70,8 +73,9 @@ public class MetadataPacket {
 		    	watcher.setObject(new WrappedDataWatcherObject(3, Registry.get(Boolean.class)), visible);
 		    }
 		    packet.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects());
-		    try {
-		    	for (Player player : HoloMobHealth.playersEnabled) {
+    
+    		try {
+		    	for (Player player : playersInRange) {
 		    		if (player.hasPermission("holomobhealth.use")) {
 		    			HoloMobHealth.protocolManager.sendServerPacket(player, packet);
 					}
@@ -79,9 +83,9 @@ public class MetadataPacket {
 		    } catch (InvocationTargetException e) {
 		        e.printStackTrace();
 		    }
-		    
-		    cache.put(entity.getEntityId(), new HoloMobCache(json == null ? "" : json, visible));
-		});
+    		
+    		 cache.put(entity.getEntityId(), new HoloMobCache(json == null ? "" : json, visible, playersInRange));
+    	});
 	}
 
 }

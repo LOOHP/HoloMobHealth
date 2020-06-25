@@ -35,6 +35,9 @@ public class Events implements Listener {
 	
 	@EventHandler
 	public void onAttack(EntityDamageEvent event) {
+		
+		HoloMobHealth.updateQueue.add(event.getEntity());
+		
 		if (HoloMobHealth.AltOnlyPlayer == true) {
 			return;
 		}

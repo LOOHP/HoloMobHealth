@@ -4,7 +4,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="D:/Users/LOOHP/Downloads/ProtocolLib (2).jar"/>
 	<classpathentry kind="lib" path="D:/Users/LOOHP/Desktop 2/test/spigot/plugins/Citizens-2.0.26-b1852.jar"/>
-	<classpathentry kind="lib" path="D:/Users/LOOHP/Desktop 2/test/spigot/plugins/MythicMobs-4.9.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="D:/Users/LOOHP/Downloads/MythicMobs-4.9.1-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="D:/Users/LOOHP/Desktop 2/test/spigot/1.8/spigot-1.15.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

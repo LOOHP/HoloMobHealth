@@ -34,13 +34,13 @@ public class EntityTypeUtils {
     }
 	
 	public static String getMinecraftLangName(Entity entity) {	
-		if (HoloMobHealth.version.contains("legacy")) {
+		if (HoloMobHealth.version.isLegacy()) {
 			return LegacyEntityTypeUtils.getLegacyMinecraftName(entity);
 		}
 		
 		EntityType type = entity.getType();
 		String path = "";
-		if (HoloMobHealth.version.equals("1.13") || HoloMobHealth.version.contentEquals("1.13.1")) {
+		if (HoloMobHealth.version.equals(MCVersion.V1_13) || HoloMobHealth.version.equals(MCVersion.V1_13_1)) {
 			path = new StringBuilder().append("entity.minecraft.").append(type.name().toLowerCase()).toString();
 			if (type.equals(EntityType.PIG_ZOMBIE)) {
 				path = new StringBuilder().append("entity.minecraft.zombie_pigman").toString();
@@ -59,13 +59,13 @@ public class EntityTypeUtils {
 	}
 	
 	public static void reloadLang() {
-		if (HoloMobHealth.version.contains("legacy")) {
+		if (HoloMobHealth.version.isLegacy()) {
 			LegacyEntityTypeUtils.reloadLegacyLang();
 		}
 	}
 	
 	public static void setupLang() {		
-		if (HoloMobHealth.version.contains("legacy")) {
+		if (HoloMobHealth.version.isLegacy()) {
 	    	Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "Translatable Components are not supported on this version");
 	    	Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "HoloMobHealth will use legacy EntityType names method instead!");
 	    	LegacyEntityTypeUtils.setupLegacyLang();

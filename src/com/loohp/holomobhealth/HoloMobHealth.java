@@ -5,12 +5,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -34,6 +36,7 @@ import com.loohp.holomobhealth.Protocol.ArmorStandPacket;
 import com.loohp.holomobhealth.Updater.Updater;
 import com.loohp.holomobhealth.Utils.BoundingBoxUtils;
 import com.loohp.holomobhealth.Utils.EntityTypeUtils;
+import com.loohp.holomobhealth.Utils.MCVersion;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -41,7 +44,7 @@ public class HoloMobHealth extends JavaPlugin {
 	
 	public static Plugin plugin = null;
 	
-	public static String version = "";
+	public static MCVersion version;
 	
 	public static ProtocolManager protocolManager;
 	
@@ -63,6 +66,7 @@ public class HoloMobHealth extends JavaPlugin {
 	
 	public static boolean alwaysShow = true;
 	public static int range = 15;
+	public static int updateRange = 45;
 	public static boolean applyToNamed = false;
 	
 	public static String ReloadPlugin = "";	
@@ -75,9 +79,12 @@ public class HoloMobHealth extends JavaPlugin {
 	public static Set<Entity> nearbyEntities = new HashSet<Entity>();
 	public static Set<Entity> nearbyPlus10Entities = new HashSet<Entity>();
 	
-	public static List<EntityType> DisabledMobTypes = new ArrayList<EntityType>();
-	public static List<String> DisabledMobNamesAbsolute = new ArrayList<String>();
+	public static Set<Entity> updateQueue = new LinkedHashSet<Entity>();
+	
+	public static Set<EntityType> DisabledMobTypes = new HashSet<EntityType>();
+	public static Set<String> DisabledMobNamesAbsolute = new HashSet<String>();
 	public static List<String> DisabledMobNamesContains = new ArrayList<String>();
+	public static Set<String> DisabledWorlds = new HashSet<String>();
 	
 	public static boolean UseAlterHealth = false;
 	public static int AltHealthDisplayTime = 3;
@@ -108,35 +115,10 @@ public class HoloMobHealth extends JavaPlugin {
 
 		Metrics metrics = new Metrics(this, pluginId);
 		
-	    String packageName = getServer().getClass().getPackage().getName();
-
-        if (packageName.contains("1_15_R1")) {
-            version = "1.15";
-        } else if (packageName.contains("1_14_R1")) {
-            version = "1.14";
-        } else if (packageName.contains("1_13_R2")) {
-            version = "1.13.1";
-        } else if (packageName.contains("1_13_R1")) {
-            version = "1.13";
-        } else if (packageName.contains("1_12_R1")) {
-            version = "legacy1.12";
-        } else if (packageName.contains("1_11_R1")) {
-            version = "legacy1.11";
-        } else if (packageName.contains("1_10_R1")) {
-            version = "legacy1.10";
-        } else if (packageName.contains("1_9_R2")) {
-            version = "legacy1.9.4";
-        } else if (packageName.contains("1_9_R1")) {
-            version = "legacy1.9";
-        } else if (packageName.contains("1_8_R3")) {
-            version = "OLDlegacy1.8.4";
-        } else if (packageName.contains("1_8_R2")) {
-            version = "OLDlegacy1.8.3";
-        } else if (packageName.contains("1_8_R1")) {
-            version = "OLDlegacy1.8";
-        } else {
+		version = MCVersion.fromPackageName(getServer().getClass().getPackage().getName());
+		
+        if (!version.isSupported()) {
             getServer().getConsoleSender().sendMessage(ChatColor.RED + "This version of minecraft is unsupported!");
-            plugin.getPluginLoader().disablePlugin(this);
         }
 		
 		protocolManager = ProtocolLibrary.getProtocolManager();
@@ -274,6 +256,7 @@ public class HoloMobHealth extends JavaPlugin {
 		
 		alwaysShow = plugin.getConfig().getBoolean("Options.AlwaysShow");
 		range = plugin.getConfig().getInt("Options.Range");
+		updateRange = range + 30;
 		applyToNamed = plugin.getConfig().getBoolean("Options.ApplyToNamed");
 		
 		ReloadPlugin = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.ReloadPlugin"));
@@ -285,13 +268,13 @@ public class HoloMobHealth extends JavaPlugin {
 		
 		List<String> types = plugin.getConfig().getStringList("Options.DisabledMobTypes");
 		for (String each : types) {
-			if (version.contains("legacy")) {
+			if (version.isLegacy()) {
 				DisabledMobTypes.add(EntityType.fromName(each.toUpperCase()));
 			} else {
 				DisabledMobTypes.add(EntityType.valueOf(each.toUpperCase()));
 			}
 		}
-		DisabledMobNamesAbsolute = plugin.getConfig().getStringList("Options.DisabledMobNamesAbsolute");
+		DisabledMobNamesAbsolute = plugin.getConfig().getStringList("Options.DisabledMobNamesAbsolute").stream().collect(Collectors.toSet());
 		DisabledMobNamesContains = plugin.getConfig().getStringList("Options.DisabledMobNamesContains");
 		
 		UseAlterHealth = plugin.getConfig().getBoolean("Options.DynamicHealthDisplay.Use");
@@ -320,7 +303,7 @@ public class HoloMobHealth extends JavaPlugin {
 			Bukkit.getScheduler().cancelTask(activeShowHealthTaskID);
 		}
 		
-		if (!armorStandMode || version.contains("OLD") || version.equals("legacy1.9.4") || version.equals("legacy1.9")) {
+		if (!armorStandMode || version.isOld() || version.equals(MCVersion.V1_9) || version.equals(MCVersion.V1_9_4)) {
 			if (!UseAlterHealth) {  			
 				NameTagDisplay.sendHealth();
 			} else {    			
@@ -349,7 +332,7 @@ public class HoloMobHealth extends JavaPlugin {
 			int delay = 1;
 			int count = 0;
 			int maxper = (int) Math.ceil((double) Bukkit.getOnlinePlayers().size() / (double) 20);
-			for (Player eachPlayer : Bukkit.getOnlinePlayers()) {
+			for (Player eachPlayer : Bukkit.getOnlinePlayers().stream().filter(each -> !DisabledWorlds.contains(each.getWorld().getName())).collect(Collectors.toList())) {
 				count++;
 				if (count > maxper) {
 					count = 0;
@@ -357,13 +340,15 @@ public class HoloMobHealth extends JavaPlugin {
 				}
 				UUID uuid = eachPlayer.getUniqueId();
 				Bukkit.getScheduler().runTaskLater(plugin, () -> {
-						if (Bukkit.getPlayer(uuid) == null) {
-							return;
-						}
-						Player player = Bukkit.getPlayer(uuid);
-						
-						nearbyEntities.addAll(player.getNearbyEntities(range, range, range));
-						nearbyPlus10Entities.addAll(player.getNearbyEntities(range + 10, range + 10, range + 10));
+					if (Bukkit.getPlayer(uuid) == null) {
+						return;
+					}
+					Player player = Bukkit.getPlayer(uuid);
+					
+					List<Entity> inRange = player.getNearbyEntities(range, range, range);
+					nearbyEntities.addAll(inRange);
+					updateQueue.addAll(inRange);
+					nearbyPlus10Entities.addAll(player.getNearbyEntities(range + 10, range + 10, range + 10));
 				}, delay);
 			}
 		}, 0, 20);
@@ -389,6 +374,7 @@ public class HoloMobHealth extends JavaPlugin {
 					}
 				}
 				nearbyEntities.remove(entity);
+				updateQueue.add(entity);
 				Bukkit.getScheduler().runTaskLater(plugin, () -> nearbyPlus10Entities.remove(entity), 10);
 			}, delay);
 		}

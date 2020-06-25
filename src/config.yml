@@ -17,6 +17,7 @@ Display:
   #{Health_Percentage_1DP}
   #{Health_Percentage_2DP}
   #{Mob_Type}
+  #{Mob_Name}
   #{Mob_Type_Or_Name}
 
   #{DynamicColor}
@@ -53,6 +54,9 @@ Options:
   #The name is not actually replaced on the server side, only client side
   #Does not work well with AlwaysShow set to false
   ApplyToNamed: true
+  #Do not use plugin in these worlds
+  DisabledWorlds: 
+    - disabled_world
   #Do not apply health to these mob types
   #https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html
   DisabledMobTypes: []

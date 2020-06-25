@@ -30,7 +30,7 @@ public class MetadataPacket {
 		String json = (entityNameJson == null || entityNameJson.equals("")) ? null : (ComponentSerializer.parse(entityNameJson)[0].toPlainText().equals("") ? null : entityNameJson);
 		Bukkit.getScheduler().runTask(HoloMobHealth.plugin, () -> {
 			
-			Set<Player> playersInRange = HoloMobHealth.playersEnabled.stream().filter(each -> (each.getWorld().equals(entity.getWorld())) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.range * HoloMobHealth.range))).collect(Collectors.toSet());
+			Set<Player> playersInRange = HoloMobHealth.playersEnabled.stream().filter(each -> (each.getWorld().equals(entity.getWorld())) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.updateRange * HoloMobHealth.updateRange))).collect(Collectors.toSet());
 			HoloMobCache hmc = cache.get(entity.getEntityId());
 			if (hmc != null) {
 				if (hmc.getCustomName().equals(json == null ? "" : json) && hmc.getCustomNameVisible() == visible && hmc.getPlayers().equals(playersInRange)) {
@@ -44,9 +44,9 @@ public class MetadataPacket {
 		    WrappedDataWatcher watcher = new WrappedDataWatcher(); //Create data watcher, the Entity Metadata packet requires this
 		    
 		    if (json != null) {
-		    	if (HoloMobHealth.version.contains("OLD")) {
+		    	if (HoloMobHealth.version.isOld()) {
 			    	watcher.setObject(2, ComponentSerializer.parse(json)[0].toLegacyText());
-		    	} else if (HoloMobHealth.version.contains("legacy")) {
+		    	} else if (HoloMobHealth.version.isLegacy()) {
 			    	Serializer serializer = Registry.get(String.class);
 			    	WrappedDataWatcherObject object = new WrappedDataWatcherObject(2, serializer);
 			    	watcher.setObject(object, ComponentSerializer.parse(json)[0].toLegacyText());
@@ -55,9 +55,9 @@ public class MetadataPacket {
 			    	watcher.setObject(new WrappedDataWatcherObject(2, Registry.getChatComponentSerializer(true)), opt);
 			    }
 		    } else {
-		    	if (HoloMobHealth.version.contains("OLD")) {
+		    	if (HoloMobHealth.version.isOld()) {
 		    		watcher.setObject(2, "");
-		    	} else if (HoloMobHealth.version.contains("legacy")) {
+		    	} else if (HoloMobHealth.version.isLegacy()) {
 			    	Serializer serializer = Registry.get(String.class);
 			    	WrappedDataWatcherObject object = new WrappedDataWatcherObject(2, serializer);
 			    	watcher.setObject(object, "");
@@ -67,7 +67,7 @@ public class MetadataPacket {
 			    }
 		    }
 		    
-		    if (HoloMobHealth.version.contains("OLD")) {
+		    if (HoloMobHealth.version.isOld()) {
 		    	watcher.setObject(3, (byte) (visible ? 1 : 0));
 		    } else {
 		    	watcher.setObject(new WrappedDataWatcherObject(3, Registry.get(Boolean.class)), visible);

@@ -3,8 +3,9 @@ package com.loohp.holomobhealth.Protocol;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +34,7 @@ import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObje
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.Holders.HoloMobArmorStand;
 import com.loohp.holomobhealth.Holders.HoloMobCache;
+import com.loohp.holomobhealth.Utils.MCVersion;
 
 import net.md_5.bungee.chat.ComponentSerializer;
 
@@ -40,8 +42,7 @@ public class ArmorStandPacket implements Listener {
 	
 	private static ProtocolManager protocolManager = HoloMobHealth.protocolManager;
 	private static Plugin plugin = HoloMobHealth.plugin;
-	private static String version = HoloMobHealth.version;
-	public static Set<HoloMobArmorStand> active = Collections.newSetFromMap(Collections.synchronizedMap(new LinkedHashMap<HoloMobArmorStand, Boolean>()));
+	public static Set<HoloMobArmorStand> active = Collections.synchronizedSet(new LinkedHashSet<HoloMobArmorStand>());
 	private static HashMap<Integer, HoloMobCache> cache = new HashMap<Integer, HoloMobCache>();
 	
 	public static ConcurrentHashMap<Player, Set<HoloMobArmorStand>> playerStatus = new ConcurrentHashMap<Player, Set<HoloMobArmorStand>>();
@@ -49,33 +50,35 @@ public class ArmorStandPacket implements Listener {
 	public static void update() {
 		Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
 			for (Player player : Bukkit.getOnlinePlayers()) {
-				Set<HoloMobArmorStand> activeList = playerStatus.get(player);
-				if (activeList == null) {
-					continue;
-				}
-				
-				List<Player> playerList = new LinkedList<Player>();
-				playerList.add(player);
-				
-				for (HoloMobArmorStand entity : activeList) {
-					if (!entity.getWorld().equals(player.getWorld()) || entity.getLocation().distanceSquared(player.getLocation()) > ((HoloMobHealth.range + 1) * (HoloMobHealth.range + 1))) {						
-						removeArmorStand(playerList, entity, false, true);
+				try {
+					Set<HoloMobArmorStand> activeList = playerStatus.get(player);
+					if (activeList == null) {
+						continue;
 					}
-				}
-				
-				for (HoloMobArmorStand entity : active) {
-					if (entity.getWorld().equals(player.getWorld()) && entity.getLocation().distanceSquared(player.getLocation()) <= (HoloMobHealth.range * HoloMobHealth.range)) {
-						if (activeList.contains(entity)) {
-							continue;
+					
+					List<Player> playerList = new LinkedList<Player>();
+					playerList.add(player);
+					
+					for (HoloMobArmorStand entity : activeList) {
+						if (!entity.getWorld().equals(player.getWorld()) || entity.getLocation().distanceSquared(player.getLocation()) > ((HoloMobHealth.range + 1) * (HoloMobHealth.range + 1))) {						
+							removeArmorStand(playerList, entity, false, true);
 						}
-						if (!HoloMobHealth.playersEnabled.contains(player)) {
-							continue;
-						}
-						
-						sendArmorStandSpawn(playerList, entity, "", false);
-						updateArmorStand(playerList, entity, "", false);
 					}
-				}
+					
+					for (HoloMobArmorStand entity : active) {
+						if (entity.getWorld().equals(player.getWorld()) && entity.getLocation().distanceSquared(player.getLocation()) <= (HoloMobHealth.range * HoloMobHealth.range)) {
+							if (activeList.contains(entity)) {
+								continue;
+							}
+							if (!HoloMobHealth.playersEnabled.contains(player)) {
+								continue;
+							}
+							
+							sendArmorStandSpawn(playerList, entity, "", false);
+							updateArmorStand(playerList, entity, "", false);
+						}
+					}
+				} catch (ConcurrentModificationException ignore) {}
 			}
 		}, 0, 20);
 	}
@@ -88,16 +91,16 @@ public class ArmorStandPacket implements Listener {
 			active.add(entity);
 		}
 		
-		List<Player> playersInRange = players.stream().filter(each -> (each.getWorld().equals(entity.getWorld())) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.range * HoloMobHealth.range))).collect(Collectors.toList());
+		List<Player> playersInRange = players.stream().filter(each -> (each.getWorld().equals(entity.getWorld())) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.updateRange * HoloMobHealth.updateRange))).collect(Collectors.toList());
 		playersInRange.forEach((each) -> playerStatus.get(each).add(entity));
 		
 		PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
 		packet1.getIntegers().write(0, entity.getEntityId());
-		if (version.equals("1.15")) {
+		if (HoloMobHealth.version.equals(MCVersion.V1_15) || HoloMobHealth.version.equals(MCVersion.V1_16)) {
 			packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 1 : 60);
-		} else if (version.equals("1.14")) {
+		} else if (HoloMobHealth.version.equals(MCVersion.V1_14)) {
 			packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 1 : 59);
-		} else if (version.equals("1.13")) {
+		} else if (HoloMobHealth.version.equals(MCVersion.V1_13) || HoloMobHealth.version.equals(MCVersion.V1_13_1)) {
 			packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 1 : 56);
 		} else {
 			packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 30 : 101);
@@ -150,7 +153,7 @@ public class ArmorStandPacket implements Listener {
 		}
 			
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-			List<Player> playersInRange = players.stream().filter(each -> (each.getWorld().equals(entity.getWorld())) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.range * HoloMobHealth.range))).collect(Collectors.toList());
+			List<Player> playersInRange = players.stream().filter(each -> (each.getWorld().equals(entity.getWorld())) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.updateRange * HoloMobHealth.updateRange))).collect(Collectors.toList());
 			PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
 			packet1.getIntegers().write(0, entity.getEntityId());	
 	        WrappedDataWatcher wpw = buildWarppedDataWatcher(entity, json, visible);
@@ -181,7 +184,7 @@ public class ArmorStandPacket implements Listener {
 		cache.remove(entity.getEntityId());
 		
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-			List<Player> playersInRange = bypassFilter ? players.stream().collect(Collectors.toList()) : players.stream().filter(each -> (each.getWorld().equals(entity.getWorld())) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.range * HoloMobHealth.range))).collect(Collectors.toList());
+			List<Player> playersInRange = bypassFilter ? players.stream().collect(Collectors.toList()) : players.stream().filter(each -> (each.getWorld().equals(entity.getWorld())) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.updateRange * HoloMobHealth.updateRange))).collect(Collectors.toList());
 			playersInRange.forEach((each) -> playerStatus.get(each).remove(entity));
 			PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
 			packet1.getIntegerArrays().write(0, new int[]{entity.getEntityId()});
@@ -204,16 +207,16 @@ public class ArmorStandPacket implements Listener {
 	    
 		if (entity.getType().equals(EntityType.ARMOR_STAND)) {
 			byte bitmask = 0x20;
-			if (HoloMobHealth.version.contains("OLD")) {
+			if (HoloMobHealth.version.isOld()) {
 				watcher.setObject(0, bitmask);
 			} else {
 				watcher.setObject(new WrappedDataWatcherObject(0, Registry.get(Byte.class)), bitmask);
 			}
 			
 			if (json != null) {
-		    	if (HoloMobHealth.version.contains("OLD")) {
+		    	if (HoloMobHealth.version.isOld()) {
 			    	watcher.setObject(2, json);
-		    	} else if (HoloMobHealth.version.contains("legacy")) {
+		    	} else if (HoloMobHealth.version.isLegacy()) {
 			    	Serializer serializer = Registry.get(String.class);
 			    	WrappedDataWatcherObject object = new WrappedDataWatcherObject(2, serializer);
 			    	watcher.setObject(object, json);
@@ -222,9 +225,9 @@ public class ArmorStandPacket implements Listener {
 			    	watcher.setObject(new WrappedDataWatcherObject(2, Registry.getChatComponentSerializer(true)), opt);
 			    }
 		    } else {
-		    	if (HoloMobHealth.version.contains("OLD")) {
+		    	if (HoloMobHealth.version.isOld()) {
 		    		watcher.setObject(2, "");
-		    	} else if (HoloMobHealth.version.contains("legacy")) {
+		    	} else if (HoloMobHealth.version.isLegacy()) {
 			    	Serializer serializer = Registry.get(String.class);
 			    	WrappedDataWatcherObject object = new WrappedDataWatcherObject(2, serializer);
 			    	watcher.setObject(object, "");
@@ -234,7 +237,7 @@ public class ArmorStandPacket implements Listener {
 			    }
 		    }
 		    
-		    if (HoloMobHealth.version.contains("OLD")) {
+		    if (HoloMobHealth.version.isOld()) {
 		    	watcher.setObject(3, (byte) (visible ? 1 : 0));
 		    	watcher.setObject(5, (byte) 1);
 		    } else {
@@ -244,34 +247,34 @@ public class ArmorStandPacket implements Listener {
 		    
 		    byte standbitmask = 0x01 | 0x10;	
 	
-		    if (HoloMobHealth.version.equals("1.15")) {
+		    if (HoloMobHealth.version.equals(MCVersion.V1_15) || HoloMobHealth.version.equals(MCVersion.V1_16)) {
 		    	watcher.setObject(new WrappedDataWatcherObject(14, Registry.get(Byte.class)), standbitmask);
-		    } else if (HoloMobHealth.version.equals("1.14")) {
+		    } else if (HoloMobHealth.version.equals(MCVersion.V1_14)) {
 		    	watcher.setObject(new WrappedDataWatcherObject(13, Registry.get(Byte.class)), standbitmask);
-		    } else if (!HoloMobHealth.version.contains("OLD")) {
+		    } else if (!HoloMobHealth.version.isOld()) {
 				watcher.setObject(new WrappedDataWatcherObject(11, Registry.get(Byte.class)), standbitmask);
 			} else {
 				watcher.setObject(10, standbitmask);
 			}
 		} else {
 			byte bitmask = 0x20;
-			if (HoloMobHealth.version.contains("OLD")) {
+			if (HoloMobHealth.version.isOld()) {
 				watcher.setObject(0, bitmask);
 			} else {
 				watcher.setObject(new WrappedDataWatcherObject(0, Registry.get(Byte.class)), bitmask);
 			}
 			
-			if (!HoloMobHealth.version.contains("OLD")) {
+			if (!HoloMobHealth.version.isOld()) {
 		    	watcher.setObject(new WrappedDataWatcherObject(4, Registry.get(Boolean.class)), true);
 			} else {
 				watcher.setObject(4, (byte) 1);
 			}
 	
-		    if (HoloMobHealth.version.equals("1.15")) {
+		    if (HoloMobHealth.version.equals(MCVersion.V1_15) || HoloMobHealth.version.equals(MCVersion.V1_16)) {
 		    	watcher.setObject(new WrappedDataWatcherObject(15, Registry.get(Boolean.class)), true);
-		    } else if (HoloMobHealth.version.equals("1.14")) {
+		    } else if (HoloMobHealth.version.equals(MCVersion.V1_14)) {
 		    	watcher.setObject(new WrappedDataWatcherObject(14, Registry.get(Boolean.class)), true);
-		    } else if (!HoloMobHealth.version.contains("OLD")) {
+		    } else if (!HoloMobHealth.version.isOld()) {
 				watcher.setObject(new WrappedDataWatcherObject(12, Registry.get(Boolean.class)), true);
 			} else {
 				watcher.setObject(10, (byte) 1);

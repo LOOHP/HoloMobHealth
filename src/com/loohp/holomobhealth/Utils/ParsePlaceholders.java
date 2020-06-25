@@ -142,7 +142,7 @@ public class ParsePlaceholders {
 		String lastColor = "";
 		for (String section : sections) {
 			if (section.equals("{Mob_Type}")) {
-				if (!HoloMobHealth.version.contains("legacy")) {
+				if (!HoloMobHealth.version.isLegacy()) {
 					TranslatableComponent textcomp = new TranslatableComponent(EntityTypeUtils.getMinecraftLangName(entity));
 					textcomp = (TranslatableComponent) ChatColorUtils.applyColor(textcomp, lastColor);
 					baselist.add(textcomp);
@@ -150,12 +150,20 @@ public class ParsePlaceholders {
 					TextComponent textcomp = new TextComponent(EntityTypeUtils.getMinecraftLangName(entity));
 					baselist.add(textcomp);
 				}
+			} else if (section.equals("{Mob_Name}")) {
+				if (entity.getCustomName() != null && !entity.getCustomName().equals("")) {
+					TextComponent textcomp = new TextComponent(ChatColor.RESET + entity.getCustomName());
+					baselist.add(textcomp);
+				} else {
+					TextComponent textcomp = new TextComponent("");
+					baselist.add(textcomp);
+				}
 			} else if (section.equals("{Mob_Type_Or_Name}")) {
 				if (entity.getCustomName() != null && !entity.getCustomName().equals("")) {
 					TextComponent textcomp = new TextComponent(ChatColor.RESET + entity.getCustomName());
 					baselist.add(textcomp);
 				} else {
-					if (!HoloMobHealth.version.contains("legacy")) {
+					if (!HoloMobHealth.version.isLegacy()) {
 						TranslatableComponent textcomp = new TranslatableComponent(EntityTypeUtils.getMinecraftLangName(entity));
 						textcomp = (TranslatableComponent) ChatColorUtils.applyColor(textcomp, lastColor);
 						baselist.add(textcomp);

@@ -1,6 +1,6 @@
 name: HoloMobHealth
 author: loohp
-version: 1.6.7
+version: 1.7.0
 main: com.loohp.holomobhealth.HoloMobHealth
 description: Show Mob Health with packets
 softdepend: [MythicMobs, Citizens]

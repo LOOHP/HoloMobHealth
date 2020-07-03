@@ -2,6 +2,7 @@ package com.loohp.holomobhealth.Utils;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.entity.LivingEntity;
@@ -114,7 +115,7 @@ public class ParsePlaceholders {
 			text = text.replace("{ScaledSymbols}", symbol);
 		}
 		
-		text = ChatColor.translateAlternateColorCodes('&', text);
+		text = ChatColorUtils.translateAlternateColorCodes('&', text);
 		List<String> sections = new ArrayList<String>();
 		String[] parts = text.split("\\{Mob_Type_Or_Name\\}");
 		if (text.startsWith("{Mob_Type_Or_Name}")) {
@@ -173,8 +174,7 @@ public class ParsePlaceholders {
 					}
 				}
 			} else {
-				TextComponent textcomp = new TextComponent(section);
-				baselist.add(textcomp);
+				baselist.addAll(Arrays.asList(TextComponent.fromLegacyText(section)));
 			}
 			lastColor = ChatColorUtils.getLastColors(section);
 		}
@@ -183,7 +183,7 @@ public class ParsePlaceholders {
 		for (int i = 0; i < baselist.size(); i++) {
 			BaseComponent each = baselist.get(i);
 			product.addExtra(each);
-		}	
+		}
 		
 		return ComponentSerializer.toString(product);
 	}

@@ -35,6 +35,7 @@ import com.loohp.holomobhealth.Modules.NameTagDisplay;
 import com.loohp.holomobhealth.Protocol.ArmorStandPacket;
 import com.loohp.holomobhealth.Updater.Updater;
 import com.loohp.holomobhealth.Utils.BoundingBoxUtils;
+import com.loohp.holomobhealth.Utils.ChatColorUtils;
 import com.loohp.holomobhealth.Utils.EntityTypeUtils;
 import com.loohp.holomobhealth.Utils.MCVersion;
 
@@ -263,12 +264,12 @@ public class HoloMobHealth extends JavaPlugin {
 		updateRange = range + 30;
 		applyToNamed = plugin.getConfig().getBoolean("Options.ApplyToNamed");
 		
-		ReloadPlugin = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.ReloadPlugin"));
-		NoPermission = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.NoPermission"));
-		PlayersOnly = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.PlayersOnly"));
-		PlayersNotFound = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.PlayerNotFound"));
-		ToggleDisplayOn = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.ToggleDisplayOn"));
-		ToggleDisplayOff = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.ToggleDisplayOff"));
+		ReloadPlugin = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.ReloadPlugin"));
+		NoPermission = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.NoPermission"));
+		PlayersOnly = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.PlayersOnly"));
+		PlayersNotFound = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.PlayerNotFound"));
+		ToggleDisplayOn = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.ToggleDisplayOn"));
+		ToggleDisplayOff = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.ToggleDisplayOff"));
 		
 		List<String> types = plugin.getConfig().getStringList("Options.DisabledMobTypes");
 		for (String each : types) {

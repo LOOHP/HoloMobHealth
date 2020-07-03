@@ -15,6 +15,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.loohp.holomobhealth.Database.Database;
 import com.loohp.holomobhealth.Updater.Updater;
+import com.loohp.holomobhealth.Utils.ChatColorUtils;
 import com.loohp.holomobhealth.Utils.EntityTypeUtils;
 
 import net.md_5.bungee.api.ChatColor;
@@ -114,7 +115,7 @@ public class Commands implements CommandExecutor, TabCompleter {
 			return true;
 		}
 		
-		sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Bukkit.spigot().getConfig().getString("messages.unknown-command")));
+		sender.sendMessage(ChatColorUtils.translateAlternateColorCodes('&', Bukkit.spigot().getConfig().getString("messages.unknown-command")));
 		return true;
 	}
 	

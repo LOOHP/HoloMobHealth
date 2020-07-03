@@ -42,7 +42,7 @@ public class EntityTypeUtils {
 		String path = "";
 		if (HoloMobHealth.version.equals(MCVersion.V1_13) || HoloMobHealth.version.equals(MCVersion.V1_13_1)) {
 			path = new StringBuilder().append("entity.minecraft.").append(type.name().toLowerCase()).toString();
-			if (type.equals(EntityType.PIG_ZOMBIE)) {
+			if (type.name().equalsIgnoreCase("PIG_ZOMBIE")) {
 				path = new StringBuilder().append("entity.minecraft.zombie_pigman").toString();
 			}
 		} else {

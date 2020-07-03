@@ -20,6 +20,7 @@ import com.loohp.holomobhealth.Holders.HoloMobArmorStand;
 import com.loohp.holomobhealth.Holders.MultilineStands;
 import com.loohp.holomobhealth.Protocol.ArmorStandPacket;
 import com.loohp.holomobhealth.Protocol.MetadataPacket;
+import com.loohp.holomobhealth.Utils.ChatColorUtils;
 import com.loohp.holomobhealth.Utils.CitizensUtils;
 import com.loohp.holomobhealth.Utils.EntityTypeUtils;
 import com.loohp.holomobhealth.Utils.MythicMobsUtils;
@@ -76,13 +77,13 @@ public class ArmorstandDisplay {
 					if (!entity.getCustomName().equals("")) {
 						boolean contain = false;
 						for (String each : HoloMobHealth.DisabledMobNamesAbsolute) {
-							if (entity.getCustomName().equals(ChatColor.translateAlternateColorCodes('&', each))) {
+							if (entity.getCustomName().equals(ChatColorUtils.translateAlternateColorCodes('&', each))) {
 								contain = true;
 								break;
 							}
 						}
 						for (String each : HoloMobHealth.DisabledMobNamesContains) {
-							if (ChatColor.stripColor(entity.getCustomName().toLowerCase()).contains(ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', each).toLowerCase()))) {
+							if (ChatColor.stripColor(entity.getCustomName().toLowerCase()).contains(ChatColor.stripColor(ChatColorUtils.translateAlternateColorCodes('&', each).toLowerCase()))) {
 								contain = true;
 								break;
 							}
@@ -175,13 +176,13 @@ public class ArmorstandDisplay {
 					if (!entity.getCustomName().equals("")) {
 						boolean contain = false;
 						for (String each : HoloMobHealth.DisabledMobNamesAbsolute) {
-							if (entity.getCustomName().equals(ChatColor.translateAlternateColorCodes('&', each))) {
+							if (entity.getCustomName().equals(ChatColorUtils.translateAlternateColorCodes('&', each))) {
 								contain = true;
 								break;
 							}
 						}
 						for (String each : HoloMobHealth.DisabledMobNamesContains) {
-							if (ChatColor.stripColor(entity.getCustomName().toLowerCase()).contains(ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', each).toLowerCase()))) {
+							if (ChatColor.stripColor(entity.getCustomName().toLowerCase()).contains(ChatColor.stripColor(ChatColorUtils.translateAlternateColorCodes('&', each).toLowerCase()))) {
 								contain = true;
 								break;
 							}

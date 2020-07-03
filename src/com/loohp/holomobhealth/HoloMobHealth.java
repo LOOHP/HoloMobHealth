@@ -103,6 +103,8 @@ public class HoloMobHealth extends JavaPlugin {
 	public static HashMap<EntityType, Integer> specialTypeOffset = new HashMap<EntityType, Integer>();
 	public static HashMap<String, Integer> specialNameOffset = new HashMap<String, Integer>();
 	
+	public static int mobsPerTick = 4;
+	
 	public static boolean UpdaterEnabled = true;
 	
 	@Override
@@ -231,6 +233,8 @@ public class HoloMobHealth extends JavaPlugin {
 	
 	@SuppressWarnings("deprecation")
 	public static void loadConfig() {
+		mobsPerTick = plugin.getConfig().getInt("Settings.MobsPerTick");
+		
 		specialNameOffset.clear();
 		specialTypeOffset.clear();
 		/*
@@ -276,6 +280,8 @@ public class HoloMobHealth extends JavaPlugin {
 		}
 		DisabledMobNamesAbsolute = plugin.getConfig().getStringList("Options.DisabledMobNamesAbsolute").stream().collect(Collectors.toSet());
 		DisabledMobNamesContains = plugin.getConfig().getStringList("Options.DisabledMobNamesContains");
+		
+		DisabledWorlds = plugin.getConfig().getStringList("Options.DisabledWorlds").stream().collect(Collectors.toSet());
 		
 		UseAlterHealth = plugin.getConfig().getBoolean("Options.DynamicHealthDisplay.Use");
 		AltHealthDisplayTime = plugin.getConfig().getInt("Options.DynamicHealthDisplay.Timeout");

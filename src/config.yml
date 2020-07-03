@@ -105,6 +105,10 @@ Messages:
   ToggleDisplayOn: "&aEnabled Mob Health Display!"
   ToggleDisplayOff: "&cDisabled Mob Health Display! Rejoin to see changes!"
 
+Settings:
+  #The amount of mobs to update per tick
+  MobsPerTick: 4
+
 Database:
   #Player data storage type, MYSQL or SQLITE
   Type: SQLITE

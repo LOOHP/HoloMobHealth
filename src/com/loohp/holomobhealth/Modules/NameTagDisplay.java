@@ -37,7 +37,7 @@ public class NameTagDisplay {
 			
 			Iterator<Entity> itr = HoloMobHealth.updateQueue.iterator();
 			AtomicInteger counter = new AtomicInteger(0);
-			while (itr.hasNext() && counter.getAndIncrement() < 2) {
+			while (itr.hasNext() && counter.getAndIncrement() < HoloMobHealth.mobsPerTick) {
 					
 				Entity entity = itr.next();
 				itr.remove();
@@ -112,7 +112,7 @@ public class NameTagDisplay {
 			
 			Iterator<Entity> itr = HoloMobHealth.updateQueue.iterator();
 			AtomicInteger counter = new AtomicInteger(0);
-			while (itr.hasNext() && counter.getAndIncrement() < 2) {
+			while (itr.hasNext() && counter.getAndIncrement() < HoloMobHealth.mobsPerTick) {
 					
 				Entity entity = itr.next();
 				itr.remove();

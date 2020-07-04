@@ -100,11 +100,6 @@ public class ChatColorUtils {
     	return true;
     }
     
-    public static boolean isColor(char code) {
-    	
-    	return true;
-    }
-    
     public static boolean isLegal(String color) {
     	if (color.charAt(0) != '§') {
     		return false;
@@ -166,13 +161,17 @@ public class ChatColorUtils {
     }
     
     public static String translateAlternateColorCodes(char code, String text) {
-        if (text.length() < 2) {
-        	return "";
+		if (text == null) {
+			return text;
+		}
+		
+		if (text.length() < 2) {
+        	return text;
         }
         
         for (int i = 0; i < text.length() - 1; i++) {
         	if (text.charAt(i) == code) {
-        		if (text.charAt(i + 1) == 'x') {
+        		if (text.charAt(i + 1) == 'x' && text.length() > (i + 14)) {
         			String section = text.substring(i, i + 14);
         			String translated = section.replace(code, '§');
         			text = text.replace(section, translated);

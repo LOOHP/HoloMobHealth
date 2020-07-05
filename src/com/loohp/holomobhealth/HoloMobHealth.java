@@ -330,7 +330,7 @@ public class HoloMobHealth extends JavaPlugin {
 			if (!UseAlterHealth) {  			
 				NameTagDisplay.sendHealth();
 			} else {    			
-				NameTagDisplay.sendAltHealth(); 
+				NameTagDisplay.sendAltHealth();
 			}
 			if (armorStandMode) {
 				Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[HoloMobHealth] Multi-line is not supported on this version of Minecraft. Using Single line instead!");

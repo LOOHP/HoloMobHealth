@@ -13,8 +13,8 @@ import org.bukkit.entity.Villager;
 import com.loohp.holomobhealth.HoloMobHealth;
 
 public class EntityTypeUtils {
-    
-    private static List<EntityType> MobTypesList = new ArrayList<EntityType>();
+	
+	private static List<EntityType> MobTypesList = new ArrayList<EntityType>();
     
     public static List<EntityType> getMobList() {
     	return MobTypesList;
@@ -53,7 +53,9 @@ public class EntityTypeUtils {
 		
 		if (type.equals(EntityType.VILLAGER)) {
 			Villager villager = (Villager) entity;
-			path = new StringBuilder().append(path).append(".").append(villager.getProfession().toString().toLowerCase()).toString();
+			if (!(HoloMobHealth.version.equals(MCVersion.V1_13) || HoloMobHealth.version.equals(MCVersion.V1_13_1))) {
+				path = new StringBuilder().append(path).append(".").append(villager.getProfession().toString().toLowerCase()).toString();
+			}
 		}
 		return path;
 	}

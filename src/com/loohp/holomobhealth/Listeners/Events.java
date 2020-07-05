@@ -34,14 +34,14 @@ public class Events implements Listener {
 	}
 	
 	@EventHandler
-	public void onAttack(EntityDamageEvent event) {		
-		if (!HoloMobHealth.DisabledWorlds.contains(event.getEntity().getWorld().getName())) {
+	public void onAttack(EntityDamageEvent event) {	
+		if (HoloMobHealth.DisabledWorlds.contains(event.getEntity().getWorld().getName())) {
 			return;
 		}
 		
 		HoloMobHealth.updateQueue.add(event.getEntity());
 		
-		if (HoloMobHealth.AltOnlyPlayer == true) {
+		if (HoloMobHealth.AltOnlyPlayer) {
 			return;
 		}
 		
@@ -50,7 +50,7 @@ public class Events implements Listener {
 	
 	@EventHandler
 	public void onPlayerAttack(EntityDamageByEntityEvent event) {
-		if (!HoloMobHealth.DisabledWorlds.contains(event.getEntity().getWorld().getName())) {
+		if (HoloMobHealth.DisabledWorlds.contains(event.getEntity().getWorld().getName())) {
 			return;
 		}
 		

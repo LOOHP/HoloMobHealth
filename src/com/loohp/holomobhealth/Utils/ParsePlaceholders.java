@@ -185,7 +185,9 @@ public class ParsePlaceholders {
 			product.addExtra(each);
 		}
 		
-		product = ChatComponentUtils.translatePluginFontFormatting(product);
+		if (HoloMobHealth.version.isPost1_16()) {
+			product = ChatComponentUtils.translatePluginFontFormatting(product);
+		}
 		
 		return ComponentSerializer.toString(product);
 	}

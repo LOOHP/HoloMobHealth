@@ -28,6 +28,7 @@ public class ChatComponentUtils {
 	private static MethodHandle hoverEventGetValueMethod;
 	
 	private static Pattern fontFormating = Pattern.compile("(?=(?<!\\\\)|(?<=\\\\\\\\))\\[[^\\]]*?font=[0-9a-zA-Z:_]*[^\\[]*?\\]");
+	private static Pattern fontEscape = Pattern.compile("\\\\\\[ *?font=[0-9a-zA-Z:_]* *?\\]");
 	
 	public static void setupLegacy() {
 		try {
@@ -311,8 +312,13 @@ public class ChatComponentUtils {
 			    	    
 			    	    if (sb.charAt(absPos) == ']' && sb.charAt(absPos - 1) == '[') {
 			    	    	sb.deleteCharAt(absPos - 1);
-			    	    	sb.deleteCharAt(absPos - 1);			    	    	
-			    	    }
+			    	    	sb.deleteCharAt(absPos - 1);	
+			    	    	
+			    	    	if (absPos > 2 && sb.charAt(absPos - 2) == '\\' && sb.charAt(absPos - 3) == '\\') {
+				    	    	sb.deleteCharAt(absPos - 2);
+				    	    	absPos--;
+				    	    }
+			    	    }			    		    			    	    
 			    	    
 			    	    absPos--;
 			    	    
@@ -335,7 +341,9 @@ public class ChatComponentUtils {
 			    	    textlist.add(before);
 		    			break;
 		    		}
-		    	}				
+		    		
+		    	}
+				
 				newlist.addAll(textlist);				
 			} else {
 				if (currentFont.isPresent()) {
@@ -348,6 +356,21 @@ public class ChatComponentUtils {
 		TextComponent product = new TextComponent("");
 		for (int i = 0; i < newlist.size(); i++) {
 			BaseComponent each = newlist.get(i);
+			if (each instanceof TextComponent) {
+				TextComponent text = (TextComponent) each;
+				String str = text.getText();
+				while (true) {
+	        		Matcher matcher = fontEscape.matcher(str);  		
+	        		if (matcher.find()) {
+	    	    	    StringBuilder sb = new StringBuilder(str);
+	    	    	    sb.deleteCharAt(matcher.start());
+	    	    	    str = sb.toString();
+	        		} else {
+	        			text.setText(str);
+	        			break;
+	        		}
+	        	}
+			}
 			product.addExtra(each);
 		}
 		

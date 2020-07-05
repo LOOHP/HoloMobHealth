@@ -66,12 +66,14 @@ public class ChatComponentUtils {
 		if (base1.isUnderlined() != base2.isUnderlined()) {
 			return false;
 		}
-		if ((base1.getFontRaw() == null && base2.getFontRaw() != null) || (base1.getFontRaw() != null && base2.getFontRaw() == null)) {
-			return false;
-		}
-		if (base1.getFontRaw() != null && base2.getFontRaw() != null) {
-			if (!base1.getFontRaw().equals(base2.getFontRaw())) {
+		if (HoloMobHealth.version.isPost1_16()) {
+			if ((base1.getFontRaw() == null && base2.getFontRaw() != null) || (base1.getFontRaw() != null && base2.getFontRaw() == null)) {
 				return false;
+			}
+			if (base1.getFontRaw() != null && base2.getFontRaw() != null) {
+				if (!base1.getFontRaw().equals(base2.getFontRaw())) {
+					return false;
+				}
 			}
 		}
 		if (compareText && !base1.toLegacyText().equals(base2.toLegacyText())) {
@@ -104,12 +106,14 @@ public class ChatComponentUtils {
 		if (base1.isUnderlined() != base2.isUnderlined()) {
 			return false;
 		}
-		if ((base1.getFontRaw() == null && base2.getFontRaw() != null) || (base1.getFontRaw() != null && base2.getFontRaw() == null)) {
-			return false;
-		}
-		if (base1.getFontRaw() != null && base2.getFontRaw() != null) {
-			if (!base1.getFontRaw().equals(base2.getFontRaw())) {
+		if (HoloMobHealth.version.isPost1_16()) {
+			if ((base1.getFontRaw() == null && base2.getFontRaw() != null) || (base1.getFontRaw() != null && base2.getFontRaw() == null)) {
 				return false;
+			}
+			if (base1.getFontRaw() != null && base2.getFontRaw() != null) {
+				if (!base1.getFontRaw().equals(base2.getFontRaw())) {
+					return false;
+				}
 			}
 		}
 		if (compareText && !base1.toLegacyText().equals(base2.toLegacyText())) {

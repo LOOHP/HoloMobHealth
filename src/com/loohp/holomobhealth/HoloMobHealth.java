@@ -2,6 +2,7 @@ package com.loohp.holomobhealth;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,6 +37,7 @@ import com.loohp.holomobhealth.Protocol.ArmorStandPacket;
 import com.loohp.holomobhealth.Updater.Updater;
 import com.loohp.holomobhealth.Utils.BoundingBoxUtils;
 import com.loohp.holomobhealth.Utils.ChatColorUtils;
+import com.loohp.holomobhealth.Utils.ChatComponentUtils;
 import com.loohp.holomobhealth.Utils.EntityTypeUtils;
 import com.loohp.holomobhealth.Utils.MCVersion;
 
@@ -106,6 +108,8 @@ public class HoloMobHealth extends JavaPlugin {
 	
 	public static int mobsPerTick = 4;
 	
+	public static boolean legacyChatAPI = false;
+	
 	public static boolean UpdaterEnabled = true;
 	
 	@Override
@@ -157,6 +161,18 @@ public class HoloMobHealth extends JavaPlugin {
 		
 		addEntities();
 		removeEntities();
+		
+		try {
+			Class<?> chatHoverEventClass = Class.forName("net.md_5.bungee.api.chat.HoverEvent");
+			legacyChatAPI = !Arrays.asList(chatHoverEventClass.getDeclaredClasses()).stream().anyMatch(each -> each.getCanonicalName().equals("net.md_5.bungee.api.chat.HoverEvent.Content"));
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		};
+		
+		if (legacyChatAPI) {
+			ChatComponentUtils.setupLegacy();
+			Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[InteractiveChat] Legacy Bungeecord Chat API detected, using legacy methods...");
+		}
 		
 		metrics.addCustomChart(new Metrics.SingleLineChart("total_mobs_displaying", new Callable<Integer>() {
             @Override

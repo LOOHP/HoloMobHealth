@@ -179,11 +179,13 @@ public class ParsePlaceholders {
 			lastColor = ChatColorUtils.getLastColors(section);
 		}
 		
-		TextComponent product = new TextComponent("");
+		BaseComponent product = new TextComponent("");
 		for (int i = 0; i < baselist.size(); i++) {
 			BaseComponent each = baselist.get(i);
 			product.addExtra(each);
 		}
+		
+		product = ChatComponentUtils.translatePluginFontFormatting(product);
 		
 		return ComponentSerializer.toString(product);
 	}

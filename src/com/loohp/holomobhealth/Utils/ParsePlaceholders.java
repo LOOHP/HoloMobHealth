@@ -17,11 +17,14 @@ import net.md_5.bungee.chat.ComponentSerializer;
 
 public class ParsePlaceholders {
 	
-	public static String parse(LivingEntity entity, String text) {
+	public static String parse(LivingEntity entity, String text) {	
 		double health = entity.getHealth();
 		@SuppressWarnings("deprecation")
 		double maxhealth = entity.getMaxHealth();
 		double percentage = (health / maxhealth) * 100;
+		
+		int heartScale = HoloMobHealth.dynamicScale ? (Math.ceil(maxhealth / 2) > HoloMobHealth.heartScale ? HoloMobHealth.heartScale : (int) Math.ceil(maxhealth / 2)) : HoloMobHealth.heartScale;
+		
 		if (text.contains("{Health_Rounded_Commas}")) {
 			DecimalFormat formatter = new DecimalFormat("#,##0");
 			text = text.replace("{Health_Rounded_Commas}", String.valueOf(formatter.format(health)));
@@ -95,49 +98,31 @@ public class ParsePlaceholders {
 			text = text.replace("{DynamicColor}", symbol);
 		}
 		if (text.contains("{ScaledSymbols}")) {
-			String symbol = "";
-			double healthpercentagescaled = percentage / 100.0 * (double) HoloMobHealth.heartScale;
-			double i = 1;
-			for (i = 1; i < healthpercentagescaled; i = i + 1) {
-				symbol = symbol + HoloMobHealth.HealthyChar;
+			StringBuilder symbol = new StringBuilder();
+			double healthpercentagescaled = percentage / 100.0 * (double) heartScale;
+			int fullhearts = (int) Math.floor(healthpercentagescaled);
+			for (int i = 0; i < fullhearts; i++) {
+				symbol.append(HoloMobHealth.HealthyChar);
 			}
-			i = i - 1;
-			if ((healthpercentagescaled - i) > 0 && (healthpercentagescaled - i) < 0.33) {
-				symbol = symbol + HoloMobHealth.EmptyChar;
-			} else if ((healthpercentagescaled - i) > 0 && (healthpercentagescaled - i) < 0.67) {
-				symbol = symbol + HoloMobHealth.HalfChar;
-			} else if ((healthpercentagescaled - i) > 0) {
-				symbol = symbol + HoloMobHealth.HealthyChar;
-			}
-			for (i = HoloMobHealth.heartScale - 1; i >= healthpercentagescaled; i = i - 1) {
-				symbol = symbol + HoloMobHealth.EmptyChar;
+			if (fullhearts < heartScale) {
+				double leftover = healthpercentagescaled - (double) fullhearts;
+				if (leftover > 0.67) {
+					symbol.append(HoloMobHealth.HealthyChar);
+				} else if (leftover > 0.33) {
+					symbol.append(HoloMobHealth.HalfChar);
+				} else {
+					symbol.append(HoloMobHealth.EmptyChar);
+				}
+				for (int i = fullhearts + 1; i < heartScale; i++) {
+					symbol.append(HoloMobHealth.EmptyChar);
+				}
 			}
 			text = text.replace("{ScaledSymbols}", symbol);
 		}
-		
+
 		text = ChatColorUtils.translateAlternateColorCodes('&', text);
 		List<String> sections = new ArrayList<String>();
-		String[] parts = text.split("\\{Mob_Type_Or_Name\\}");
-		if (text.startsWith("{Mob_Type_Or_Name}")) {
-			sections.add("{Mob_Type_Or_Name}");
-		}
-		for (int i = 0; i < parts.length; i++) {
-			String each = parts[i];
-			String[] partsparts = each.split("\\{Mob_Type\\}");
-			if (each.startsWith("{Mob_Type}")) {
-				sections.add("{Mob_Type}");
-			}
-			for (int u = 0; u < partsparts.length; u++) {
-				String eacheach = partsparts[u];
-				sections.add(eacheach);
-				if (u < partsparts.length - 1 || each.endsWith("{Mob_Type}")) {
-					sections.add("{Mob_Type}");
-				}
-			}
-			if (i < parts.length - 1 || text.endsWith("{Mob_Type_Or_Name}")) {
-				sections.add("{Mob_Type_Or_Name}");
-			}
-		}
+		sections.addAll(Arrays.asList(text.split("(?<=})|(?![^{])")));
 		
 		List<BaseComponent> baselist = new ArrayList<BaseComponent>();
 		String lastColor = "";

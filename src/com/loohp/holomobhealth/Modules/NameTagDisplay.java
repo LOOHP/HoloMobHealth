@@ -83,7 +83,7 @@ public class NameTagDisplay {
 						}
 					}
 				}
-				if (EntityTypeUtils.getMobList().contains(entity.getType())) { 
+				if (EntityTypeUtils.getMobsTypesSet().contains(entity.getType())) { 
 					if ((!HoloMobHealth.nearbyEntities.contains(entity)) || (!HoloMobHealth.altShowHealth.containsKey(entity))) {
 						String name = entity.getCustomName() != null && !entity.getCustomName().equals("") ? ComponentSerializer.toString(new TextComponent(entity.getCustomName())) : "";
 						boolean visible = entity.isCustomNameVisible();
@@ -158,7 +158,7 @@ public class NameTagDisplay {
 						}
 					}
 				}
-				if (EntityTypeUtils.getMobList().contains(entity.getType())) { 
+				if (EntityTypeUtils.getMobsTypesSet().contains(entity.getType())) { 
 					if (!HoloMobHealth.nearbyEntities.contains(entity)) {
 						String name = entity.getCustomName() != null && !entity.getCustomName().equals("") ? ComponentSerializer.toString(new TextComponent(entity.getCustomName())) : "";
 						boolean visible = entity.isCustomNameVisible();

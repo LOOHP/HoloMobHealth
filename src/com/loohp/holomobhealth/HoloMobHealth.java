@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -56,8 +55,9 @@ public class HoloMobHealth extends JavaPlugin {
 	public static List<String> DisplayText = new ArrayList<String>();
 	
 	public static int heartScale = 10;
+	public static boolean dynamicScale = true;
 	
-	public static List<Player> playersEnabled = new LinkedList<Player>();
+	public static Set<Player> playersEnabled = ConcurrentHashMap.newKeySet();
 	
 	public static String HealthyColor = "&a";
 	public static String HalfColor = "&e";
@@ -266,6 +266,7 @@ public class HoloMobHealth extends JavaPlugin {
 		DisplayText = plugin.getConfig().getStringList("Display.Text");
 		
 		heartScale = plugin.getConfig().getInt("Display.ScaledSymbolSettings.Scale");
+		dynamicScale = plugin.getConfig().getBoolean("Display.ScaledSymbolSettings.DynamicScale");
 		
 		HealthyColor = plugin.getConfig().getString("Display.DynamicColorSettings.HealthyColor");
 		HalfColor = plugin.getConfig().getString("Display.DynamicColorSettings.HalfColor");

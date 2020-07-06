@@ -38,6 +38,9 @@ Display:
   ScaledSymbolSettings:
     #How many of these symbols are considered max health
     Scale: 10
+    #If DynamicScale is set to true, entities with health lower than the Scale setting
+    #will use the amount of hearts it has rather than the Scale setting
+    DynamicScale: true
     #Character used for hearts that represents remaining health
     HealthyChar: "&c❤"
     #Character used for hearts that represents remaining health

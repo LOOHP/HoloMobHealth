@@ -1,7 +1,6 @@
 package com.loohp.holomobhealth.Utils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -14,21 +13,21 @@ import com.loohp.holomobhealth.HoloMobHealth;
 
 public class EntityTypeUtils {
 	
-	private static List<EntityType> MobTypesList = new ArrayList<EntityType>();
+	private static Set<EntityType> MobTypesSet = new HashSet<EntityType>();
     
-    public static List<EntityType> getMobList() {
-    	return MobTypesList;
+    public static Set<EntityType> getMobsTypesSet() {
+    	return MobTypesSet;
     }
     
     public static void setUpList() {
-    	MobTypesList.clear();
+    	MobTypesSet.clear();
     	for (EntityType each : EntityType.values()) {
     		if (each.equals(EntityType.PLAYER) || each.equals(EntityType.ARMOR_STAND) || each.equals(EntityType.UNKNOWN)) {
     			continue;
     		}
     		Set<Class<?>> clazzList = ClassUtils.getAllExtendedOrImplementedTypesRecursively(each.getEntityClass());
     		if (clazzList.contains(org.bukkit.entity.LivingEntity.class)) {
-    			MobTypesList.add(each);
+    			MobTypesSet.add(each);
     		}
     	}
     }

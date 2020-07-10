@@ -2,7 +2,6 @@ package com.loohp.holomobhealth;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -163,15 +162,15 @@ public class HoloMobHealth extends JavaPlugin {
 		removeEntities();
 		
 		try {
-			Class<?> chatHoverEventClass = Class.forName("net.md_5.bungee.api.chat.HoverEvent");
-			legacyChatAPI = !Arrays.asList(chatHoverEventClass.getDeclaredClasses()).stream().anyMatch(each -> each.getCanonicalName().equals("net.md_5.bungee.api.chat.HoverEvent.Content"));
+			Class.forName("net.md_5.bungee.api.chat.hover.content.Content");
+			legacyChatAPI = false;
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			legacyChatAPI = true;
 		};
 		
 		if (legacyChatAPI) {
 			ChatComponentUtils.setupLegacy();
-			Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[InteractiveChat] Legacy Bungeecord Chat API detected, using legacy methods...");
+			Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[HoloMobHealth] Legacy Bungeecord Chat API detected, using legacy methods...");
 		}
 		
 		metrics.addCustomChart(new Metrics.SingleLineChart("total_mobs_displaying", new Callable<Integer>() {

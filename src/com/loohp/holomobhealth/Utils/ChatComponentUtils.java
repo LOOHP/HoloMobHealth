@@ -4,23 +4,28 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import org.bukkit.entity.Player;
 
 import com.loohp.holomobhealth.HoloMobHealth;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention;
 import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.HoverEvent.Content;
-import net.md_5.bungee.api.chat.HoverEvent.ContentEntity;
-import net.md_5.bungee.api.chat.HoverEvent.ContentItem;
-import net.md_5.bungee.api.chat.HoverEvent.ContentText;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Content;
+import net.md_5.bungee.api.chat.hover.content.Entity;
+import net.md_5.bungee.api.chat.hover.content.Item;
+import net.md_5.bungee.api.chat.hover.content.Text;
 
 public class ChatComponentUtils {
 	
@@ -29,6 +34,8 @@ public class ChatComponentUtils {
 	
 	private static Pattern fontFormating = Pattern.compile("(?=(?<!\\\\)|(?<=\\\\\\\\))\\[[^\\]]*?font=[0-9a-zA-Z:_]*[^\\[]*?\\]");
 	private static Pattern fontEscape = Pattern.compile("\\\\\\[ *?font=[0-9a-zA-Z:_]* *?\\]");
+	
+	private static String validFont = "^([0-9a-zA-Z_]+:)?[0-9a-zA-Z_]+$";
 	
 	public static void setupLegacy() {
 		try {
@@ -194,9 +201,9 @@ public class ChatComponentUtils {
 							for (int i = 0; i < contents1.size() && i < contents2.size() ; i++) {
 								Content c1 = contents1.get(i);
 								Content c2 = contents2.get(i);
-								if (c1 instanceof ContentText && c2 instanceof ContentText) {
-									ContentText ct1 = (ContentText) c1;
-									ContentText ct2 = (ContentText) c2;
+								if (c1 instanceof Text && c2 instanceof Text) {
+									Text ct1 = (Text) c1;
+									Text ct2 = (Text) c2;
 									if (ct1.getValue() instanceof BaseComponent[] && ct2.getValue() instanceof BaseComponent[]) {
 										BaseComponent[] basecomponentarray1 = (BaseComponent[]) ct1.getValue();
 										BaseComponent[] basecomponentarray2 = (BaseComponent[]) ct2.getValue();
@@ -222,16 +229,16 @@ public class ChatComponentUtils {
 											break;
 										}
 									}
-								} else if (c1 instanceof ContentEntity && c2 instanceof ContentEntity) {
-									ContentEntity ce1 = (ContentEntity) c1;
-									ContentEntity ce2 = (ContentEntity) c2;
+								} else if (c1 instanceof Entity && c2 instanceof Entity) {
+									Entity ce1 = (Entity) c1;
+									Entity ce2 = (Entity) c2;
 									if (!(ce1.getId().equals(ce2.getId()) && ce1.getType().equals(ce2.getType()) && areSimilarNoEvents(ce1.getName(), ce2.getName(), true))) {
 										hoverSim = false;
 										break;
 									}
-								} else if (c1 instanceof ContentItem && c2 instanceof ContentItem) {
-									ContentItem ci1 = (ContentItem) c1;
-									ContentItem ci2 = (ContentItem) c2;
+								} else if (c1 instanceof Item && c2 instanceof Item) {
+									Item ci1 = (Item) c1;
+									Item ci2 = (Item) c2;
 									if (!(ci1.getCount() == ci2.getCount() && ci1.getId().equals(ci2.getId()) && ci1.getTag().equals(ci2.getTag()))) {
 										hoverSim = false;
 										break;
@@ -248,6 +255,94 @@ public class ChatComponentUtils {
 		}
 
 		return clickSim && hoverSim;
+	}
+	
+	public static BaseComponent removeHoverEventColor(BaseComponent baseComponent) {
+		if (baseComponent.getHoverEvent() != null) {
+			if (HoloMobHealth.legacyChatAPI) {
+				try {
+					for (BaseComponent each : (BaseComponent[]) hoverEventGetValueMethod.invoke(baseComponent.getHoverEvent())) {
+						each.setColor(ChatColor.WHITE);
+						if (each instanceof TextComponent) {
+							((TextComponent) each).setText(ChatColor.stripColor(((TextComponent) each).getText()));
+						}
+					}
+				} catch (Throwable e) {
+					e.printStackTrace();
+				}
+			} else {
+				int j = 0;
+				List<Content> contents = baseComponent.getHoverEvent().getContents();
+				for (Content content : contents) {
+					if (content instanceof Text) {
+						Object value = ((Text) content).getValue();
+						if (value instanceof BaseComponent[]) {
+							for (BaseComponent each : (BaseComponent[]) value) {
+								each.setColor(ChatColor.WHITE);
+								if (each instanceof TextComponent) {
+									((TextComponent) each).setText(ChatColor.stripColor(((TextComponent) each).getText()));
+								}
+							}
+						} else if (value instanceof String) {
+							contents.set(j, new Text(((String) value).replaceAll("§[0-9a-e]", "§f")));
+						}
+					}
+					j++;
+				}
+			}
+		}
+		return baseComponent;
+	}
+	
+	public static BaseComponent cleanUpLegacyText(BaseComponent basecomponent, Player player) {
+		List<BaseComponent> newlist = new LinkedList<BaseComponent>();
+		for (BaseComponent base : CustomStringUtils.loadExtras(basecomponent)) {
+			if (base instanceof TextComponent) {
+				List<TextComponent> texts = Arrays.asList(TextComponent.fromLegacyText(base.toLegacyText())).stream().map(each -> (TextComponent) each).collect(Collectors.toList());
+				for (TextComponent each : texts) {
+					if (HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12)) {
+						each = (TextComponent) CustomStringUtils.copyFormattingEventsNoReplace(each, base);
+	 	        	} else {
+	 	        		each.copyFormatting(base, FormatRetention.EVENTS, false);
+	 	        	}
+					if (HoloMobHealth.version.isPost1_16()) {
+						each.setFont(base.getFontRaw());
+					}
+					//Bukkit.getConsoleSender().sendMessage(ComponentSerializer.toString(each).replace("§", "&"));
+				}
+				newlist.addAll(texts);
+			} else {
+				newlist.add(base);
+			}
+		}
+
+		TextComponent product = new TextComponent("");
+		for (int i = 0; i < newlist.size(); i++) {
+			BaseComponent each = newlist.get(i);
+			product.addExtra(each);
+		}
+
+		return product;
+	}
+	
+	public static BaseComponent join(BaseComponent base, BaseComponent... basecomponentarray) {
+		if (basecomponentarray.length <= 0) {
+			return base;
+		} else {
+			BaseComponent product = base;
+			for (BaseComponent each : basecomponentarray) {
+				product.addExtra(each);
+			}
+			return product;
+		}
+	}
+	
+	public static BaseComponent join(BaseComponent[] basecomponentarray) {
+		if (basecomponentarray.length <= 1) {
+			return basecomponentarray[0];
+		} else {
+			return join(basecomponentarray[0], Arrays.copyOfRange(basecomponentarray, 1, basecomponentarray.length));
+		}
 	}
 	
 	public static BaseComponent translatePluginFontFormatting(BaseComponent basecomponent) {
@@ -318,13 +413,13 @@ public class ChatComponentUtils {
 			    	    
 			    	    if (sb.charAt(absPos) == ']' && sb.charAt(absPos - 1) == '[') {
 			    	    	sb.deleteCharAt(absPos - 1);
-			    	    	sb.deleteCharAt(absPos - 1);	
+			    	    	sb.deleteCharAt(absPos - 1);		
 			    	    	
 			    	    	if (absPos > 2 && sb.charAt(absPos - 2) == '\\' && sb.charAt(absPos - 3) == '\\') {
 				    	    	sb.deleteCharAt(absPos - 2);
 				    	    	absPos--;
 				    	    }
-			    	    }			    		    			    	    
+			    	    }			    	
 			    	    
 			    	    absPos--;
 			    	    
@@ -337,7 +432,7 @@ public class ChatComponentUtils {
 			    	    
 			    	    text = sb.substring(absPos);
 			    	    
-			    	    currentFont = (nextFont.length() == 0 || nextFont.equalsIgnoreCase("null") || nextFont.equalsIgnoreCase("reset")) ? Optional.empty() : Optional.of(nextFont);
+			    	    currentFont = (nextFont.length() == 0 || nextFont.equalsIgnoreCase("null") || nextFont.equalsIgnoreCase("reset")) ? Optional.empty() : (nextFont.matches(validFont) ? Optional.of(nextFont) : Optional.empty());
 		    		} else {
 		    			TextComponent before = new TextComponent(textcomponent);
 			    	    before.setText(text);

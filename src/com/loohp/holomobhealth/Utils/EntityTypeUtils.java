@@ -30,6 +30,7 @@ public class EntityTypeUtils {
     			MobTypesSet.add(each);
     		}
     	}
+    	MobTypesSet.add(EntityType.UNKNOWN);
     }
 	
 	public static String getMinecraftLangName(Entity entity) {	

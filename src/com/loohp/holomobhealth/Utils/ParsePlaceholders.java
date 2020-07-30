@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 
 import com.loohp.holomobhealth.HoloMobHealth;
@@ -17,10 +18,15 @@ import net.md_5.bungee.chat.ComponentSerializer;
 
 public class ParsePlaceholders {
 	
+	@SuppressWarnings("deprecation")
 	public static String parse(LivingEntity entity, String text) {	
 		double health = entity.getHealth();
-		@SuppressWarnings("deprecation")
-		double maxhealth = entity.getMaxHealth();
+		double maxhealth = 0.0;
+		try {
+			maxhealth = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+		} catch (Exception e) {
+			maxhealth = entity.getMaxHealth();
+		}
 		double percentage = (health / maxhealth) * 100;
 		
 		int heartScale = HoloMobHealth.dynamicScale ? (Math.ceil(maxhealth / 2) > HoloMobHealth.heartScale ? HoloMobHealth.heartScale : (int) Math.ceil(maxhealth / 2)) : HoloMobHealth.heartScale;
@@ -124,6 +130,8 @@ public class ParsePlaceholders {
 		List<String> sections = new ArrayList<String>();
 		sections.addAll(Arrays.asList(text.split("(?<=})|(?![^{])")));
 		
+		String customName = CustomNameUtils.getMobCustomName(entity);
+		
 		List<BaseComponent> baselist = new ArrayList<BaseComponent>();
 		String lastColor = "";
 		for (String section : sections) {
@@ -137,16 +145,16 @@ public class ParsePlaceholders {
 					baselist.add(textcomp);
 				}
 			} else if (section.equals("{Mob_Name}")) {
-				if (entity.getCustomName() != null && !entity.getCustomName().equals("")) {
-					TextComponent textcomp = new TextComponent(ChatColor.RESET + entity.getCustomName());
+				if (customName != null) {
+					TextComponent textcomp = new TextComponent(ChatColor.RESET + customName);
 					baselist.add(textcomp);
 				} else {
 					TextComponent textcomp = new TextComponent("");
 					baselist.add(textcomp);
 				}
 			} else if (section.equals("{Mob_Type_Or_Name}")) {
-				if (entity.getCustomName() != null && !entity.getCustomName().equals("")) {
-					TextComponent textcomp = new TextComponent(ChatColor.RESET + entity.getCustomName());
+				if (customName != null) {
+					TextComponent textcomp = new TextComponent(ChatColor.RESET + customName);
 					baselist.add(textcomp);
 				} else {
 					if (!HoloMobHealth.version.isLegacy()) {

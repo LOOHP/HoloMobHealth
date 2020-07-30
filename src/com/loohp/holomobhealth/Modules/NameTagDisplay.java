@@ -14,9 +14,12 @@ import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.Protocol.MetadataPacket;
 import com.loohp.holomobhealth.Utils.ChatColorUtils;
 import com.loohp.holomobhealth.Utils.CitizensUtils;
+import com.loohp.holomobhealth.Utils.CustomNameUtils;
 import com.loohp.holomobhealth.Utils.EntityTypeUtils;
+import com.loohp.holomobhealth.Utils.MyPetUtils;
 import com.loohp.holomobhealth.Utils.MythicMobsUtils;
 import com.loohp.holomobhealth.Utils.ParsePlaceholders;
+import com.loohp.holomobhealth.Utils.ShopkeepersUtils;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -42,8 +45,10 @@ public class NameTagDisplay {
 					
 				Entity entity = itr.next();
 				itr.remove();
+				
+				String customName = CustomNameUtils.getMobCustomName(entity);
 					
-				if (entity.getCustomName() != null && entity.getCustomName().matches("(?i)mellifluous|euphoria|liarcar")) {
+				if (customName != null && customName.matches("(?i)mellifluous|euphoria|liarcar")) {
 					entity.getWorld().spawnParticle(Particle.HEART, entity.getLocation().add(0.0, 1.0, 0.0), 1, 0.5, 0.5, 0.5, 1);
 				}
 				if ((entity instanceof Player) && ((Player) entity).getName().matches("(?i)mellifluous|euphoria|liarcar")) {
@@ -63,41 +68,47 @@ public class NameTagDisplay {
 						return;
 					}
 				}
-				if (entity.getCustomName() != null) {
-					if (!entity.getCustomName().equals("")) {
-						boolean contain = false;
-						for (String each : HoloMobHealth.DisabledMobNamesAbsolute) {
-							if (entity.getCustomName().equals(ChatColorUtils.translateAlternateColorCodes('&', each))) {
-								contain = true;
-								break;
-							}
+				if (!HoloMobHealth.showShopkeepers && HoloMobHealth.ShopkeepersHook) {
+					if (ShopkeepersUtils.isShopkeeper(entity)) {
+						return;
+					}
+				}
+				if (!HoloMobHealth.showMyPet && HoloMobHealth.MyPetHook) {
+					if (MyPetUtils.isMyPet(entity)) {
+						return;
+					}
+				}
+				if (customName != null) {
+					boolean contain = false;
+					for (String each : HoloMobHealth.DisabledMobNamesAbsolute) {
+						if (customName.equals(ChatColorUtils.translateAlternateColorCodes('&', each))) {
+							contain = true;
+							break;
 						}
-						for (String each : HoloMobHealth.DisabledMobNamesContains) {
-							if (ChatColor.stripColor(entity.getCustomName().toLowerCase()).contains(ChatColor.stripColor(ChatColorUtils.translateAlternateColorCodes('&', each).toLowerCase()))) {
-								contain = true;
-								break;
-							}
+					}
+					for (String each : HoloMobHealth.DisabledMobNamesContains) {
+						if (ChatColor.stripColor(customName.toLowerCase()).contains(ChatColor.stripColor(ChatColorUtils.translateAlternateColorCodes('&', each).toLowerCase()))) {
+							contain = true;
+							break;
 						}
-						if (contain) {
-							return;
-						}
+					}
+					if (contain) {
+						return;
 					}
 				}
 				if (EntityTypeUtils.getMobsTypesSet().contains(entity.getType())) { 
 					if ((!HoloMobHealth.nearbyEntities.contains(entity)) || (!HoloMobHealth.altShowHealth.containsKey(entity))) {
-						String name = entity.getCustomName() != null && !entity.getCustomName().equals("") ? ComponentSerializer.toString(new TextComponent(entity.getCustomName())) : "";
+						String name = customName != null && !customName.equals("") ? ComponentSerializer.toString(new TextComponent(customName)) : "";
 						boolean visible = entity.isCustomNameVisible();
 						MetadataPacket.sendMetadataPacket(entity, name, visible);
 						return;
 					}
 					if (!HoloMobHealth.applyToNamed) {
-						if (entity.getCustomName() != null) {
-							if (!entity.getCustomName().equals("")) {
-								String name = entity.getCustomName() != null && !entity.getCustomName().equals("") ? ComponentSerializer.toString(new TextComponent(entity.getCustomName())) : "";
-								boolean visible = entity.isCustomNameVisible();
-								MetadataPacket.sendMetadataPacket(entity, name, visible);
-								return;
-							}
+						if (customName != null) {
+							String name = customName != null && !customName.equals("") ? ComponentSerializer.toString(new TextComponent(customName)) : "";
+							boolean visible = entity.isCustomNameVisible();
+							MetadataPacket.sendMetadataPacket(entity, name, visible);
+							return;
 						}	
 					}
 					String display = ParsePlaceholders.parse((LivingEntity) entity, HoloMobHealth.DisplayText.get(0));
@@ -118,7 +129,9 @@ public class NameTagDisplay {
 				Entity entity = itr.next();
 				itr.remove();
 				
-				if (entity.getCustomName() != null && entity.getCustomName().matches("(?i)mellifluous|euphoria|liarcar")) {
+				String customName = CustomNameUtils.getMobCustomName(entity);
+				
+				if (customName != null && customName.matches("(?i)mellifluous|euphoria|liarcar")) {
 					entity.getWorld().spawnParticle(Particle.HEART, entity.getLocation().add(0.0, 1.0, 0.0), 1, 0.5, 0.5, 0.5, 1);
 				}
 				if ((entity instanceof Player) && ((Player) entity).getName().matches("(?i)mellifluous|euphoria|liarcar")) {
@@ -138,41 +151,47 @@ public class NameTagDisplay {
 						return;
 					}
 				}
-				if (entity.getCustomName() != null) {
-					if (!entity.getCustomName().equals("")) {
-						boolean contain = false;
-						for (String each : HoloMobHealth.DisabledMobNamesAbsolute) {
-							if (entity.getCustomName().equals(ChatColorUtils.translateAlternateColorCodes('&', each))) {
-								contain = true;
-								break;
-							}
+				if (!HoloMobHealth.showShopkeepers && HoloMobHealth.ShopkeepersHook) {
+					if (ShopkeepersUtils.isShopkeeper(entity)) {
+						return;
+					}
+				}
+				if (!HoloMobHealth.showMyPet && HoloMobHealth.MyPetHook) {
+					if (MyPetUtils.isMyPet(entity)) {
+						return;
+					}
+				}
+				if (customName != null) {
+					boolean contain = false;
+					for (String each : HoloMobHealth.DisabledMobNamesAbsolute) {
+						if (customName.equals(ChatColorUtils.translateAlternateColorCodes('&', each))) {
+							contain = true;
+							break;
 						}
-						for (String each : HoloMobHealth.DisabledMobNamesContains) {
-							if (ChatColor.stripColor(entity.getCustomName().toLowerCase()).contains(ChatColor.stripColor(ChatColorUtils.translateAlternateColorCodes('&', each).toLowerCase()))) {
-								contain = true;
-								break;
-							}
+					}
+					for (String each : HoloMobHealth.DisabledMobNamesContains) {
+						if (ChatColor.stripColor(customName.toLowerCase()).contains(ChatColor.stripColor(ChatColorUtils.translateAlternateColorCodes('&', each).toLowerCase()))) {
+							contain = true;
+							break;
 						}
-						if (contain) {
-							return;
-						}
+					}
+					if (contain) {
+						return;
 					}
 				}
 				if (EntityTypeUtils.getMobsTypesSet().contains(entity.getType())) { 
 					if (!HoloMobHealth.nearbyEntities.contains(entity)) {
-						String name = entity.getCustomName() != null && !entity.getCustomName().equals("") ? ComponentSerializer.toString(new TextComponent(entity.getCustomName())) : "";
+						String name = customName != null && !customName.equals("") ? ComponentSerializer.toString(new TextComponent(customName)) : "";
 						boolean visible = entity.isCustomNameVisible();
 						MetadataPacket.sendMetadataPacket(entity, name, visible);
 						return;
 					}
 					if (!HoloMobHealth.applyToNamed) {
-						if (entity.getCustomName() != null) {
-							if (!entity.getCustomName().equals("")) {
-								String name = entity.getCustomName() != null && !entity.getCustomName().equals("") ? ComponentSerializer.toString(new TextComponent(entity.getCustomName())) : "";
-								boolean visible = entity.isCustomNameVisible();
-								MetadataPacket.sendMetadataPacket(entity, name, visible);
-								return;
-							}
+						if (customName != null) {
+							String name = customName != null && !customName.equals("") ? ComponentSerializer.toString(new TextComponent(customName)) : "";
+							boolean visible = entity.isCustomNameVisible();
+							MetadataPacket.sendMetadataPacket(entity, name, visible);
+							return;
 						}	
 					}
 					String display = ParsePlaceholders.parse((LivingEntity) entity, HoloMobHealth.DisplayText.get(0));

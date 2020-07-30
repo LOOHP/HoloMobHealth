@@ -99,6 +99,12 @@ Hooks:
   MythicMobs:
     #Whether HoloMobHealth should show health for MythicMobs (applies to mobs only)
     ShowMythicMobsHealth: true
+  Shopkeepers:
+    #Whether HoloMobHealth should show health for Shopkeepers (applies to mobs only)
+    ShowShopkeepersHealth: true
+  MyPet:
+    #Whether HoloMobHealth should show health for MyPet pets (applies to mobs only)
+    ShowMyPetHealth: true
 
 Messages:
   ReloadPlugin: "&aHoloMobHealth has been reloaded!"

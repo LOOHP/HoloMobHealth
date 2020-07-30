@@ -99,6 +99,12 @@ public class HoloMobHealth extends JavaPlugin {
 	public static boolean CitizensHook = false;
 	public static boolean showCitizens = true;
 	
+	public static boolean ShopkeepersHook = false;
+	public static boolean showShopkeepers = true;
+	
+	public static boolean MyPetHook = false;
+	public static boolean showMyPet = true;
+	
 	public static boolean armorStandMode = false;
 	public static int armorStandYOffset = 0;
 	
@@ -131,8 +137,8 @@ public class HoloMobHealth extends JavaPlugin {
         
         getServer().getPluginManager().registerEvents(new Events(), this);
 		
-		plugin.getConfig().options().copyDefaults(true);
-		plugin.saveConfig();
+        getConfig().options().copyDefaults(true);
+        saveConfig();
 		
 		loadConfig();
 		
@@ -153,6 +159,16 @@ public class HoloMobHealth extends JavaPlugin {
 	    if (Bukkit.getServer().getPluginManager().getPlugin("MythicMobs") != null) {
 	    	Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into MythicMobs!");
 	    	MythicHook = true;
+		}
+	    
+	    if (Bukkit.getServer().getPluginManager().getPlugin("Shopkeepers") != null) {
+	    	Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into Shopkeepers!");
+	    	ShopkeepersHook = true;
+		}
+	    
+	    if (Bukkit.getServer().getPluginManager().getPlugin("MyPet") != null) {
+	    	Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into MyPet!");
+	    	MyPetHook = true;
 		}
 		
 	    EntityTypeUtils.setUpList();
@@ -343,9 +359,10 @@ public class HoloMobHealth extends JavaPlugin {
 			}
 		}
 		
-		showCitizens = plugin.getConfig().getBoolean("Hooks.Citizens.ShowNPCMobHealth");
-		
+		showCitizens = plugin.getConfig().getBoolean("Hooks.Citizens.ShowNPCMobHealth");		
 		showMythicMobs = plugin.getConfig().getBoolean("Hooks.MythicMobs.ShowMythicMobsHealth");
+		showShopkeepers = plugin.getConfig().getBoolean("Hooks.Shopkeepers.ShowShopkeepersHealth");
+		showMyPet = plugin.getConfig().getBoolean("Hooks.MyPet.ShowMyPetHealth");
 		
 		UpdaterEnabled = plugin.getConfig().getBoolean("Updater.Enable");
 	}

@@ -36,7 +36,9 @@ import com.loohp.holomobhealth.Updater.Updater;
 import com.loohp.holomobhealth.Utils.BoundingBoxUtils;
 import com.loohp.holomobhealth.Utils.ChatColorUtils;
 import com.loohp.holomobhealth.Utils.ChatComponentUtils;
+import com.loohp.holomobhealth.Utils.DisplayTextCacher;
 import com.loohp.holomobhealth.Utils.EntityTypeUtils;
+import com.loohp.holomobhealth.Utils.LegacyPlaceholdersConverter;
 import com.loohp.holomobhealth.Utils.MCVersion;
 
 import net.md_5.bungee.api.ChatColor;
@@ -139,6 +141,12 @@ public class HoloMobHealth extends JavaPlugin {
 		
         getConfig().options().copyDefaults(true);
         saveConfig();
+        
+        //Legacy Placeholders Converter
+        List<String> lines = plugin.getConfig().getStringList("Display.Text");
+        if (LegacyPlaceholdersConverter.getLegacyPlaceholderSet().stream().anyMatch(each -> lines.stream().anyMatch(line -> line.contains(each)))) {
+        	LegacyPlaceholdersConverter.convert();
+        }
 		
 		loadConfig();
 		
@@ -278,7 +286,7 @@ public class HoloMobHealth extends JavaPlugin {
 		}
 		*/
 		
-		DisplayText = plugin.getConfig().getStringList("Display.Text");
+		DisplayText = DisplayTextCacher.cacheDecimalFormat(plugin.getConfig().getStringList("Display.Text"));
 		
 		heartScale = plugin.getConfig().getInt("Display.ScaledSymbolSettings.Scale");
 		dynamicScale = plugin.getConfig().getBoolean("Display.ScaledSymbolSettings.DynamicScale");

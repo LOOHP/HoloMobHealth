@@ -1,14 +1,15 @@
 package com.loohp.holomobhealth.Utils;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 
 import com.loohp.holomobhealth.HoloMobHealth;
+import com.loohp.holomobhealth.Utils.DisplayTextCacher.HealthFormatData;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -31,72 +32,26 @@ public class ParsePlaceholders {
 		
 		int heartScale = HoloMobHealth.dynamicScale ? (Math.ceil(maxhealth / 2) > HoloMobHealth.heartScale ? HoloMobHealth.heartScale : (int) Math.ceil(maxhealth / 2)) : HoloMobHealth.heartScale;
 		
-		if (text.contains("{Health_Rounded_Commas}")) {
-			DecimalFormat formatter = new DecimalFormat("#,##0");
-			text = text.replace("{Health_Rounded_Commas}", String.valueOf(formatter.format(health)));
+		for (Entry<String, HealthFormatData> entry : DisplayTextCacher.getDecimalFormatMapping().entrySet()) {
+			HealthFormatData data = entry.getValue();
+			switch (data.getType()) {
+			case HEALTH:
+				text = text.replace(entry.getKey(), String.valueOf(data.getFormatter().format(health)));
+				break;
+			case MAXHEALTH:
+				text = text.replace(entry.getKey(), String.valueOf(data.getFormatter().format(maxhealth)));
+				break;
+			case PERCENTAGEHEALTH:
+				text = text.replace(entry.getKey(), String.valueOf(data.getFormatter().format(percentage)));
+				break;
+			}
 		}
-		if (text.contains("{Max_Health_Rounded_Commas}")) {
-			DecimalFormat formatter = new DecimalFormat("#,##0");
-			text = text.replace("{Max_Health_Rounded_Commas}", String.valueOf(formatter.format(maxhealth)));
-		}
-		if (text.contains("{Health_1DP_Commas}")) {
-			DecimalFormat formatter = new DecimalFormat("#,##0.0");
-			text = text.replace("{Health_1DP_Commas}", String.valueOf(formatter.format(health)));
-		}
-		if (text.contains("{Max_Health_1DP_Commas}")) {
-			DecimalFormat formatter = new DecimalFormat("#,##0.0");
-			text = text.replace("{Max_Health_1DP_Commas}", String.valueOf(formatter.format(maxhealth)));
-		}
-		if (text.contains("{Health_2DP_Commas}")) {
-			DecimalFormat formatter = new DecimalFormat("#,##0.00");
-			text = text.replace("{Health_2DP_Commas}", String.valueOf(formatter.format(health)));
-		}
-		if (text.contains("{Max_Health_2DP_Commas}")) {
-			DecimalFormat formatter = new DecimalFormat("#,##0.00");
-			text = text.replace("{Max_Health_2DP_Commas}", String.valueOf(formatter.format(maxhealth)));
-		}		
-		if (text.contains("{Health_Rounded}")) {
-			DecimalFormat formatter = new DecimalFormat("0");
-			text = text.replace("{Health_Rounded}", String.valueOf(formatter.format(health)));
-		}
-		if (text.contains("{Max_Health_Rounded}")) {
-			DecimalFormat formatter = new DecimalFormat("0");
-			text = text.replace("{Max_Health_Rounded}", String.valueOf(formatter.format(maxhealth)));
-		}
-		if (text.contains("{Health_1DP}")) {
-			DecimalFormat formatter = new DecimalFormat("0.0");
-			text = text.replace("{Health_1DP}", String.valueOf(formatter.format(health)));
-		}
-		if (text.contains("{Max_Health_1DP}")) {
-			DecimalFormat formatter = new DecimalFormat("0.0");
-			text = text.replace("{Max_Health_1DP}", String.valueOf(formatter.format(maxhealth)));
-		}
-		if (text.contains("{Health_2DP}")) {
-			DecimalFormat formatter = new DecimalFormat("0.00");
-			text = text.replace("{Health_2DP}", String.valueOf(formatter.format(health)));
-		}
-		if (text.contains("{Max_Health_2DP}")) {
-			DecimalFormat formatter = new DecimalFormat("0.00");
-			text = text.replace("{Max_Health_2DP}", String.valueOf(formatter.format(maxhealth)));
-		}
-		if (text.contains("{Health_Percentage}")) {
-			DecimalFormat formatter = new DecimalFormat("0");
-			text = text.replace("{Health_Percentage}", String.valueOf(formatter.format(percentage)));
-		}
-		if (text.contains("{Health_Percentage_1DP}")) {
-			DecimalFormat formatter = new DecimalFormat("0.0");
-			text = text.replace("{Health_Percentage_1DP}", String.valueOf(formatter.format(percentage)));
-		}
-		if (text.contains("{Health_Percentage_2DP}")) {
-			DecimalFormat formatter = new DecimalFormat("0.00");
-			text = text.replace("{Health_Percentage_2DP}", String.valueOf(formatter.format(percentage)));
-		}
+
 		if (text.contains("{DynamicColor}")) {
-			double healthpercentage = percentage / 100.0;
-			String symbol = "";
-			if (healthpercentage < 0.33) {
+			String symbol;
+			if (percentage < 33.33) {
 				symbol = HoloMobHealth.LowColor;
-			} else if (healthpercentage < 0.67) {
+			} else if (percentage < 66.67) {
 				symbol = HoloMobHealth.HalfColor;
 			} else {
 				symbol = HoloMobHealth.HealthyColor;
@@ -127,6 +82,8 @@ public class ParsePlaceholders {
 		}
 
 		text = ChatColorUtils.translateAlternateColorCodes('&', text);
+		
+		
 		List<String> sections = new ArrayList<String>();
 		sections.addAll(Arrays.asList(text.split("(?<=})|(?![^{])")));
 		

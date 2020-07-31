@@ -1,30 +1,29 @@
 Display:
   #The text to display above the mob
   #Placeholders:
-  #{Health_Rounded}
-  #{Max_Health_Rounded}
-  #{Health_1DP}
-  #{Max_Health_1DP}
-  #{Health_2DP}
-  #{Max_Health_2DP}
-  #{Health_Rounded_Commas}
-  #{Max_Health_Rounded_Commas}
-  #{Health_1DP_Commas}
-  #{Max_Health_1DP_Commas}
-  #{Health_2DP_Commas}
-  #{Max_Health_2DP_Commas}
-  #{Health_Percentage}
-  #{Health_Percentage_1DP}
-  #{Health_Percentage_2DP}
+  #{Health_<DecimalFormat>}
+  #{MaxHealth_<DecimalFormat>}
+  #{PercentageHealth_<DecimalFormat>}
+
+  #Example of DecimalFormat:
+  #{Health_0.0} = Health with 1 decimal point
+  #{MaxHealth_#,##0.00} = Health formatted with commas with 2 decimal points
+
+  #For more info:
+  #https://docs.oracle.com/javase/7/docs/api/java/text/DecimalFormat.html
+
+  #Supports custom mob names of supported plugins if enabled
   #{Mob_Type}
   #{Mob_Name}
   #{Mob_Type_Or_Name}
 
+  #These placeholders can be further configurated
   #{DynamicColor}
   #{ScaledSymbols}
-  #Only one line is allowed (Unless you enabled EXPERIMENTAL multi-line)
+  
+  #Only one line is allowed (Unless you enabled ***EXPERIMENTAL*** multi-line which is not recommended)
   Text: 
-    - "&b{Mob_Type_Or_Name}: {DynamicColor}{Health_1DP}&f/{Max_Health_1DP}"
+    - "&b{Mob_Type_Or_Name}: {DynamicColor}{Health_0.0}&f/{MaxHealth_0.0}"
 
   #Settings for the {DynamicColor} Placeholder
   DynamicColorSettings:

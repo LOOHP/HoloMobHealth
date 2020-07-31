@@ -7,9 +7,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import com.loohp.holomobhealth.HoloMobHealth;
+
+import net.md_5.bungee.api.ChatColor;
 
 public class LegacyPlaceholdersConverter {
 	
@@ -38,6 +41,8 @@ public class LegacyPlaceholdersConverter {
 	}
 	
 	public static void convert() {
+		Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[HoloMobHealth] Translating old placeholders to new placeholders...");
+		
 		FileConfiguration config = HoloMobHealth.plugin.getConfig();		
 		List<String> lines = config.getStringList("Display.Text");
 		
@@ -55,6 +60,7 @@ public class LegacyPlaceholdersConverter {
 		config.set("Display.Text", lines);
 		HoloMobHealth.plugin.saveConfig();
 		
+		Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[HoloMobHealth] Translation complete!");		
 	}
 
 }

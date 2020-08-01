@@ -27,7 +27,7 @@ public class MetadataPacket {
 	private static HashMap<Integer, HoloMobCache> cache = new HashMap<Integer, HoloMobCache>();
 	
 	public static void sendMetadataPacket(Entity entity, String entityNameJson, boolean visible) {
-		String json = (entityNameJson == null || entityNameJson.equals("")) ? null : (ComponentSerializer.parse(entityNameJson)[0].toPlainText().equals("") ? null : entityNameJson);
+		String json = (entityNameJson == null || entityNameJson.equals("")) ? null : entityNameJson;
 		Bukkit.getScheduler().runTask(HoloMobHealth.plugin, () -> {
 			
 			Set<Player> playersInRange = HoloMobHealth.playersEnabled.stream().filter(each -> (each.getWorld().equals(entity.getWorld())) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.updateRange * HoloMobHealth.updateRange))).collect(Collectors.toSet());

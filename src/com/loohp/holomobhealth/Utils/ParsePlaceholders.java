@@ -87,7 +87,8 @@ public class ParsePlaceholders {
 		List<String> sections = new ArrayList<String>();
 		sections.addAll(Arrays.asList(text.split("(?<=})|(?![^{])")));
 		
-		String customName = CustomNameUtils.getMobCustomName(entity);
+		String rawName = CustomNameUtils.getMobCustomName(entity);
+		BaseComponent customName = rawName != null ? ChatComponentUtils.join(TextComponent.fromLegacyText(ChatColor.RESET + rawName)) : null;
 		
 		List<BaseComponent> baselist = new ArrayList<BaseComponent>();
 		String lastColor = "";
@@ -103,16 +104,14 @@ public class ParsePlaceholders {
 				}
 			} else if (section.equals("{Mob_Name}")) {
 				if (customName != null) {
-					TextComponent textcomp = new TextComponent(ChatColor.RESET + customName);
-					baselist.add(textcomp);
+					baselist.add(customName);
 				} else {
 					TextComponent textcomp = new TextComponent("");
 					baselist.add(textcomp);
 				}
 			} else if (section.equals("{Mob_Type_Or_Name}")) {
 				if (customName != null) {
-					TextComponent textcomp = new TextComponent(ChatColor.RESET + customName);
-					baselist.add(textcomp);
+					baselist.add(customName);
 				} else {
 					if (!HoloMobHealth.version.isLegacy()) {
 						TranslatableComponent textcomp = new TranslatableComponent(EntityTypeUtils.getMinecraftLangName(entity));
@@ -136,9 +135,10 @@ public class ParsePlaceholders {
 		}
 		
 		if (HoloMobHealth.version.isPost1_16()) {
-			product = ChatComponentUtils.translatePluginFontFormatting(product);
+			product = ChatComponentUtils.cleanUpLegacyText(ChatComponentUtils.translatePluginFontFormatting(product));
 		}
 		
+		//Bukkit.getConsoleSender().sendMessage(ComponentSerializer.toString(product));
 		return ComponentSerializer.toString(product);
 	}
 

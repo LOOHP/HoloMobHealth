@@ -12,8 +12,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.bukkit.entity.Player;
-
 import com.loohp.holomobhealth.HoloMobHealth;
 
 import net.md_5.bungee.api.ChatColor;
@@ -74,11 +72,11 @@ public class ChatComponentUtils {
 			return false;
 		}
 		if (HoloMobHealth.version.isPost1_16()) {
-			if ((base1.getFontRaw() == null && base2.getFontRaw() != null) || (base1.getFontRaw() != null && base2.getFontRaw() == null)) {
+			if ((base1.getFont() == null && base2.getFont() != null) || (base1.getFont() != null && base2.getFont() == null)) {
 				return false;
 			}
-			if (base1.getFontRaw() != null && base2.getFontRaw() != null) {
-				if (!base1.getFontRaw().equals(base2.getFontRaw())) {
+			if (base1.getFont() != null && base2.getFont() != null) {
+				if (!base1.getFont().equals(base2.getFont())) {
 					return false;
 				}
 			}
@@ -114,11 +112,11 @@ public class ChatComponentUtils {
 			return false;
 		}
 		if (HoloMobHealth.version.isPost1_16()) {
-			if ((base1.getFontRaw() == null && base2.getFontRaw() != null) || (base1.getFontRaw() != null && base2.getFontRaw() == null)) {
+			if ((base1.getFont() == null && base2.getFont() != null) || (base1.getFont() != null && base2.getFont() == null)) {
 				return false;
 			}
-			if (base1.getFontRaw() != null && base2.getFontRaw() != null) {
-				if (!base1.getFontRaw().equals(base2.getFontRaw())) {
+			if (base1.getFont() != null && base2.getFont() != null) {
+				if (!base1.getFont().equals(base2.getFont())) {
 					return false;
 				}
 			}
@@ -131,11 +129,11 @@ public class ChatComponentUtils {
 	
 	public static boolean areFontsSimilar(BaseComponent base1, BaseComponent base2) {
 		if (HoloMobHealth.version.isPost1_16()) {
-			if ((base1.getFontRaw() == null && base2.getFontRaw() != null) || (base1.getFontRaw() != null && base2.getFontRaw() == null)) {
+			if ((base1.getFont() == null && base2.getFont() != null) || (base1.getFont() != null && base2.getFont() == null)) {
 				return false;
 			}
-			if (base1.getFontRaw() != null && base2.getFontRaw() != null) {
-				if (!base1.getFontRaw().equals(base2.getFontRaw())) {
+			if (base1.getFont() != null && base2.getFont() != null) {
+				if (!base1.getFont().equals(base2.getFont())) {
 					return false;
 				}
 			}
@@ -294,7 +292,7 @@ public class ChatComponentUtils {
 		return baseComponent;
 	}
 	
-	public static BaseComponent cleanUpLegacyText(BaseComponent basecomponent, Player player) {
+	public static BaseComponent cleanUpLegacyText(BaseComponent basecomponent) {
 		List<BaseComponent> newlist = new LinkedList<BaseComponent>();
 		for (BaseComponent base : CustomStringUtils.loadExtras(basecomponent)) {
 			if (base instanceof TextComponent) {
@@ -306,7 +304,7 @@ public class ChatComponentUtils {
 	 	        		each.copyFormatting(base, FormatRetention.EVENTS, false);
 	 	        	}
 					if (HoloMobHealth.version.isPost1_16()) {
-						each.setFont(base.getFontRaw());
+						each.setFont(base.getFont());
 					}
 					//Bukkit.getConsoleSender().sendMessage(ComponentSerializer.toString(each).replace("§", "&"));
 				}
@@ -325,24 +323,18 @@ public class ChatComponentUtils {
 		return product;
 	}
 	
-	public static BaseComponent join(BaseComponent base, BaseComponent... basecomponentarray) {
-		if (basecomponentarray.length <= 0) {
-			return base;
-		} else {
-			BaseComponent product = base;
-			for (BaseComponent each : basecomponentarray) {
-				product.addExtra(each);
-			}
-			return product;
+	public static BaseComponent join(BaseComponent... toJoin) {
+		if (toJoin.length <= 0) {
+			return new TextComponent("");
 		}
-	}
-	
-	public static BaseComponent join(BaseComponent[] basecomponentarray) {
-		if (basecomponentarray.length <= 1) {
-			return basecomponentarray[0];
-		} else {
-			return join(basecomponentarray[0], Arrays.copyOfRange(basecomponentarray, 1, basecomponentarray.length));
+		
+		BaseComponent base = toJoin[0];
+		for (int i = 1; i < toJoin.length; i++) {
+			BaseComponent each = toJoin[i];
+			base.addExtra(each);
 		}
+		
+		return base;
 	}
 	
 	public static BaseComponent translatePluginFontFormatting(BaseComponent basecomponent) {
@@ -351,8 +343,8 @@ public class ChatComponentUtils {
 		Optional<String> currentFont = Optional.empty();
 		
 		for (BaseComponent each : list) {
-			if (each.getFontRaw() != null) {
-				currentFont = Optional.of(each.getFontRaw());
+			if (each.getFont() != null) {
+				currentFont = Optional.of(each.getFont());
 			}
 			
 			if (each instanceof TextComponent) {

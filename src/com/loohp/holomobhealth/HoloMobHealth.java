@@ -121,7 +121,7 @@ public class HoloMobHealth extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {	
-		plugin = (Plugin)getServer().getPluginManager().getPlugin("HoloMobHealth");
+		plugin = this;
 		
 		getServer().getPluginManager().registerEvents(new Debug(), this);
 

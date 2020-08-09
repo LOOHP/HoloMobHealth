@@ -115,7 +115,7 @@ Messages:
 
 Settings:
   #The amount of mobs to update per tick
-  MobsPerTick: 4
+  MobsPerTick: 15
 
 Database:
   #Player data storage type, MYSQL or SQLITE

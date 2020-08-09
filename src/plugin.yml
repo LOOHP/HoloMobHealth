@@ -1,6 +1,6 @@
 name: HoloMobHealth
 author: loohp
-version: 1.8.1
+version: 1.8.2
 api-version: 1.13
 main: com.loohp.holomobhealth.HoloMobHealth
 description: Show Mob Health with packets

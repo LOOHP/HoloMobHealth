@@ -133,6 +133,13 @@
 			<systemPath>${basedir}/lib/MyPet-3.11-SNAPSHOT-B1556.jar</systemPath>
 		</dependency>
 		<dependency>
+			<groupId>MythicMobsLegacy</groupId>
+			<artifactId>MythicMobsLegacy</artifactId>
+			<scope>system</scope>
+			<version>1.0</version>
+			<systemPath>${basedir}/lib/MythicMobs-4.5.1.jar</systemPath>
+		</dependency>
+		<dependency>
 			<groupId>Spigot-1.16.1</groupId>
 			<artifactId>Spigot-1.16.1</artifactId>
 			<scope>system</scope>

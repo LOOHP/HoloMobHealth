@@ -4,7 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,17 +32,15 @@ import com.comphenix.protocol.wrappers.WrappedDataWatcher.Serializer;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObject;
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.Holders.HoloMobArmorStand;
-import com.loohp.holomobhealth.Holders.HoloMobCache;
 import com.loohp.holomobhealth.Utils.MCVersion;
 
 import net.md_5.bungee.chat.ComponentSerializer;
 
 public class ArmorStandPacket implements Listener {
-	
+
 	private static ProtocolManager protocolManager = HoloMobHealth.protocolManager;
 	private static Plugin plugin = HoloMobHealth.plugin;
 	public static Set<HoloMobArmorStand> active = Collections.synchronizedSet(new LinkedHashSet<HoloMobArmorStand>());
-	private static HashMap<Integer, HoloMobCache> cache = new HashMap<Integer, HoloMobCache>();
 	
 	public static ConcurrentHashMap<Player, Set<HoloMobArmorStand>> playerStatus = new ConcurrentHashMap<Player, Set<HoloMobArmorStand>>();
 	
@@ -60,13 +57,13 @@ public class ArmorStandPacket implements Listener {
 					playerList.add(player);
 					
 					for (HoloMobArmorStand entity : activeList) {
-						if (!entity.getWorld().equals(player.getWorld()) || entity.getLocation().distanceSquared(player.getLocation()) > ((HoloMobHealth.range + 1) * (HoloMobHealth.range + 1))) {						
+						if (!entity.getWorld().equals(player.getWorld()) || entity.getLocation().distanceSquared(player.getLocation()) > ((HoloMobHealth.updateRange + 1) * (HoloMobHealth.updateRange + 1))) {						
 							removeArmorStand(playerList, entity, false, true);
 						}
 					}
 					
 					for (HoloMobArmorStand entity : active) {
-						if (entity.getWorld().equals(player.getWorld()) && entity.getLocation().distanceSquared(player.getLocation()) <= (HoloMobHealth.range * HoloMobHealth.range)) {
+						if (entity.getWorld().equals(player.getWorld()) && entity.getLocation().distanceSquared(player.getLocation()) <= (HoloMobHealth.updateRange * HoloMobHealth.updateRange)) {
 							if (activeList.contains(entity)) {
 								continue;
 							}
@@ -138,20 +135,8 @@ public class ArmorStandPacket implements Listener {
 	}
 	
 	public static void updateArmorStand(Collection<? extends Player> players, HoloMobArmorStand entity, String json, boolean visible) {
-		updateArmorStand(players, entity, json, visible, false);
-	}
-	
-	public static void updateArmorStand(Collection<? extends Player> players, HoloMobArmorStand entity, String json, boolean visible, boolean bypasscache) {
 		if (players.isEmpty()) {
 			return;
-		}
-		if (!bypasscache) {
-			HoloMobCache hmc = cache.get(entity.getEntityId());
-			if (hmc != null) {
-				if (hmc.getCustomName().equals(json) && hmc.getCustomNameVisible() == visible) {
-					return;
-				}
-			}
 		}
 			
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
@@ -171,8 +156,6 @@ public class ArmorStandPacket implements Listener {
 				}
 			});
 		});
-        
-        cache.put(entity.getEntityId(), new HoloMobCache(json, visible));
 	}
 	
 	public static void removeArmorStand(Collection<? extends Player> players, HoloMobArmorStand entity, boolean removeFromActive, boolean bypassFilter) {
@@ -182,8 +165,6 @@ public class ArmorStandPacket implements Listener {
 		if (removeFromActive) {
 			active.remove(entity);
 		}
-		
-		cache.remove(entity.getEntityId());
 		
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 			List<Player> playersInRange = bypassFilter ? players.stream().collect(Collectors.toList()) : players.stream().filter(each -> (each.getWorld().equals(entity.getWorld())) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.updateRange * HoloMobHealth.updateRange))).collect(Collectors.toList());

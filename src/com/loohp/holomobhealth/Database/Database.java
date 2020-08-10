@@ -14,6 +14,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import com.loohp.holomobhealth.HoloMobHealth;
+import com.loohp.holomobhealth.Protocol.EntityMetadata;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -210,6 +211,7 @@ public class Database {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
+			Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updatePlayer(player), 10);
 			return newvalue;
 		}
 	}
@@ -265,6 +267,7 @@ public class Database {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
+			Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updatePlayer(player), 10);
 			try {
 				connection.close();
 			} catch (SQLException e) {

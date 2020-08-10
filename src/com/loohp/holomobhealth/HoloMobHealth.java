@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -14,7 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -69,8 +68,6 @@ public class HoloMobHealth extends JavaPlugin {
 	public static String EmptyChar = "&7❤";
 	
 	public static boolean alwaysShow = true;
-	public static int range = 15;
-	public static int updateRange = 45;
 	public static boolean applyToNamed = false;
 	
 	public static String ReloadPlugin = "";	
@@ -80,11 +77,6 @@ public class HoloMobHealth extends JavaPlugin {
 	public static String ToggleDisplayOn = "";
 	public static String ToggleDisplayOff = "";
 	
-	public static Set<Entity> nearbyEntities = new HashSet<Entity>();
-	public static Set<Entity> nearbyPlus10Entities = new HashSet<Entity>();
-	
-	public static Set<Entity> updateQueue = new LinkedHashSet<Entity>();
-	
 	public static Set<EntityType> DisabledMobTypes = new HashSet<EntityType>();
 	public static Set<String> DisabledMobNamesAbsolute = new HashSet<String>();
 	public static List<String> DisabledMobNamesContains = new ArrayList<String>();
@@ -93,7 +85,9 @@ public class HoloMobHealth extends JavaPlugin {
 	public static boolean UseAlterHealth = false;
 	public static int AltHealthDisplayTime = 3;
 	public static boolean AltOnlyPlayer = false;
-	public static HashMap<Entity, Long> altShowHealth = new HashMap<Entity, Long>();
+	public static Map<UUID, Long> altShowHealth = new ConcurrentHashMap<>();
+	
+	public static int updateRange = 45;
 	
 	public static boolean MythicHook = false;
 	public static boolean showMythicMobs = true;
@@ -112,8 +106,6 @@ public class HoloMobHealth extends JavaPlugin {
 	
 	public static HashMap<EntityType, Integer> specialTypeOffset = new HashMap<EntityType, Integer>();
 	public static HashMap<String, Integer> specialNameOffset = new HashMap<String, Integer>();
-	
-	public static int mobsPerTick = 4;
 	
 	public static boolean legacyChatAPI = false;
 	
@@ -182,9 +174,6 @@ public class HoloMobHealth extends JavaPlugin {
 	    EntityTypeUtils.setUpList();
 		EntityTypeUtils.setupLang();
 		
-		addEntities();
-		removeEntities();
-		
 		try {
 			Class.forName("net.md_5.bungee.api.chat.hover.content.Content");
 			legacyChatAPI = false;
@@ -200,7 +189,7 @@ public class HoloMobHealth extends JavaPlugin {
 		metrics.addCustomChart(new Metrics.SingleLineChart("total_mobs_displaying", new Callable<Integer>() {
             @Override
             public Integer call() throws Exception {
-                return nearbyPlus10Entities.size();
+                return Bukkit.getWorlds().stream().mapToInt(world -> world.getEntities().size()).sum();
             }
         }));
 		
@@ -273,7 +262,10 @@ public class HoloMobHealth extends JavaPlugin {
 	
 	@SuppressWarnings("deprecation")
 	public static void loadConfig() {
-		mobsPerTick = plugin.getConfig().getInt("Settings.MobsPerTick");
+		plugin.getConfig().set("Settings.MobsPerTick", null);
+		plugin.getConfig().set("Settings", null);
+		plugin.getConfig().set("Options.Range", null);
+		plugin.saveConfig();
 		
 		specialNameOffset.clear();
 		specialTypeOffset.clear();
@@ -300,8 +292,6 @@ public class HoloMobHealth extends JavaPlugin {
 		EmptyChar = plugin.getConfig().getString("Display.ScaledSymbolSettings.EmptyChar");
 		
 		alwaysShow = plugin.getConfig().getBoolean("Options.AlwaysShow");
-		range = plugin.getConfig().getInt("Options.Range");
-		updateRange = range + 30;
 		applyToNamed = plugin.getConfig().getBoolean("Options.ApplyToNamed");
 		
 		ReloadPlugin = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.ReloadPlugin"));
@@ -350,21 +340,15 @@ public class HoloMobHealth extends JavaPlugin {
 			Bukkit.getScheduler().cancelTask(activeShowHealthTaskID);
 		}
 		
+		HoloMobHealth.protocolManager.removePacketListeners(plugin);
+		
 		if (!armorStandMode || version.isOld() || version.equals(MCVersion.V1_9) || version.equals(MCVersion.V1_9_4)) {
-			if (!UseAlterHealth) {  			
-				NameTagDisplay.sendHealth();
-			} else {    			
-				NameTagDisplay.sendAltHealth();
-			}
+			NameTagDisplay.entityMetadataPacketListener();
 			if (armorStandMode) {
 				Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[HoloMobHealth] Multi-line is not supported on this version of Minecraft. Using Single line instead!");
 			}
 		} else {
-			if (!UseAlterHealth) {
-				ArmorstandDisplay.sendHealth();
-			} else {    			
-				ArmorstandDisplay.sendAltHealth(); 
-			}
+			ArmorstandDisplay.entityMetadataPacketListener();
 		}
 		
 		showCitizens = plugin.getConfig().getBoolean("Hooks.Citizens.ShowNPCMobHealth");		
@@ -373,61 +357,6 @@ public class HoloMobHealth extends JavaPlugin {
 		showMyPet = plugin.getConfig().getBoolean("Hooks.MyPet.ShowMyPetHealth");
 		
 		UpdaterEnabled = plugin.getConfig().getBoolean("Updater.Enable");
-	}
-	
-	public static void addEntities() {
-		Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-			int delay = 1;
-			int count = 0;
-			int maxper = (int) Math.ceil((double) Bukkit.getOnlinePlayers().size() / (double) 20);
-			for (Player eachPlayer : Bukkit.getOnlinePlayers().stream().filter(each -> !DisabledWorlds.contains(each.getWorld().getName())).collect(Collectors.toList())) {
-				count++;
-				if (count > maxper) {
-					count = 0;
-					delay++;
-				}
-				UUID uuid = eachPlayer.getUniqueId();
-				Bukkit.getScheduler().runTaskLater(plugin, () -> {
-					if (Bukkit.getPlayer(uuid) == null) {
-						return;
-					}
-					Player player = Bukkit.getPlayer(uuid);
-					
-					List<Entity> inRange = player.getNearbyEntities(range, range, range);
-					nearbyEntities.addAll(inRange);
-					updateQueue.addAll(inRange);
-					nearbyPlus10Entities.addAll(player.getNearbyEntities(range + 10, range + 10, range + 10));
-				}, delay);
-			}
-		}, 0, 20);
-	}
-	
-	public static void removeEntities() {
-		int next = 2;
-		int delay = 10;
-		int count = 0;
-		int maxper = (int) Math.ceil((double) nearbyPlus10Entities.size() / (double) 400); 
-		for (Entity entity : nearbyPlus10Entities) {
-			count++;
-			if (count > 5 && count > maxper) {
-				count = 0;
-				delay++;
-			}
-			Bukkit.getScheduler().runTaskLater(plugin, () -> {
-				for (Player player : Bukkit.getOnlinePlayers()) {
-					if (player.getWorld().equals(entity.getWorld())) {
-						if (player.getLocation().distanceSquared(entity.getLocation()) <= ((range + 10) * (range + 10))) {
-							return;
-						}
-					}
-				}
-				nearbyEntities.remove(entity);
-				updateQueue.add(entity);
-				Bukkit.getScheduler().runTaskLater(plugin, () -> nearbyPlus10Entities.remove(entity), 10);
-			}, delay);
-		}
-		next = next + delay;
-		Bukkit.getScheduler().runTaskLater(plugin, () -> removeEntities(), next);
 	}
 	
 }

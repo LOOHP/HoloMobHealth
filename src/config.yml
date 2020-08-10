@@ -50,8 +50,6 @@ Display:
 Options:
   #Health always visible when in range or only visible when the player is looking at the mob
   AlwaysShow: true
-  #The range where health information is sent to the player
-  Range: 15
   #Whether or not named mobs should so had their name replaced to show health
   #The name is not actually replaced on the server side, only client side
   #Does not work well with AlwaysShow set to false
@@ -112,10 +110,6 @@ Messages:
   PlayerNotFound: "&cThat player is not online!"
   ToggleDisplayOn: "&aEnabled Mob Health Display!"
   ToggleDisplayOff: "&cDisabled Mob Health Display! Rejoin to see changes!"
-
-Settings:
-  #The amount of mobs to update per tick
-  MobsPerTick: 15
 
 Database:
   #Player data storage type, MYSQL or SQLITE

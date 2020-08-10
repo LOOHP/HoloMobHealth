@@ -17,11 +17,28 @@ import net.citizensnpcs.api.npc.NPC;
 
 public class CustomNameUtils {
 	
+	private static boolean legacyMythicMobs = false;
+	
+	static {
+		if (HoloMobHealth.MythicHook) {
+			try {
+				Class<?> clazz = Class.forName("io.lumine.xikage.mythicmobs.mobs.ActiveMob");
+				clazz.getMethod("getDisplayName");
+			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
+				legacyMythicMobs = true;
+			}
+		}
+	}
+	
 	public static String getMobCustomName(Entity entity) {
 		if (HoloMobHealth.MythicHook) {
 			Optional<ActiveMob> optmob = MythicMobs.inst().getMobManager().getActiveMob(entity.getUniqueId());
 			if (optmob.isPresent()) {
-				return optmob.get().getDisplayName();
+				if (legacyMythicMobs) {
+					return optmob.get().getType().getDisplayName() + "";
+				} else {
+					return optmob.get().getDisplayName();
+				}
 			}
 		}
 		if (HoloMobHealth.CitizensHook) {

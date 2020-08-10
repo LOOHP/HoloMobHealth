@@ -358,7 +358,10 @@ public class HoloMobHealth extends JavaPlugin {
 	}
 	
 	public static int getUpdateRange(World world) {
-		return Math.min(world.getViewDistance() * 16 / 2, 80);
+		if (version.isOld()) {
+			return 80;
+		}
+		return Math.min((version.isPost1_16() ? world.getViewDistance() : Bukkit.getViewDistance()) * 16 / 2, 80);
 	}
 	
 }

@@ -23,9 +23,9 @@ public class ParsePlaceholders {
 	public static String parse(LivingEntity entity, String text) {	
 		double health = entity.getHealth();
 		double maxhealth = 0.0;
-		try {
+		if (!HoloMobHealth.version.isLegacy()) {
 			maxhealth = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-		} catch (Exception e) {
+		} else {
 			maxhealth = entity.getMaxHealth();
 		}
 		double percentage = (health / maxhealth) * 100;

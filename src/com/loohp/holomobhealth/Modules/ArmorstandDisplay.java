@@ -36,6 +36,7 @@ import com.loohp.holomobhealth.Utils.ChatColorUtils;
 import com.loohp.holomobhealth.Utils.CitizensUtils;
 import com.loohp.holomobhealth.Utils.CustomNameUtils;
 import com.loohp.holomobhealth.Utils.EntityTypeUtils;
+import com.loohp.holomobhealth.Utils.MCVersion;
 import com.loohp.holomobhealth.Utils.MyPetUtils;
 import com.loohp.holomobhealth.Utils.MythicMobsUtils;
 import com.loohp.holomobhealth.Utils.NMSUtils;
@@ -82,7 +83,7 @@ public class ArmorstandDisplay {
 					
 					packet.getWatchableCollectionModifier().write(0, data.watcher.getWatchableObjects());
 					
-					Entity entity = Bukkit.getEntity(entityUUID);
+					Entity entity = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(entityUUID) : Bukkit.getEntity(entityUUID);
 					String customName = data.customName;
 					
 					if (EntityTypeUtils.getMobsTypesSet().contains(entity.getType())) { 
@@ -150,7 +151,7 @@ public class ArmorstandDisplay {
 					return;
 				}
 				
-				Entity entity = Bukkit.getEntity(entityUUID);
+				Entity entity = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(entityUUID) : Bukkit.getEntity(entityUUID);
 				
 				if (entity == null) {
 					return;
@@ -180,7 +181,7 @@ public class ArmorstandDisplay {
 					return;
 				}
 				
-				Entity entity = Bukkit.getEntity(entityUUID);
+				Entity entity = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(entityUUID) : Bukkit.getEntity(entityUUID);
 				
 				if (entity == null) {
 					return;
@@ -197,7 +198,7 @@ public class ArmorstandDisplay {
 		//	return cahcedData;
 		//}
 		
-		Entity entity = Bukkit.getEntity(entityUUID);
+		Entity entity = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(entityUUID) : Bukkit.getEntity(entityUUID);
 		
 		if (entity == null || !EntityTypeUtils.getMobsTypesSet().contains(entity.getType())) {
 			return null;

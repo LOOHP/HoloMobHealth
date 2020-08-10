@@ -102,7 +102,6 @@ public class NameTagDisplay {
 				}
 				
 				Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(player, entity), 5);
-				Bukkit.getConsoleSender().sendMessage("Spawn -> " + player.getName());
 			}
 		});
 		HoloMobHealth.protocolManager.addPacketListener(new PacketAdapter(HoloMobHealth.plugin, ListenerPriority.HIGHEST, PacketType.Play.Server.SPAWN_ENTITY) {
@@ -132,7 +131,6 @@ public class NameTagDisplay {
 				}
 				
 				Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(player, entity), 5);
-				Bukkit.getConsoleSender().sendMessage("Spawn -> " + player.getName());
 			}
 		});
 	}

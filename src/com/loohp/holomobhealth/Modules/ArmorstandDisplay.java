@@ -188,7 +188,6 @@ public class ArmorstandDisplay {
 				}
 				
 				Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(player, entity), 5);
-				Bukkit.getConsoleSender().sendMessage("Spawn -> " + player.getName());
 			}
 		});
 	}

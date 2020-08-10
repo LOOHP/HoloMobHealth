@@ -109,7 +109,7 @@ Messages:
   PlayersOnly: "&cThis can only be ran as a player!"
   PlayerNotFound: "&cThat player is not online!"
   ToggleDisplayOn: "&aEnabled Mob Health Display!"
-  ToggleDisplayOff: "&cDisabled Mob Health Display! Rejoin to see changes!"
+  ToggleDisplayOff: "&cDisabled Mob Health Display!"
 
 Database:
   #Player data storage type, MYSQL or SQLITE

@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
@@ -49,7 +48,7 @@ import net.md_5.bungee.chat.ComponentSerializer;
 
 public class ArmorstandDisplay {
 	
-	private static Map<UUID, ArmorStandDisplayCache> cache = new ConcurrentHashMap<>();
+	//private static Map<UUID, ArmorStandDisplayCache> cache = new ConcurrentHashMap<>();
 	private static Map<UUID, MultilineStands> mapping = new HashMap<UUID, MultilineStands>();
 
 	public static void entityMetadataPacketListener() {
@@ -193,10 +192,10 @@ public class ArmorstandDisplay {
 	}
 
 	public static ArmorStandDisplayCache getData(UUID entityUUID, World world, PacketContainer packet) {
-		ArmorStandDisplayCache cahcedData = cache.get(entityUUID);
-		if (cahcedData != null) {
-			return cahcedData;
-		}
+		//ArmorStandDisplayCache cahcedData = cache.get(entityUUID);
+		//if (cahcedData != null) {
+		//	return cahcedData;
+		//}
 		
 		Entity entity = Bukkit.getEntity(entityUUID);
 		
@@ -277,8 +276,8 @@ public class ArmorstandDisplay {
 			
 			ArmorStandDisplayCache newData = new ArmorStandDisplayCache(watcher, json, customName);
 			
-			cache.put(entityUUID, newData);
-			Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> cache.remove(entityUUID), 1);
+			//cache.put(entityUUID, newData);
+			//Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> cache.remove(entityUUID), 1);
 			
 			return newData;
 		}

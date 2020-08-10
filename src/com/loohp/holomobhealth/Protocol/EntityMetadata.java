@@ -27,7 +27,8 @@ public class EntityMetadata {
 	public static void updatePlayer(Player player) {
 		List<Player> players = new ArrayList<>();
 		players.add(player);
-		for (Entity entity : player.getNearbyEntities(HoloMobHealth.updateRange, HoloMobHealth.updateRange, HoloMobHealth.updateRange)) {
+		int range = HoloMobHealth.getUpdateRange(player.getWorld());
+		for (Entity entity : player.getNearbyEntities(range, range, range)) {
 			updateEntity(players, entity);
 		}
 	}

@@ -1,10 +1,8 @@
 package com.loohp.holomobhealth.Modules;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
@@ -41,7 +39,7 @@ import net.md_5.bungee.chat.ComponentSerializer;
 
 public class NameTagDisplay {
 	
-	private static Map<UUID, WrappedDataWatcher> cache = new ConcurrentHashMap<>();
+	//private static Map<UUID, WrappedDataWatcher> cache = new HashMap<>();
 
 	public static void entityMetadataPacketListener() {
 		HoloMobHealth.protocolManager.addPacketListener(new PacketAdapter(HoloMobHealth.plugin, ListenerPriority.HIGHEST, PacketType.Play.Server.ENTITY_METADATA) {
@@ -50,7 +48,7 @@ public class NameTagDisplay {
 				if (!event.getPacketType().equals(PacketType.Play.Server.ENTITY_METADATA)) {
 					return;
 				}
-				
+
 				Player player = event.getPlayer();
 				
 				if (!player.hasPermission("holomobhealth.use") || !HoloMobHealth.playersEnabled.contains(player)) {
@@ -136,10 +134,10 @@ public class NameTagDisplay {
 	}
 
 	public static WrappedDataWatcher getWatcher(UUID entityUUID, World world, PacketContainer packet) {
-		WrappedDataWatcher cachedWatcher = cache.get(entityUUID);
-		if (cachedWatcher != null) {
-			return cachedWatcher;
-		}
+		//WrappedDataWatcher cachedWatcher = cache.get(entityUUID);
+		//if (cachedWatcher != null) {
+		//	return cachedWatcher;
+		//}
 		
 		Entity entity = Bukkit.getEntity(entityUUID);
 		
@@ -243,8 +241,8 @@ public class NameTagDisplay {
 				watcher.setObject(new WrappedDataWatcherObject(3, Registry.get(Boolean.class)), visible);
 			}
 			
-			cache.put(entityUUID, watcher);
-			Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> cache.remove(entityUUID), 1);
+			//cache.put(entityUUID, watcher);
+			//Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> cache.remove(entityUUID), 1);
 			
 			return watcher;
 		}

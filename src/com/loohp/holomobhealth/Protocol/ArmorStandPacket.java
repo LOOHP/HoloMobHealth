@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -57,13 +58,15 @@ public class ArmorStandPacket implements Listener {
 					playerList.add(player);
 					
 					for (HoloMobArmorStand entity : activeList) {
-						if (!entity.getWorld().equals(player.getWorld()) || entity.getLocation().distanceSquared(player.getLocation()) > ((HoloMobHealth.updateRange + 1) * (HoloMobHealth.updateRange + 1))) {						
+						World world = player.getWorld();
+						if (!entity.getWorld().equals(world) || entity.getLocation().distanceSquared(player.getLocation()) > ((HoloMobHealth.getUpdateRange(world) + 1) * (HoloMobHealth.getUpdateRange(world) + 1))) {						
 							removeArmorStand(playerList, entity, false, true);
 						}
 					}
 					
 					for (HoloMobArmorStand entity : active) {
-						if (entity.getWorld().equals(player.getWorld()) && entity.getLocation().distanceSquared(player.getLocation()) <= (HoloMobHealth.updateRange * HoloMobHealth.updateRange)) {
+						World world = player.getWorld();
+						if (entity.getWorld().equals(player.getWorld()) && entity.getLocation().distanceSquared(player.getLocation()) <= (HoloMobHealth.getUpdateRange(world) * HoloMobHealth.getUpdateRange(world))) {
 							if (activeList.contains(entity)) {
 								continue;
 							}
@@ -88,7 +91,8 @@ public class ArmorStandPacket implements Listener {
 			active.add(entity);
 		}
 		
-		List<Player> playersInRange = players.stream().filter(each -> (each.getWorld().equals(entity.getWorld())) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.updateRange * HoloMobHealth.updateRange))).collect(Collectors.toList());
+		World world = entity.getWorld();
+		List<Player> playersInRange = players.stream().filter(each -> (each.getWorld().equals(world)) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.getUpdateRange(world) * HoloMobHealth.getUpdateRange(world)))).collect(Collectors.toList());
 		playersInRange.forEach((each) -> playerStatus.get(each).add(entity));
 		
 		PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
@@ -140,7 +144,8 @@ public class ArmorStandPacket implements Listener {
 		}
 			
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-			List<Player> playersInRange = players.stream().filter(each -> (each.getWorld().equals(entity.getWorld())) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.updateRange * HoloMobHealth.updateRange))).collect(Collectors.toList());
+			World world = entity.getWorld();
+			List<Player> playersInRange = players.stream().filter(each -> (each.getWorld().equals(world)) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.getUpdateRange(world) * HoloMobHealth.getUpdateRange(world)))).collect(Collectors.toList());
 			PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
 			packet1.getIntegers().write(0, entity.getEntityId());	
 	        WrappedDataWatcher wpw = buildWarppedDataWatcher(entity, json, visible);
@@ -167,7 +172,8 @@ public class ArmorStandPacket implements Listener {
 		}
 		
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-			List<Player> playersInRange = bypassFilter ? players.stream().collect(Collectors.toList()) : players.stream().filter(each -> (each.getWorld().equals(entity.getWorld())) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.updateRange * HoloMobHealth.updateRange))).collect(Collectors.toList());
+			World world = entity.getWorld();
+			List<Player> playersInRange = bypassFilter ? players.stream().collect(Collectors.toList()) : players.stream().filter(each -> (each.getWorld().equals(world)) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.getUpdateRange(world) * HoloMobHealth.getUpdateRange(world)))).collect(Collectors.toList());
 			playersInRange.forEach((each) -> playerStatus.get(each).remove(entity));
 			PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
 			packet1.getIntegerArrays().write(0, new int[]{entity.getEntityId()});

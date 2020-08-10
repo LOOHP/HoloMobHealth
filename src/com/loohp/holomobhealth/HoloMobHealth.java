@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -86,8 +87,6 @@ public class HoloMobHealth extends JavaPlugin {
 	public static int AltHealthDisplayTime = 3;
 	public static boolean AltOnlyPlayer = false;
 	public static Map<UUID, Long> altShowHealth = new ConcurrentHashMap<>();
-	
-	public static int updateRange = 45;
 	
 	public static boolean MythicHook = false;
 	public static boolean showMythicMobs = true;
@@ -341,7 +340,6 @@ public class HoloMobHealth extends JavaPlugin {
 		}
 		
 		HoloMobHealth.protocolManager.removePacketListeners(plugin);
-		
 		if (!armorStandMode || version.isOld() || version.equals(MCVersion.V1_9) || version.equals(MCVersion.V1_9_4)) {
 			NameTagDisplay.entityMetadataPacketListener();
 			if (armorStandMode) {
@@ -357,6 +355,10 @@ public class HoloMobHealth extends JavaPlugin {
 		showMyPet = plugin.getConfig().getBoolean("Hooks.MyPet.ShowMyPetHealth");
 		
 		UpdaterEnabled = plugin.getConfig().getBoolean("Updater.Enable");
+	}
+	
+	public static int getUpdateRange(World world) {
+		return Math.min(world.getViewDistance() * 16 / 2, 80);
 	}
 	
 }

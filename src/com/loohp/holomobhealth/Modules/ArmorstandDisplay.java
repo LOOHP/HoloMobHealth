@@ -87,7 +87,7 @@ public class ArmorstandDisplay {
 					String customName = data.customName;
 					
 					if (EntityTypeUtils.getMobsTypesSet().contains(entity.getType())) { 
-						if (HoloMobHealth.UseAlterHealth && !HoloMobHealth.altShowHealth.containsKey(entity.getUniqueId())) {
+						if ((!HoloMobHealth.applyToNamed && customName != null) || (HoloMobHealth.UseAlterHealth && !HoloMobHealth.altShowHealth.containsKey(entity.getUniqueId())) || (HoloMobHealth.rangeEnabled && !RangeModule.isEntityInRangeOfPlayer(player, entity))) {
 							String name = customName != null && !customName.equals("") ? ComponentSerializer.toString(new TextComponent(customName)) : "";
 							boolean visible = entity.isCustomNameVisible();
 							EntityMetadata.sendMetadataPacket(entity, name, visible, Arrays.asList(player), true);
@@ -98,20 +98,6 @@ public class ArmorstandDisplay {
 							multi.getStands().forEach((each) -> ArmorStandPacket.removeArmorStand(HoloMobHealth.playersEnabled, each, true, false));
 							multi.remove();
 							return;
-						}
-						if (!HoloMobHealth.applyToNamed) {
-							if (customName != null) {
-								String name = customName != null && !customName.equals("") ? ComponentSerializer.toString(new TextComponent(customName)) : "";
-								boolean visible = entity.isCustomNameVisible();
-								EntityMetadata.sendMetadataPacket(entity, name, visible, Arrays.asList(player), true);
-								MultilineStands multi = mapping.remove(entity.getUniqueId());
-								if (multi == null) {
-									return;
-								}
-								multi.getStands().forEach((each) -> ArmorStandPacket.removeArmorStand(HoloMobHealth.playersEnabled, each, true, false));
-								multi.remove();
-								return;
-							}	
 						}
 						MultilineStands multi = mapping.get(entity.getUniqueId());
 						if (multi == null) {

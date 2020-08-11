@@ -77,6 +77,15 @@ Options:
     Timeout: 3
     #Should health be triggered only from attacks from players
     OnlyPlayerTrigger: false
+  #Settings for the range detection module
+  #Note that disabling it saves performance
+  #Restart to see changes
+  Range:
+    Use: false
+    Distance: 15
+    #Refresh rate of the detection of mobs within range in ticks
+    #20 ticks = 1 second
+    UpdateRate: 20
 
   #Enable EXPERIEMENTAL multi-line mob name tag
   #Note that it is a bit more performance heavy

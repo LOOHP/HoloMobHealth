@@ -43,6 +43,9 @@ public class EntityMetadata {
 		if (!EntityTypeUtils.getMobsTypesSet().contains(entity.getType())) {
 			return;
 		}
+		if (!entity.isValid()) {
+			return;
+		}
 		PacketContainer packet = HoloMobHealth.protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
 		packet.getIntegers().write(0, entity.getEntityId());
 		packet.getWatchableCollectionModifier().write(0, WrappedDataWatcher.getEntityWatcher(entity).getWatchableObjects());

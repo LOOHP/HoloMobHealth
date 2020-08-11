@@ -31,6 +31,7 @@ import com.loohp.holomobhealth.Listeners.Events;
 import com.loohp.holomobhealth.Metrics.Metrics;
 import com.loohp.holomobhealth.Modules.ArmorstandDisplay;
 import com.loohp.holomobhealth.Modules.NameTagDisplay;
+import com.loohp.holomobhealth.Modules.RangeModule;
 import com.loohp.holomobhealth.Protocol.ArmorStandPacket;
 import com.loohp.holomobhealth.Updater.Updater;
 import com.loohp.holomobhealth.Utils.BoundingBoxUtils;
@@ -105,6 +106,8 @@ public class HoloMobHealth extends JavaPlugin {
 	
 	public static HashMap<EntityType, Integer> specialTypeOffset = new HashMap<EntityType, Integer>();
 	public static HashMap<String, Integer> specialNameOffset = new HashMap<String, Integer>();
+	
+	public static boolean rangeEnabled = false;
 	
 	public static boolean legacyChatAPI = false;
 	
@@ -185,6 +188,10 @@ public class HoloMobHealth extends JavaPlugin {
 			Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[HoloMobHealth] Legacy Bungeecord Chat API detected, using legacy methods...");
 		}
 		
+		if (rangeEnabled) {
+			RangeModule.run();
+		}
+		
 		metrics.addCustomChart(new Metrics.SingleLineChart("total_mobs_displaying", new Callable<Integer>() {
             @Override
             public Integer call() throws Exception {
@@ -263,8 +270,9 @@ public class HoloMobHealth extends JavaPlugin {
 	public static void loadConfig() {
 		plugin.getConfig().set("Settings.MobsPerTick", null);
 		plugin.getConfig().set("Settings", null);
-		plugin.getConfig().set("Options.Range", null);
 		plugin.saveConfig();
+		
+		rangeEnabled = plugin.getConfig().getBoolean("Options.Range.Use");
 		
 		specialNameOffset.clear();
 		specialTypeOffset.clear();

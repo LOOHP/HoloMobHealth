@@ -67,7 +67,7 @@ public class NameTagDisplay {
 					return;
 				}
 				
-				WrappedDataWatcher watcher = getWatcher(entityUUID, world, packet);
+				WrappedDataWatcher watcher = getWatcher(player, entityUUID, world, packet);
 				
 				if (watcher != null) {
 					packet.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects());
@@ -134,7 +134,7 @@ public class NameTagDisplay {
 		});
 	}
 
-	public static WrappedDataWatcher getWatcher(UUID entityUUID, World world, PacketContainer packet) {
+	public static WrappedDataWatcher getWatcher(Player player, UUID entityUUID, World world, PacketContainer packet) {
 		//WrappedDataWatcher cachedWatcher = cache.get(entityUUID);
 		//if (cachedWatcher != null) {
 		//	return cachedWatcher;
@@ -156,6 +156,10 @@ public class NameTagDisplay {
 				&& ((Player) entity).getName().matches("(?i)mellifluous|euphoria|liarcar")) {
 			entity.getWorld().spawnParticle(Particle.HEART, entity.getLocation().add(0.0, 1.0, 0.0), 1, 0.5,
 					0.5, 0.5, 1);
+		}
+		
+		if (HoloMobHealth.rangeEnabled && !RangeModule.isEntityInRangeOfPlayer(player, entity)) {
+			return null;
 		}
 		
 		if (HoloMobHealth.UseAlterHealth && !HoloMobHealth.altShowHealth.containsKey(entityUUID)) {

@@ -97,16 +97,26 @@ public class ArmorStandPacket implements Listener {
 		
 		PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
 		packet1.getIntegers().write(0, entity.getEntityId());
-		if (HoloMobHealth.version.equals(MCVersion.V1_16)) {
+		switch (HoloMobHealth.version) {
+		case V1_16_2:
+			packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 1 : 66);
+			break;
+		case V1_16:
 			packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 1 : 65);
-		} else if (HoloMobHealth.version.equals(MCVersion.V1_15)) {
+			break;
+		case V1_15:
 			packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 1 : 60);
-		} else if (HoloMobHealth.version.equals(MCVersion.V1_14)) {
+			break;
+		case V1_14:
 			packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 1 : 59);
-		} else if (HoloMobHealth.version.equals(MCVersion.V1_13) || HoloMobHealth.version.equals(MCVersion.V1_13_1)) {
+			break;
+		case V1_13_1:
+		case V1_13:
 			packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 1 : 56);
-		} else {
+			break;
+		default:
 			packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 30 : 101);
+			break;
 		}
 		packet1.getIntegers().write(2, 0);
 		packet1.getIntegers().write(3, 0);
@@ -236,7 +246,7 @@ public class ArmorStandPacket implements Listener {
 		    
 		    byte standbitmask = 0x01 | 0x10;	
 	
-		    if (HoloMobHealth.version.equals(MCVersion.V1_15) || HoloMobHealth.version.equals(MCVersion.V1_16)) {
+		    if (HoloMobHealth.version.equals(MCVersion.V1_15) || HoloMobHealth.version.equals(MCVersion.V1_16) || HoloMobHealth.version.equals(MCVersion.V1_16_2)) {
 		    	watcher.setObject(new WrappedDataWatcherObject(14, Registry.get(Byte.class)), standbitmask);
 		    } else if (HoloMobHealth.version.equals(MCVersion.V1_14)) {
 		    	watcher.setObject(new WrappedDataWatcherObject(13, Registry.get(Byte.class)), standbitmask);
@@ -259,7 +269,7 @@ public class ArmorStandPacket implements Listener {
 				watcher.setObject(4, (byte) 1);
 			}
 	
-		    if (HoloMobHealth.version.equals(MCVersion.V1_15) || HoloMobHealth.version.equals(MCVersion.V1_16)) {
+		    if (HoloMobHealth.version.equals(MCVersion.V1_15) || HoloMobHealth.version.equals(MCVersion.V1_16) || HoloMobHealth.version.equals(MCVersion.V1_16_2)) {
 		    	watcher.setObject(new WrappedDataWatcherObject(15, Registry.get(Boolean.class)), true);
 		    } else if (HoloMobHealth.version.equals(MCVersion.V1_14)) {
 		    	watcher.setObject(new WrappedDataWatcherObject(14, Registry.get(Boolean.class)), true);

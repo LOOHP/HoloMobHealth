@@ -44,7 +44,7 @@ public class ChatColorUtils {
 	}
 	
 	public static String filterIllegalColorCodes(String string) {
-		return HoloMobHealth.version.equals(MCVersion.V1_16) ? string.replaceAll("§[^0-9A-Fa-fk-or]", "") : string.replaceAll("§[^0-9a-fk-or]", "");
+		return HoloMobHealth.version.isPost1_16() ? string.replaceAll("§[^0-9A-Fa-fk-or]", "") : string.replaceAll("§[^0-9a-fk-or]", "");
 	}
 	
 	public static String getLastColors(String input) {

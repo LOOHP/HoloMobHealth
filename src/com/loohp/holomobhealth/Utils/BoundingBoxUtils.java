@@ -31,7 +31,7 @@ public class BoundingBoxUtils {
 	}
 	
 	public static double getBoundingYHeight(Entity entity) {
-		if (HoloMobHealth.version.equals(MCVersion.V1_14) || HoloMobHealth.version.equals(MCVersion.V1_15) || HoloMobHealth.version.equals(MCVersion.V1_16)) {
+		if (HoloMobHealth.version.isPost1_16() || HoloMobHealth.version.equals(MCVersion.V1_14) || HoloMobHealth.version.equals(MCVersion.V1_15)) {
 			return entity.getBoundingBox().getMaxY() - entity.getBoundingBox().getMinY();
 		}
 		try {

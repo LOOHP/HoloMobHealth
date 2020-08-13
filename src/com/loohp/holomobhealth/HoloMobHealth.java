@@ -36,13 +36,13 @@ import com.loohp.holomobhealth.Protocol.ArmorStandPacket;
 import com.loohp.holomobhealth.Updater.Updater;
 import com.loohp.holomobhealth.Utils.BoundingBoxUtils;
 import com.loohp.holomobhealth.Utils.ChatColorUtils;
-import com.loohp.holomobhealth.Utils.ChatComponentUtils;
 import com.loohp.holomobhealth.Utils.DisplayTextCacher;
 import com.loohp.holomobhealth.Utils.EntityTypeUtils;
 import com.loohp.holomobhealth.Utils.LegacyPlaceholdersConverter;
 import com.loohp.holomobhealth.Utils.MCVersion;
 
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class HoloMobHealth extends JavaPlugin {
 	
@@ -177,16 +177,12 @@ public class HoloMobHealth extends JavaPlugin {
 		EntityTypeUtils.setupLang();
 		
 		try {
-			Class.forName("net.md_5.bungee.api.chat.hover.content.Content");
+			new TextComponent("Legacy Bungeecord Chat API Test").getHoverEvent().getContents();
 			legacyChatAPI = false;
-		} catch (ClassNotFoundException e) {
+		} catch (Exception | NoSuchMethodError e) {
 			legacyChatAPI = true;
-		};
-		
-		if (legacyChatAPI) {
-			ChatComponentUtils.setupLegacy();
 			Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[HoloMobHealth] Legacy Bungeecord Chat API detected, using legacy methods...");
-		}
+		};
 		
 		if (rangeEnabled) {
 			RangeModule.run();

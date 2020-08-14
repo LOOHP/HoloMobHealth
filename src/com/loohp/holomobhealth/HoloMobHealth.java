@@ -34,7 +34,6 @@ import com.loohp.holomobhealth.Modules.NameTagDisplay;
 import com.loohp.holomobhealth.Modules.RangeModule;
 import com.loohp.holomobhealth.Protocol.ArmorStandPacket;
 import com.loohp.holomobhealth.Updater.Updater;
-import com.loohp.holomobhealth.Utils.BoundingBoxUtils;
 import com.loohp.holomobhealth.Utils.ChatColorUtils;
 import com.loohp.holomobhealth.Utils.DisplayTextCacher;
 import com.loohp.holomobhealth.Utils.EntityTypeUtils;
@@ -148,8 +147,6 @@ public class HoloMobHealth extends JavaPlugin {
 			getServer().getPluginManager().registerEvents(new ArmorStandPacket(), plugin);
 			ArmorStandPacket.update();
 		}
-		
-		BoundingBoxUtils.setup();
 		
 	    getCommand("holomobhealth").setExecutor(new Commands());
 	    

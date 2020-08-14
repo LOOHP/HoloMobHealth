@@ -1,8 +1,6 @@
 package com.loohp.holomobhealth.Utils;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
+import java.lang.reflect.Method;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -14,25 +12,23 @@ import com.loohp.holomobhealth.HoloMobHealth;
 public class NMSUtils {
 	
 	private static Class<?> craftWorldClass;
-	private static Class<?> craftEntityClass;
 	private static Class<?> nmsEntityClass;
 	private static Class<?> nmsWorldServerClass;
-	private static MethodHandle craftWorldGetHandleMethod;
-	private static MethodHandle nmsWorldServerGetEntityByIDMethod;
-	private static MethodHandle nmsWorldServerGetEntityByUUIDMethod;
-	private static MethodHandle nmsEntityGetBukkitEntityMethod;
-	private static MethodHandle nmsEntityGetUniqueIDMethod;
+	private static Method craftWorldGetHandleMethod;
+	private static Method nmsWorldServerGetEntityByIDMethod;
+	private static Method nmsWorldServerGetEntityByUUIDMethod;
+	private static Method nmsEntityGetBukkitEntityMethod;
+	private static Method nmsEntityGetUniqueIDMethod;
 	
 	static {
 		try {craftWorldClass = getNMSClass("org.bukkit.craftbukkit.", "CraftWorld");} catch (Exception e) {}
-		try {craftEntityClass = getNMSClass("org.bukkit.craftbukkit.", "entity.CraftEntity");} catch (Exception e) {}
 		try {nmsEntityClass = getNMSClass("net.minecraft.server.", "Entity");} catch (Exception e) {}
 		try {nmsWorldServerClass = getNMSClass("net.minecraft.server.", "WorldServer");} catch (Exception e) {}
-		try {craftWorldGetHandleMethod = MethodHandles.lookup().findVirtual(craftWorldClass, "getHandle", MethodType.methodType(nmsWorldServerClass));} catch (Exception e) {}
-		try {nmsWorldServerGetEntityByIDMethod = MethodHandles.lookup().findVirtual(nmsWorldServerClass, "getEntity", MethodType.methodType(nmsEntityClass, int.class));} catch (Exception e) {}
-		try {nmsWorldServerGetEntityByUUIDMethod = MethodHandles.lookup().findVirtual(nmsWorldServerClass, "getEntity", MethodType.methodType(nmsEntityClass, UUID.class));} catch (Exception e) {}
-		try {nmsEntityGetBukkitEntityMethod = MethodHandles.lookup().findVirtual(nmsEntityClass, "getBukkitEntity", MethodType.methodType(craftEntityClass));} catch (Exception e) {}
-		try {nmsEntityGetUniqueIDMethod = MethodHandles.lookup().findVirtual(nmsEntityClass, "getUniqueID", MethodType.methodType(UUID.class));} catch (Exception e) {}
+		try {craftWorldGetHandleMethod = craftWorldClass.getMethod("getHandle");} catch (Exception e) {}
+		try {nmsWorldServerGetEntityByIDMethod = nmsWorldServerClass.getMethod("getEntity", int.class);} catch (Exception e) {}
+		try {nmsWorldServerGetEntityByUUIDMethod = nmsWorldServerClass.getMethod("getEntity", UUID.class);} catch (Exception e) {}
+		try {nmsEntityGetBukkitEntityMethod = nmsEntityClass.getMethod("getBukkitEntity");} catch (Exception e) {}
+		try {nmsEntityGetUniqueIDMethod = nmsEntityClass.getMethod("getUniqueID");} catch (Exception e) {}
 	}
 	
 	public static UUID getEntityUUIDFromID(World world, int id) {

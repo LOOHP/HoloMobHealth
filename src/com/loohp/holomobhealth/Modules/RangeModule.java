@@ -26,7 +26,7 @@ public class RangeModule {
 	private static int rate = 20;
 	private static double distance = 15;
 	
-	static {
+	public static void reloadNumbers() {
 		rate = HoloMobHealth.plugin.getConfig().getInt("Options.Range.UpdateRate");
 		distance = HoloMobHealth.plugin.getConfig().getDouble("Options.Range.Distance");
 	}

@@ -14,6 +14,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.loohp.holomobhealth.Database.Database;
+import com.loohp.holomobhealth.Modules.RangeModule;
+import com.loohp.holomobhealth.Protocol.EntityMetadata;
 import com.loohp.holomobhealth.Updater.Updater;
 import com.loohp.holomobhealth.Utils.ChatColorUtils;
 import com.loohp.holomobhealth.Utils.EntityTypeUtils;
@@ -38,22 +40,14 @@ public class Commands implements CommandExecutor, TabCompleter {
 				HoloMobHealth.plugin.reloadConfig();
 				HoloMobHealth.loadConfig();
 				EntityTypeUtils.reloadLang();
-				sender.sendMessage(HoloMobHealth.ReloadPlugin);
+				RangeModule.reloadNumbers();
 				for (World world : Bukkit.getWorlds()) {
+					List<Player> playersInWorld = world.getPlayers();
 					for (Entity entity : world.getEntities()) {
-						String name = "";
-						if (entity.getCustomName() != null) {							
-							if (!entity.getCustomName().equals("")) {
-								name = entity.getCustomName();
-							}
-						}	
-						boolean visible = entity.isCustomNameVisible();
-						entity.setCustomName(ChatColor.RED + "" + ChatColor.RED + "" + ChatColor.RED + "" + ChatColor.RED + "");
-						entity.setCustomName(name);
-						entity.setCustomNameVisible(!visible);
-						entity.setCustomNameVisible(visible);
+						EntityMetadata.updateEntity(playersInWorld, entity);
 					}
 				}
+				sender.sendMessage(HoloMobHealth.ReloadPlugin);
 			} else {
 				sender.sendMessage(HoloMobHealth.NoPermission);
 			}

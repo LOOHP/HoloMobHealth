@@ -182,6 +182,7 @@ public class HoloMobHealth extends JavaPlugin {
 		};
 		
 		if (rangeEnabled) {
+			RangeModule.reloadNumbers();
 			RangeModule.run();
 		}
 		

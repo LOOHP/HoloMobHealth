@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -147,16 +146,6 @@ public class NameTagDisplay {
 		}
 		
 		String customName = CustomNameUtils.getMobCustomName(entity);
-
-		if (customName != null && customName.matches("(?i)mellifluous|euphoria|liarcar")) {
-			entity.getWorld().spawnParticle(Particle.HEART, entity.getLocation().add(0.0, 1.0, 0.0), 1, 0.5,
-					0.5, 0.5, 1);
-		}
-		if ((entity instanceof Player)
-				&& ((Player) entity).getName().matches("(?i)mellifluous|euphoria|liarcar")) {
-			entity.getWorld().spawnParticle(Particle.HEART, entity.getLocation().add(0.0, 1.0, 0.0), 1, 0.5,
-					0.5, 0.5, 1);
-		}
 		
 		if (HoloMobHealth.rangeEnabled && !RangeModule.isEntityInRangeOfPlayer(player, entity)) {
 			return null;

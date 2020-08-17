@@ -144,6 +144,10 @@ public class NameTagDisplay {
 			return null;
 		}
 		
+		if (HoloMobHealth.DisabledMobTypes.contains(entity.getType())) {
+			return null;
+		}
+		
 		String customName = CustomNameUtils.getMobCustomName(entity);
 		
 		if (HoloMobHealth.rangeEnabled && !RangeModule.isEntityInRangeOfPlayer(player, entity)) {

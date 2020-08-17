@@ -38,6 +38,7 @@ import com.loohp.holomobhealth.Utils.EntityTypeUtils;
 import com.loohp.holomobhealth.Utils.MCVersion;
 import com.loohp.holomobhealth.Utils.MyPetUtils;
 import com.loohp.holomobhealth.Utils.MythicMobsUtils;
+import com.loohp.holomobhealth.Utils.NBTUtils;
 import com.loohp.holomobhealth.Utils.NMSUtils;
 import com.loohp.holomobhealth.Utils.ParsePlaceholders;
 import com.loohp.holomobhealth.Utils.ShopkeepersUtils;
@@ -75,42 +76,57 @@ public class ArmorstandDisplay {
 					return;
 				}
 				
-				ArmorStandDisplayCache data = getData(entityUUID, world, packet);
+				ArmorStandDisplayData data = getData(entityUUID, world, packet);
 				
 				if (data != null) {
-					
-					packet.getWatchableCollectionModifier().write(0, data.watcher.getWatchableObjects());
-					
-					Entity entity = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(entityUUID) : Bukkit.getEntity(entityUUID);
-					String customName = data.customName;
-					
-					if (EntityTypeUtils.getMobsTypesSet().contains(entity.getType())) { 
-						if ((!HoloMobHealth.applyToNamed && customName != null) || (HoloMobHealth.UseAlterHealth && !HoloMobHealth.altShowHealth.containsKey(entity.getUniqueId())) || (HoloMobHealth.rangeEnabled && !RangeModule.isEntityInRangeOfPlayer(player, entity))) {
-							String name = customName != null && !customName.equals("") ? ComponentSerializer.toString(new TextComponent(customName)) : "";
-							boolean visible = entity.isCustomNameVisible();
-							EntityMetadata.sendMetadataPacket(entity, name, visible, Arrays.asList(player), true);
-							MultilineStands multi = mapping.remove(entity.getUniqueId());
+					if (data.use) {
+						packet.getWatchableCollectionModifier().write(0, data.watcher.getWatchableObjects());
+						
+						Entity entity = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(entityUUID) : Bukkit.getEntity(entityUUID);
+						String customName = data.customName;
+						
+						if (EntityTypeUtils.getMobsTypesSet().contains(entity.getType())) { 
+							if ((!HoloMobHealth.applyToNamed && customName != null) || (HoloMobHealth.UseAlterHealth && !HoloMobHealth.altShowHealth.containsKey(entity.getUniqueId())) || (HoloMobHealth.rangeEnabled && !RangeModule.isEntityInRangeOfPlayer(player, entity))) {
+								String name = customName != null && !customName.equals("") ? ComponentSerializer.toString(new TextComponent(customName)) : "";
+								boolean visible = entity.isCustomNameVisible();
+								EntityMetadata.sendMetadataPacket(entity, name, visible, Arrays.asList(player), true);
+								MultilineStands multi = mapping.remove(entity.getUniqueId());
+								if (multi == null) {
+									return;
+								}
+								multi.getStands().forEach((each) -> ArmorStandPacket.removeArmorStand(HoloMobHealth.playersEnabled, each, true, false));
+								multi.remove();
+								return;
+							}
+							MultilineStands multi = mapping.get(entity.getUniqueId());
+							if (multi == null) {
+								multi = new MultilineStands(entity);
+								mapping.put(entity.getUniqueId(), multi);
+								List<HoloMobArmorStand> stands = new ArrayList<HoloMobArmorStand>(multi.getAllRelatedEntities());
+								Collections.reverse(stands);
+								for (HoloMobArmorStand stand : stands) {
+									ArmorStandPacket.sendArmorStandSpawn(HoloMobHealth.playersEnabled, stand, "", HoloMobHealth.alwaysShow);
+								}
+							}
+							for (int i = 0; i < HoloMobHealth.DisplayText.size(); i++) {
+								String display = ParsePlaceholders.parse((LivingEntity) entity, HoloMobHealth.DisplayText.get(i));
+								ArmorStandPacket.updateArmorStand(HoloMobHealth.playersEnabled, multi.getStand(i), display, HoloMobHealth.alwaysShow);
+							}
+						}
+					} else {
+						Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {
+							MultilineStands multi = mapping.remove(entityUUID);
 							if (multi == null) {
 								return;
 							}
+							Entity entity = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(entityUUID) : Bukkit.getEntity(entityUUID);
+							String name = NBTUtils.getString(entity, "CustomName");
+							boolean visible = entity.isCustomNameVisible();
+							EntityMetadata.sendMetadataPacket(entity, name, visible, Arrays.asList(player), true);
 							multi.getStands().forEach((each) -> ArmorStandPacket.removeArmorStand(HoloMobHealth.playersEnabled, each, true, false));
 							multi.remove();
-							return;
-						}
-						MultilineStands multi = mapping.get(entity.getUniqueId());
-						if (multi == null) {
-							multi = new MultilineStands(entity);
-							mapping.put(entity.getUniqueId(), multi);
-							List<HoloMobArmorStand> stands = new ArrayList<HoloMobArmorStand>(multi.getAllRelatedEntities());
-							Collections.reverse(stands);
-							for (HoloMobArmorStand stand : stands) {
-								ArmorStandPacket.sendArmorStandSpawn(HoloMobHealth.playersEnabled, stand, "", HoloMobHealth.alwaysShow);
-							}
-						}
-						for (int i = 0; i < HoloMobHealth.DisplayText.size(); i++) {
-							String display = ParsePlaceholders.parse((LivingEntity) entity, HoloMobHealth.DisplayText.get(i));
-							ArmorStandPacket.updateArmorStand(HoloMobHealth.playersEnabled, multi.getStand(i), display, HoloMobHealth.alwaysShow);
-						}
+							EntityMetadata.sendMetadataPacket(entity, name, entity.isCustomNameVisible(), entity.getWorld().getPlayers(), true);
+						}, 1);
 					}
 				}
 			}
@@ -176,7 +192,7 @@ public class ArmorstandDisplay {
 		});
 	}
 
-	public static ArmorStandDisplayCache getData(UUID entityUUID, World world, PacketContainer packet) {
+	public static ArmorStandDisplayData getData(UUID entityUUID, World world, PacketContainer packet) {
 		//ArmorStandDisplayCache cahcedData = cache.get(entityUUID);
 		//if (cahcedData != null) {
 		//	return cahcedData;
@@ -186,6 +202,10 @@ public class ArmorstandDisplay {
 		
 		if (entity == null || !EntityTypeUtils.getMobsTypesSet().contains(entity.getType())) {
 			return null;
+		}
+		
+		if (HoloMobHealth.DisabledMobTypes.contains(entity.getType())) {
+			return new ArmorStandDisplayData();
 		}
 		
 		String customName = CustomNameUtils.getMobCustomName(entity);
@@ -215,13 +235,13 @@ public class ArmorstandDisplay {
 			
 			if (customName != null) {
 				for (String each : HoloMobHealth.DisabledMobNamesAbsolute) {
-					if (customName.equals(ChatColorUtils.translateAlternateColorCodes('&', each))) {
-						return null;
+					if (customName.equals(ChatColorUtils.translateAlternateColorCodes('&', each))) {						
+						return new ArmorStandDisplayData();
 					}
 				}
 				for (String each : HoloMobHealth.DisabledMobNamesContains) {
 					if (ChatColorUtils.stripColor(customName.toLowerCase()).contains(ChatColorUtils.stripColor(ChatColorUtils.translateAlternateColorCodes('&', each).toLowerCase()))) {
-						return null;
+						return new ArmorStandDisplayData();
 					}
 				}
 			}
@@ -245,11 +265,10 @@ public class ArmorstandDisplay {
 				watcher.setObject(object, "");
 			} else {
 				Optional<?> opt = Optional.empty();
-				watcher.setObject(
-						new WrappedDataWatcherObject(2, Registry.getChatComponentSerializer(true)), opt);
+				watcher.setObject(new WrappedDataWatcherObject(2, Registry.getChatComponentSerializer(true)), opt);
 			}
 			
-			ArmorStandDisplayCache newData = new ArmorStandDisplayCache(watcher, json, customName);
+			ArmorStandDisplayData newData = new ArmorStandDisplayData(watcher, json, customName);
 			
 			//cache.put(entityUUID, newData);
 			//Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> cache.remove(entityUUID), 1);
@@ -259,15 +278,21 @@ public class ArmorstandDisplay {
 		return null;
 	}
 	
-	protected static class ArmorStandDisplayCache {
+	protected static class ArmorStandDisplayData {
 		public WrappedDataWatcher watcher;
 		public List<String> json;
 		public String customName;
+		public boolean use;
 		
-		public ArmorStandDisplayCache(WrappedDataWatcher watcher, List<String> json, String customName) {
+		public ArmorStandDisplayData(WrappedDataWatcher watcher, List<String> json, String customName) {
 			this.watcher = watcher;
 			this.json = json;
 			this.customName = customName;
+			this.use = true;
+		}
+		
+		public ArmorStandDisplayData() {
+			this.use = false;
 		}
 	}
 }

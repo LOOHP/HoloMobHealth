@@ -42,7 +42,6 @@ import com.loohp.holomobhealth.Utils.NMSUtils;
 import com.loohp.holomobhealth.Utils.ParsePlaceholders;
 import com.loohp.holomobhealth.Utils.ShopkeepersUtils;
 
-import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
@@ -221,7 +220,7 @@ public class ArmorstandDisplay {
 					}
 				}
 				for (String each : HoloMobHealth.DisabledMobNamesContains) {
-					if (ChatColor.stripColor(customName.toLowerCase()).contains(ChatColor.stripColor(ChatColorUtils.translateAlternateColorCodes('&', each).toLowerCase()))) {
+					if (ChatColorUtils.stripColor(customName.toLowerCase()).contains(ChatColorUtils.stripColor(ChatColorUtils.translateAlternateColorCodes('&', each).toLowerCase()))) {
 						return null;
 					}
 				}

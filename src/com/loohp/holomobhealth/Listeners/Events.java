@@ -46,6 +46,10 @@ public class Events implements Listener {
 	
 	@EventHandler
 	public void onAttack(EntityDamageEvent event) {	
+		if (!HoloMobHealth.UseAlterHealth) {
+			return;
+		}
+		
 		if (HoloMobHealth.DisabledWorlds.contains(event.getEntity().getWorld().getName())) {
 			return;
 		}
@@ -69,6 +73,10 @@ public class Events implements Listener {
 	
 	@EventHandler
 	public void onPlayerAttack(EntityDamageByEntityEvent event) {
+		if (!HoloMobHealth.UseAlterHealth) {
+			return;
+		}
+		
 		if (HoloMobHealth.DisabledWorlds.contains(event.getEntity().getWorld().getName())) {
 			return;
 		}

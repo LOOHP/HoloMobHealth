@@ -44,7 +44,9 @@ public class CustomNameUtils {
 		if (HoloMobHealth.CitizensHook) {
 			NPC npc = CitizensAPI.getNPCRegistry().getNPC(entity);
 			if (npc != null) {
-				return npc.getFullName();
+				try {
+					return npc.getFullName();
+				} catch (Exception ignore) {}
 			}
 		}
 		if (HoloMobHealth.ShopkeepersHook) {

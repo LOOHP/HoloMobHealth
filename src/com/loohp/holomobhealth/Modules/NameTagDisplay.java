@@ -44,90 +44,96 @@ public class NameTagDisplay {
 		HoloMobHealth.protocolManager.addPacketListener(new PacketAdapter(HoloMobHealth.plugin, ListenerPriority.HIGHEST, PacketType.Play.Server.ENTITY_METADATA) {
 			@Override
 			public void onPacketSending(PacketEvent event) {
-				if (!event.getPacketType().equals(PacketType.Play.Server.ENTITY_METADATA)) {
-					return;
-				}
-
-				Player player = event.getPlayer();
-				
-				if (!player.hasPermission("holomobhealth.use") || !HoloMobHealth.playersEnabled.contains(player)) {
-					return;
-				}
-				
-				PacketContainer packet = event.getPacket();
-
-				World world = player.getWorld();
-				int entityId = packet.getIntegers().read(0);
-				
-				UUID entityUUID = NMSUtils.getEntityUUIDFromID(world, entityId);
-				
-				if (entityUUID == null) {
-					return;
-				}
-				
-				WrappedDataWatcher watcher = getWatcher(player, entityUUID, world, packet);
-				
-				if (watcher != null) {
-					packet.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects());
-				}
+				try {
+					if (!event.getPacketType().equals(PacketType.Play.Server.ENTITY_METADATA)) {
+						return;
+					}
+	
+					Player player = event.getPlayer();
+					
+					if (!player.hasPermission("holomobhealth.use") || !HoloMobHealth.playersEnabled.contains(player)) {
+						return;
+					}
+					
+					PacketContainer packet = event.getPacket();
+	
+					World world = player.getWorld();
+					int entityId = packet.getIntegers().read(0);
+					
+					UUID entityUUID = NMSUtils.getEntityUUIDFromID(world, entityId);
+					
+					if (entityUUID == null) {
+						return;
+					}
+					
+					WrappedDataWatcher watcher = getWatcher(player, entityUUID, world, packet);
+					
+					if (watcher != null) {
+						packet.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects());
+					}
+				} catch (UnsupportedOperationException e) {}
 			}
 		});
 		HoloMobHealth.protocolManager.addPacketListener(new PacketAdapter(HoloMobHealth.plugin, ListenerPriority.HIGHEST, PacketType.Play.Server.SPAWN_ENTITY_LIVING) {
 			@Override
 			public void onPacketSending(PacketEvent event) {
-				if (!event.getPacketType().equals(PacketType.Play.Server.SPAWN_ENTITY_LIVING)) {
-					return;
-				}
-				
-				PacketContainer packet = event.getPacket();
-				
-				Player player = event.getPlayer();
-				
-				World world = player.getWorld();
-				int entityId = packet.getIntegers().read(0);
-				
-				UUID entityUUID = NMSUtils.getEntityUUIDFromID(world, entityId);
-				
-				if (entityUUID == null) {
-					return;
-				}
-				
-				Entity entity = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(entityUUID) : Bukkit.getEntity(entityUUID);
-				
-				if (entity == null) {
-					return;
-				}
-				
-				Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(player, entity), 5);
+				try {
+					if (!event.getPacketType().equals(PacketType.Play.Server.SPAWN_ENTITY_LIVING)) {
+						return;
+					}
+					
+					PacketContainer packet = event.getPacket();
+					
+					Player player = event.getPlayer();
+					
+					World world = player.getWorld();
+					int entityId = packet.getIntegers().read(0);
+					
+					UUID entityUUID = NMSUtils.getEntityUUIDFromID(world, entityId);
+					
+					if (entityUUID == null) {
+						return;
+					}
+					
+					Entity entity = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(entityUUID) : Bukkit.getEntity(entityUUID);
+					
+					if (entity == null) {
+						return;
+					}
+					
+					Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(player, entity), 5);
+				} catch (UnsupportedOperationException e) {}
 			}
 		});
 		HoloMobHealth.protocolManager.addPacketListener(new PacketAdapter(HoloMobHealth.plugin, ListenerPriority.HIGHEST, PacketType.Play.Server.SPAWN_ENTITY) {
 			@Override
 			public void onPacketSending(PacketEvent event) {
-				if (!event.getPacketType().equals(PacketType.Play.Server.SPAWN_ENTITY)) {
-					return;
-				}
-				
-				PacketContainer packet = event.getPacket();
-				
-				Player player = event.getPlayer();
-				
-				World world = player.getWorld();
-				int entityId = packet.getIntegers().read(0);
-				
-				UUID entityUUID = NMSUtils.getEntityUUIDFromID(world, entityId);
-				
-				if (entityUUID == null) {
-					return;
-				}
-				
-				Entity entity = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(entityUUID) : Bukkit.getEntity(entityUUID);
-				
-				if (entity == null) {
-					return;
-				}
-				
-				Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(player, entity), 5);
+				try {
+					if (!event.getPacketType().equals(PacketType.Play.Server.SPAWN_ENTITY)) {
+						return;
+					}
+					
+					PacketContainer packet = event.getPacket();
+					
+					Player player = event.getPlayer();
+					
+					World world = player.getWorld();
+					int entityId = packet.getIntegers().read(0);
+					
+					UUID entityUUID = NMSUtils.getEntityUUIDFromID(world, entityId);
+					
+					if (entityUUID == null) {
+						return;
+					}
+					
+					Entity entity = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(entityUUID) : Bukkit.getEntity(entityUUID);
+					
+					if (entity == null) {
+						return;
+					}
+					
+					Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(player, entity), 5);
+				} catch (UnsupportedOperationException e) {}
 			}
 		});
 	}

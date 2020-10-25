@@ -6,6 +6,7 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Villager;
 
 import com.loohp.holomobhealth.HoloMobHealth;
@@ -27,7 +28,7 @@ public class EntityTypeUtils {
     			continue;
     		}
     		Set<Class<?>> clazzList = ClassUtils.getAllExtendedOrImplementedTypesRecursively(each.getEntityClass());
-    		if (clazzList.contains(org.bukkit.entity.LivingEntity.class)) {
+    		if (clazzList.contains(LivingEntity.class)) {
     			MobTypesSet.add(each);
     		}
     	}

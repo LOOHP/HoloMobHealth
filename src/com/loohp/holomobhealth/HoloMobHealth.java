@@ -103,6 +103,8 @@ public class HoloMobHealth extends JavaPlugin {
 	public static boolean MyPetHook = false;
 	public static boolean showMyPet = true;
 	
+	public static boolean UltimateStackerHook = false;
+	
 	public static boolean armorStandMode = false;
 	public static int armorStandYOffset = 0;
 	
@@ -172,6 +174,11 @@ public class HoloMobHealth extends JavaPlugin {
 	    	Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into MyPet!");
 	    	MyPetHook = true;
 		}
+	    
+	    if (Bukkit.getServer().getPluginManager().getPlugin("UltimateStacker") != null) {
+	    	Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into UltimateStacker!");
+	    	UltimateStackerHook = true;
+		}
 		
 	    EntityTypeUtils.setUpList();
 		EntityTypeUtils.setupLang();
@@ -201,6 +208,8 @@ public class HoloMobHealth extends JavaPlugin {
 		if (UpdaterEnabled) {
 			getServer().getPluginManager().registerEvents(new Updater(), this);
 		}
+		
+		ArmorstandDisplay.run();
 	    
 	    getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "[HoloMobHealth] HoloMobHealth has been Enabled!");
 	    
@@ -351,6 +360,7 @@ public class HoloMobHealth extends JavaPlugin {
 			NameTagDisplay.entityMetadataPacketListener();
 			if (armorStandMode) {
 				Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[HoloMobHealth] Multi-line is not supported on this version of Minecraft. Using Single line instead!");
+				armorStandMode = false;
 			}
 		} else {
 			ArmorstandDisplay.entityMetadataPacketListener();

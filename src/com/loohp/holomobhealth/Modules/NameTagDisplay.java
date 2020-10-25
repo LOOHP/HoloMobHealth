@@ -65,7 +65,17 @@ public class NameTagDisplay {
 					if (entityUUID == null) {
 						return;
 					}
-					
+					/*
+					if (HoloMobHealth.UltimateStackerHook) {
+						if (UltimateStackerUtils.isStacked(entityUUID)) {
+							UUID hostUUID = UltimateStackerUtils.getHost(entityUUID);
+							Entity stackerHost = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(hostUUID) : Bukkit.getEntity(hostUUID);
+							if (stackerHost != null) {
+								EntityMetadata.updateEntity(player, stackerHost);
+							}
+						}
+					}
+					*/
 					WrappedDataWatcher watcher = getWatcher(player, entityUUID, world, packet);
 					
 					if (watcher != null) {

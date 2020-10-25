@@ -22,9 +22,9 @@ public class RangeModule {
 	private static Map<Player, List<Entity>> current = new HashMap<>();
 	private static Queue<Player> updateQueue = new LinkedList<>();
 	
-	private static int playersPerTick = 1;
-	private static int rate = 20;
-	private static double distance = 15;
+	protected static int playersPerTick = 1;
+	protected static int rate = 20;
+	protected static double distance = 15;
 	
 	public static void reloadNumbers() {
 		rate = HoloMobHealth.plugin.getConfig().getInt("Options.Range.UpdateRate");

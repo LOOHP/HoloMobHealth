@@ -2,6 +2,7 @@ package com.loohp.holomobhealth.Modules;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
@@ -41,15 +43,63 @@ import com.loohp.holomobhealth.Utils.MythicMobsUtils;
 import com.loohp.holomobhealth.Utils.NBTUtils;
 import com.loohp.holomobhealth.Utils.NMSUtils;
 import com.loohp.holomobhealth.Utils.ParsePlaceholders;
+import com.loohp.holomobhealth.Utils.RayTrace;
 import com.loohp.holomobhealth.Utils.ShopkeepersUtils;
 
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
-public class ArmorstandDisplay {
+public class ArmorstandDisplay implements Listener {
 	
 	//private static Map<UUID, ArmorStandDisplayCache> cache = new ConcurrentHashMap<>();
-	private static Map<UUID, MultilineStands> mapping = new HashMap<UUID, MultilineStands>();
+	private static Map<UUID, MultilineStands> mapping = new HashMap<>();
+	private static Map<Player, UUID> focusingEntities = new HashMap<>();
+	
+	public static void run() {
+		Bukkit.getScheduler().runTaskTimer(HoloMobHealth.plugin, () -> {
+			if (HoloMobHealth.alwaysShow || !HoloMobHealth.armorStandMode) {
+				return;
+			}
+			Collection<? extends Player> players = Bukkit.getOnlinePlayers();
+			int perTick = (int) Math.ceil((double) players.size() / 5);
+			int current = 0;
+			int count = 0;
+			for (Player each : players) {
+				UUID playerUUID = each.getUniqueId();
+				if (count >= perTick) {
+					count = 0;
+					current++;
+				}
+				count++;
+				Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {
+					Player player = Bukkit.getPlayer(playerUUID);
+					if (player == null) {
+						return;
+					}
+					if (HoloMobHealth.DisabledWorlds.contains(player.getWorld().getName())) {
+						return;
+					}
+					Entity entity = RayTrace.getLookingEntity(player, 6);
+					UUID last = focusingEntities.get(player);
+					if (entity != null) {
+						UUID now = entity.getUniqueId();
+						if (!now.equals(last)) {
+							focusingEntities.put(player, now);
+							EntityMetadata.updateEntity(player, entity);
+						}
+					} else {
+						if (last != null) {
+							focusingEntities.remove(player);
+							Entity lastEntity = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(last) : Bukkit.getEntity(last);
+							if (lastEntity != null) {
+								EntityMetadata.updateEntity(player, lastEntity);
+							}
+						}
+					}
+				}, current);
+			}
+		}, 0, 5);
+	}
 
 	public static void entityMetadataPacketListener() {
 		HoloMobHealth.protocolManager.addPacketListener(new PacketAdapter(HoloMobHealth.plugin, ListenerPriority.HIGHEST, PacketType.Play.Server.ENTITY_METADATA) {
@@ -76,7 +126,21 @@ public class ArmorstandDisplay {
 					if (entityUUID == null) {
 						return;
 					}
-					
+					/*
+					if (HoloMobHealth.UltimateStackerHook) {
+						if (UltimateStackerUtils.isStacked(entityUUID)) {
+							UUID hostUUID = UltimateStackerUtils.getHost(entityUUID);
+							Bukkit.broadcastMessage("Entity: " + entityUUID.toString());
+							Bukkit.broadcastMessage("Host: " + hostUUID.toString());
+							if (!entityUUID.equals(hostUUID)) {
+								Entity stackerHost = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(hostUUID) : Bukkit.getEntity(hostUUID);
+								if (stackerHost != null) {
+									EntityMetadata.updateEntity(player, stackerHost);
+								}
+							}
+						}
+					}
+					*/
 					ArmorStandDisplayData data = getData(entityUUID, world, packet);
 					
 					if (data != null) {
@@ -111,7 +175,8 @@ public class ArmorstandDisplay {
 								}
 								for (int i = 0; i < HoloMobHealth.DisplayText.size(); i++) {
 									String display = ParsePlaceholders.parse((LivingEntity) entity, HoloMobHealth.DisplayText.get(i));
-									ArmorStandPacket.updateArmorStand(HoloMobHealth.playersEnabled, multi.getStand(i), display, HoloMobHealth.alwaysShow);
+									UUID focusing = focusingEntities.get(player);
+									ArmorStandPacket.updateArmorStand(HoloMobHealth.playersEnabled, multi.getStand(i), display, HoloMobHealth.alwaysShow || (focusing != null && focusing.equals(entityUUID)));
 								}
 							}
 						} else {

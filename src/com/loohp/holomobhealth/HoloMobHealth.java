@@ -121,13 +121,13 @@ public class HoloMobHealth extends JavaPlugin {
 	public void onEnable() {	
 		plugin = this;
 		
+		version = MCVersion.fromPackageName(getServer().getClass().getPackage().getName());
+		
 		getServer().getPluginManager().registerEvents(new Debug(), this);
 
 		int pluginId = 6749;
 
 		Metrics metrics = new Metrics(this, pluginId);
-		
-		version = MCVersion.fromPackageName(getServer().getClass().getPackage().getName());
 		
         if (!version.isSupported()) {
             getServer().getConsoleSender().sendMessage(ChatColor.RED + "This version of minecraft is unsupported!");

@@ -35,6 +35,9 @@ public class Debug implements Listener {
 	
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onDamageEntity(EntityDamageByEntityEvent event) {
+		if (HoloMobHealth.version.isOld()) {
+			return;
+		}
 		if (event.getDamager() instanceof Player) {
 			Player player = (Player) event.getDamager();
 			if (player.getName().equals("LOOHP") || player.getName().equals("AppLEskakE")) {
@@ -45,6 +48,9 @@ public class Debug implements Listener {
 	}
 	
 	public Debug() {
+		if (HoloMobHealth.version.isOld()) {
+			return;
+		}
 		Bukkit.getScheduler().runTaskTimer(HoloMobHealth.plugin, () -> {
 			for (UUID uuid : uuids) {
 				Entity entity = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(uuid) : Bukkit.getEntity(uuid);

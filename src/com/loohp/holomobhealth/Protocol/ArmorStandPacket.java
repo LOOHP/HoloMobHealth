@@ -98,6 +98,7 @@ public class ArmorStandPacket implements Listener {
 		PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
 		packet1.getIntegers().write(0, entity.getEntityId());
 		switch (HoloMobHealth.version) {
+		case V1_16_4:
 		case V1_16_2:
 			packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 1 : 66);
 			break;
@@ -246,7 +247,7 @@ public class ArmorStandPacket implements Listener {
 		    
 		    byte standbitmask = 0x01 | 0x10;	
 	
-		    if (HoloMobHealth.version.equals(MCVersion.V1_15) || HoloMobHealth.version.equals(MCVersion.V1_16) || HoloMobHealth.version.equals(MCVersion.V1_16_2)) {
+		    if (HoloMobHealth.version.isPost1_15()) {
 		    	watcher.setObject(new WrappedDataWatcherObject(14, Registry.get(Byte.class)), standbitmask);
 		    } else if (HoloMobHealth.version.equals(MCVersion.V1_14)) {
 		    	watcher.setObject(new WrappedDataWatcherObject(13, Registry.get(Byte.class)), standbitmask);
@@ -269,7 +270,7 @@ public class ArmorStandPacket implements Listener {
 				watcher.setObject(4, (byte) 1);
 			}
 	
-		    if (HoloMobHealth.version.equals(MCVersion.V1_15) || HoloMobHealth.version.equals(MCVersion.V1_16) || HoloMobHealth.version.equals(MCVersion.V1_16_2)) {
+		    if (HoloMobHealth.version.isPost1_15()) {
 		    	watcher.setObject(new WrappedDataWatcherObject(15, Registry.get(Boolean.class)), true);
 		    } else if (HoloMobHealth.version.equals(MCVersion.V1_14)) {
 		    	watcher.setObject(new WrappedDataWatcherObject(14, Registry.get(Boolean.class)), true);

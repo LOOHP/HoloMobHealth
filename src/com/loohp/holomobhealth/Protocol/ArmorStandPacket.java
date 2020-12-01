@@ -98,7 +98,6 @@ public class ArmorStandPacket implements Listener {
 		PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
 		packet1.getIntegers().write(0, entity.getEntityId());
 		switch (HoloMobHealth.version) {
-		case V1_16_4:
 		case V1_16_2:
 			packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 1 : 66);
 			break;

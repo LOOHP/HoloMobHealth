@@ -11,12 +11,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.loohp.holomobhealth.Database.Database;
 import com.loohp.holomobhealth.Modules.RangeModule;
 import com.loohp.holomobhealth.Protocol.EntityMetadata;
 import com.loohp.holomobhealth.Updater.Updater;
+import com.loohp.holomobhealth.Updater.Updater.UpdaterResponse;
 import com.loohp.holomobhealth.Utils.ChatColorUtils;
 import com.loohp.holomobhealth.Utils.EntityTypeUtils;
 
@@ -93,16 +93,18 @@ public class Commands implements CommandExecutor, TabCompleter {
 			if (sender.hasPermission("holomobhealth.update")) {
 				sender.sendMessage(ChatColor.AQUA + "[HoloMobHealth] HoloMobHealth written by LOOHP!");
 				sender.sendMessage(ChatColor.GOLD + "[HoloMobHealth] You are running HoloMobHealth version: " + HoloMobHealth.plugin.getDescription().getVersion());
-				new BukkitRunnable() {
-					public void run() {
-						String version = Updater.checkUpdate();
-						if (version.equals("latest")) {
+				Bukkit.getScheduler().runTaskAsynchronously(HoloMobHealth.plugin, () -> {
+					UpdaterResponse version = Updater.checkUpdate();
+					if (version.getResult().equals("latest")) {
+						if (version.isDevBuildLatest()) {
 							sender.sendMessage(ChatColor.GREEN + "[HoloMobHealth] You are running the latest version!");
 						} else {
-							Updater.sendUpdateMessage(sender, version);
+							Updater.sendUpdateMessage(sender, version.getResult(), version.getSpigotPluginId(), true);
 						}
+					} else {
+						Updater.sendUpdateMessage(sender, version.getResult(), version.getSpigotPluginId());
 					}
-				}.runTaskAsynchronously(HoloMobHealth.plugin);
+				});
 			} else {
 				sender.sendMessage(HoloMobHealth.NoPermission);
 			}

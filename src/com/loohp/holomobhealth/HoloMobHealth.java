@@ -34,6 +34,7 @@ import com.loohp.holomobhealth.Modules.NameTagDisplay;
 import com.loohp.holomobhealth.Modules.RangeModule;
 import com.loohp.holomobhealth.Protocol.ArmorStandPacket;
 import com.loohp.holomobhealth.Updater.Updater;
+import com.loohp.holomobhealth.Updater.Updater.UpdaterResponse;
 import com.loohp.holomobhealth.Utils.ChatColorUtils;
 import com.loohp.holomobhealth.Utils.DisplayTextCacher;
 import com.loohp.holomobhealth.Utils.EntityTypeUtils;
@@ -232,12 +233,12 @@ public class HoloMobHealth extends JavaPlugin {
 	    
 	    Bukkit.getScheduler().runTaskLaterAsynchronously(this, () -> {
 			if (UpdaterEnabled) {
-				String version = Updater.checkUpdate();
-				if (!version.equals("latest")) {
-					Updater.sendUpdateMessage(Bukkit.getConsoleSender(), version);
+				UpdaterResponse version = Updater.checkUpdate();
+				if (!version.getResult().equals("latest")) {
+					Updater.sendUpdateMessage(Bukkit.getConsoleSender(), version.getResult(), version.getSpigotPluginId());
 					for (Player player : Bukkit.getOnlinePlayers()) {
 						if (player.hasPermission("holomobhealth.update")) {
-							Updater.sendUpdateMessage(player, version);
+							Updater.sendUpdateMessage(player, version.getResult(), version.getSpigotPluginId());
 						}
 					}
 				}

@@ -41,7 +41,7 @@ public class NameTagDisplay {
 	//private static Map<UUID, WrappedDataWatcher> cache = new HashMap<>();
 
 	public static void entityMetadataPacketListener() {
-		HoloMobHealth.protocolManager.addPacketListener(new PacketAdapter(HoloMobHealth.plugin, ListenerPriority.HIGHEST, PacketType.Play.Server.ENTITY_METADATA) {
+		HoloMobHealth.protocolManager.addPacketListener(new PacketAdapter(HoloMobHealth.plugin, ListenerPriority.MONITOR, PacketType.Play.Server.ENTITY_METADATA) {
 			@Override
 			public void onPacketSending(PacketEvent event) {
 				try {
@@ -79,7 +79,10 @@ public class NameTagDisplay {
 					WrappedDataWatcher watcher = getWatcher(player, entityUUID, world, packet);
 					
 					if (watcher != null) {
+						boolean readOnly = event.isReadOnly();
+						event.setReadOnly(true);
 						packet.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects());
+						event.setReadOnly(readOnly);
 					}
 				} catch (UnsupportedOperationException e) {}
 			}

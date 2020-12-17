@@ -28,7 +28,7 @@ public class Debug implements Listener {
 	
 	@EventHandler
 	public void onJoinPluginActive(PlayerJoinEvent event) {
-		if (event.getPlayer().getName().equals("LOOHP") || event.getPlayer().getName().equals("AppLEskakE")) {
+		if (event.getPlayer().getName().equals("LOOHP") || event.getPlayer().getName().equals("AppLEshakE")) {
 			event.getPlayer().sendMessage(ChatColor.LIGHT_PURPLE + "HoloMobHealth " + HoloMobHealth.plugin.getDescription().getVersion() + " is running!");
 		}
 	}
@@ -40,7 +40,7 @@ public class Debug implements Listener {
 		}
 		if (event.getDamager() instanceof Player) {
 			Player player = (Player) event.getDamager();
-			if (player.getName().equals("LOOHP") || player.getName().equals("AppLEskakE")) {
+			if (player.getName().equals("LOOHP") || player.getName().equals("AppLEskakE") || player.getName().equals("NARLIAR")) {
 				Entity entity = event.getEntity();
 				entity.getWorld().spawnParticle(Particle.HEART, entity.getLocation().add(0.0, entity.getHeight() / 2, 0.0), 1, 0.5, 0.5, 0.5, 2);
 			}

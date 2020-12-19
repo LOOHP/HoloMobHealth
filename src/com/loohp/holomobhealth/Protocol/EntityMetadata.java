@@ -54,7 +54,7 @@ public class EntityMetadata {
 			if (player.getWorld().equals(entity.getWorld())) {
 				try {
 					HoloMobHealth.protocolManager.sendServerPacket(player, packet);
-				} catch (InvocationTargetException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}

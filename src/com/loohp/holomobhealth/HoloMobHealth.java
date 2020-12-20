@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -30,6 +29,7 @@ import com.loohp.holomobhealth.Database.Database;
 import com.loohp.holomobhealth.Debug.Debug;
 import com.loohp.holomobhealth.Holders.HoloMobArmorStand;
 import com.loohp.holomobhealth.Listeners.Events;
+import com.loohp.holomobhealth.Metrics.Charts;
 import com.loohp.holomobhealth.Metrics.Metrics;
 import com.loohp.holomobhealth.Modules.ArmorstandDisplay;
 import com.loohp.holomobhealth.Modules.NameTagDisplay;
@@ -134,6 +134,7 @@ public class HoloMobHealth extends JavaPlugin {
 		int pluginId = 6749;
 
 		Metrics metrics = new Metrics(this, pluginId);
+		Charts.setup(metrics);
 		
         if (!version.isSupported()) {
             getServer().getConsoleSender().sendMessage(ChatColor.RED + "This version of minecraft is unsupported!");
@@ -209,13 +210,6 @@ public class HoloMobHealth extends JavaPlugin {
 			RangeModule.reloadNumbers();
 			RangeModule.run();
 		}
-		
-		metrics.addCustomChart(new Metrics.SingleLineChart("total_mobs_displaying", new Callable<Integer>() {
-            @Override
-            public Integer call() throws Exception {
-                return Bukkit.getWorlds().stream().mapToInt(world -> world.getEntities().size()).sum();
-            }
-        }));
 		
 		if (UpdaterEnabled) {
 			getServer().getPluginManager().registerEvents(new Updater(), this);

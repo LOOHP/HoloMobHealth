@@ -82,5 +82,9 @@ public class CustomPlaceholderScripts {
 		}
 		return text;
 	}
+	
+	public static int getScriptsCount() {
+		return scripts.size();
+	}
 
 }

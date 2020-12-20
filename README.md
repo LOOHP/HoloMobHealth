@@ -1,3 +1,3 @@
-[![Build Status](https://ci.loohpjames.com/job/HoloMobHealth/1/badge/icon)](https://ci.loohpjames.com/job/HoloMobHealth/1/)
+[![Build Status](https://ci.loohpjames.com/job/HoloMobHealth/badge/icon)](https://ci.loohpjames.com/job/HoloMobHealth/)
 # HoloMobHealth
 https://www.spigotmc.org/resources/75975/

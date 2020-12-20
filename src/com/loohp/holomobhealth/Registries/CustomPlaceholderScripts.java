@@ -44,10 +44,11 @@ public class CustomPlaceholderScripts {
 		ScriptEngineManager manager = new ScriptEngineManager();
 		ScriptEngine engine = manager.getEngineByName("JavaScript");
 		BufferedReader reader = new BufferedReader(new FileReader(file));
-		engine.eval(reader.lines().collect(Collectors.joining()));
+		engine.eval(reader.lines().collect(Collectors.joining("\n")));
 		reader.close();
 		Invocable invocable = (Invocable) engine;
 		String placeholder = invocable.invokeFunction(PLACEHOLDER_FUNCTION).toString();
+		invocable.invokeFunction(PARSE_FUNCTION, "test", EntityType.ZOMBIE.toString(), 0, 10);
 		long start = System.currentTimeMillis();
 		invocable.invokeFunction(PARSE_FUNCTION, "test", EntityType.ZOMBIE.toString(), 0, 10);
 		if ((System.currentTimeMillis() - start) > 10) {

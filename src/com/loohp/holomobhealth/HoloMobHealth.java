@@ -97,6 +97,8 @@ public class HoloMobHealth extends JavaPlugin {
 	public static boolean AltOnlyPlayer = false;
 	public static Map<UUID, Long> altShowHealth = new ConcurrentHashMap<>();
 	
+	public static boolean PlaceholderAPIHook = false;
+	
 	public static boolean MythicHook = false;
 	public static boolean showMythicMobs = true;
 	
@@ -191,6 +193,11 @@ public class HoloMobHealth extends JavaPlugin {
 	    if (Bukkit.getServer().getPluginManager().getPlugin("UltimateStacker") != null) {
 	    	Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into UltimateStacker!");
 	    	UltimateStackerHook = true;
+		}
+	    
+	    if (Bukkit.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+	    	Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into PlaceholderAPI!");
+	    	PlaceholderAPIHook = true;
 		}
 		
 	    EntityTypeUtils.setUpList();

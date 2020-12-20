@@ -7,12 +7,14 @@ import java.util.Map.Entry;
 
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.Registries.CustomPlaceholderScripts;
 import com.loohp.holomobhealth.Registries.DisplayTextCacher;
 import com.loohp.holomobhealth.Registries.DisplayTextCacher.HealthFormatData;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -22,7 +24,7 @@ import net.md_5.bungee.chat.ComponentSerializer;
 public class ParsePlaceholders {
 	
 	@SuppressWarnings("deprecation")
-	public static String parse(LivingEntity entity, String text) {	
+	public static String parse(Player player, LivingEntity entity, String text) {	
 		double health = entity.getHealth();
 		double maxhealth = 0.0;
 		if (!HoloMobHealth.version.isLegacy()) {
@@ -87,6 +89,10 @@ public class ParsePlaceholders {
 			text = CustomPlaceholderScripts.runScripts(text, entity);
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		
+		if (HoloMobHealth.PlaceholderAPIHook) {
+			text = PlaceholderAPI.setPlaceholders(player, text);
 		}
 
 		text = ChatColorUtils.translateAlternateColorCodes('&', text);

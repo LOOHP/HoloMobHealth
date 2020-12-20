@@ -222,7 +222,7 @@ public class NameTagDisplay {
 			List<WrappedWatchableObject> data = packet.getWatchableCollectionModifier().read(0);
 			WrappedDataWatcher watcher = new WrappedDataWatcher(data);
 			
-			String json = ParsePlaceholders.parse((LivingEntity) entity, HoloMobHealth.DisplayText.get(0));
+			String json = ParsePlaceholders.parse(player, (LivingEntity) entity, HoloMobHealth.DisplayText.get(0));
 			boolean visible = HoloMobHealth.alwaysShow;
 
 			if (json != null) {

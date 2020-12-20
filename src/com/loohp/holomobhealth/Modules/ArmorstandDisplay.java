@@ -141,7 +141,7 @@ public class ArmorstandDisplay implements Listener {
 						}
 					}
 					*/
-					ArmorStandDisplayData data = getData(entityUUID, world, packet);
+					ArmorStandDisplayData data = getData(player, entityUUID, world, packet);
 					
 					if (data != null) {
 						if (data.use) {
@@ -174,7 +174,7 @@ public class ArmorstandDisplay implements Listener {
 									}
 								}
 								for (int i = 0; i < HoloMobHealth.DisplayText.size(); i++) {
-									String display = ParsePlaceholders.parse((LivingEntity) entity, HoloMobHealth.DisplayText.get(i));
+									String display = ParsePlaceholders.parse(player, (LivingEntity) entity, HoloMobHealth.DisplayText.get(i));
 									UUID focusing = focusingEntities.get(player);
 									ArmorStandPacket.updateArmorStand(HoloMobHealth.playersEnabled, multi.getStand(i), display, HoloMobHealth.alwaysShow || (focusing != null && focusing.equals(entityUUID)));
 								}
@@ -262,7 +262,7 @@ public class ArmorstandDisplay implements Listener {
 		});
 	}
 
-	public static ArmorStandDisplayData getData(UUID entityUUID, World world, PacketContainer packet) {
+	public static ArmorStandDisplayData getData(Player player, UUID entityUUID, World world, PacketContainer packet) {
 		//ArmorStandDisplayCache cahcedData = cache.get(entityUUID);
 		//if (cahcedData != null) {
 		//	return cahcedData;
@@ -325,7 +325,7 @@ public class ArmorstandDisplay implements Listener {
 			List<WrappedWatchableObject> data = packet.getWatchableCollectionModifier().read(0);
 			WrappedDataWatcher watcher = new WrappedDataWatcher(data);
 			
-			List<String> json = HoloMobHealth.DisplayText.stream().map(each -> ParsePlaceholders.parse((LivingEntity) entity, each)).collect(Collectors.toList());
+			List<String> json = HoloMobHealth.DisplayText.stream().map(each -> ParsePlaceholders.parse(player, (LivingEntity) entity, each)).collect(Collectors.toList());
 
 			if (HoloMobHealth.version.isOld()) {
 				watcher.setObject(2, "");

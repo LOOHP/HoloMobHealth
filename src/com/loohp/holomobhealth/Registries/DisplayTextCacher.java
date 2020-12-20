@@ -1,4 +1,4 @@
-package com.loohp.holomobhealth.Utils;
+package com.loohp.holomobhealth.Registries;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -10,11 +10,13 @@ import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 
+import com.loohp.holomobhealth.Utils.CustomStringUtils;
+
 import net.md_5.bungee.api.ChatColor;
 
 public class DisplayTextCacher {
 	
-	public enum HealthType {
+	public static enum HealthType {
 		HEALTH("Health"),
 		MAXHEALTH("MaxHealth"),
 		PERCENTAGEHEALTH("PercentageHealth");

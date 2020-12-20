@@ -1,5 +1,7 @@
 package com.loohp.holomobhealth;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,11 +35,14 @@ import com.loohp.holomobhealth.Modules.ArmorstandDisplay;
 import com.loohp.holomobhealth.Modules.NameTagDisplay;
 import com.loohp.holomobhealth.Modules.RangeModule;
 import com.loohp.holomobhealth.Protocol.ArmorStandPacket;
+import com.loohp.holomobhealth.Registries.CustomPlaceholderScripts;
+import com.loohp.holomobhealth.Registries.DisplayTextCacher;
 import com.loohp.holomobhealth.Updater.Updater;
 import com.loohp.holomobhealth.Updater.Updater.UpdaterResponse;
 import com.loohp.holomobhealth.Utils.ChatColorUtils;
-import com.loohp.holomobhealth.Utils.DisplayTextCacher;
 import com.loohp.holomobhealth.Utils.EntityTypeUtils;
+import com.loohp.holomobhealth.Utils.JarUtils;
+import com.loohp.holomobhealth.Utils.JarUtils.CopyOption;
 import com.loohp.holomobhealth.Utils.LegacyPlaceholdersConverter;
 import com.loohp.holomobhealth.Utils.MCVersion;
 
@@ -140,6 +145,12 @@ public class HoloMobHealth extends JavaPlugin {
 		
         getConfig().options().copyDefaults(true);
         saveConfig();
+        
+        try {
+			JarUtils.copyFolderFromJar("placeholder_scripts", getDataFolder(), CopyOption.COPY_IF_NOT_EXIST);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
         
         //Legacy Placeholders Converter
         List<String> lines = plugin.getConfig().getStringList("Display.Text");
@@ -373,6 +384,9 @@ public class HoloMobHealth extends JavaPlugin {
 		showMyPet = plugin.getConfig().getBoolean("Hooks.MyPet.ShowMyPetHealth");
 		
 		UpdaterEnabled = plugin.getConfig().getBoolean("Updater.Enable");
+		
+		CustomPlaceholderScripts.clearScripts();
+		CustomPlaceholderScripts.loadScriptsFromFolder(new File(plugin.getDataFolder(), "placeholder_scripts"));
 	}
 	
 	public static int getUpdateRange(World world) {

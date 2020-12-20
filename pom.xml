@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.loohp</groupId>
 	<artifactId>HoloMobHealth</artifactId>
-	<version>2.0.10.5</version>
+	<version>2.0.11.0</version>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<resources>
@@ -92,7 +92,7 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.16.1-R0.1-SNAPSHOT</version>
+			<version>1.16.4-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -155,11 +155,11 @@
 			<systemPath>${basedir}/lib/MythicMobs-4.5.1.jar</systemPath>
 		</dependency>
 		<dependency>
-			<groupId>Spigot-1.16.1</groupId>
-			<artifactId>Spigot-1.16.1</artifactId>
+			<groupId>Spigot-1.16.4</groupId>
+			<artifactId>Spigot-1.16.4</artifactId>
 			<scope>system</scope>
 			<version>1.0</version>
-			<systemPath>${basedir}/lib/spigot-1.16.1.jar</systemPath>
+			<systemPath>${basedir}/lib/spigot-1.16.4.jar</systemPath>
 		</dependency>
 	</dependencies>
 </project>

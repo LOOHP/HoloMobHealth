@@ -9,7 +9,9 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 
 import com.loohp.holomobhealth.HoloMobHealth;
-import com.loohp.holomobhealth.Utils.DisplayTextCacher.HealthFormatData;
+import com.loohp.holomobhealth.Registries.CustomPlaceholderScripts;
+import com.loohp.holomobhealth.Registries.DisplayTextCacher;
+import com.loohp.holomobhealth.Registries.DisplayTextCacher.HealthFormatData;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -80,9 +82,14 @@ public class ParsePlaceholders {
 			}
 			text = text.replace("{ScaledSymbols}", symbol);
 		}
+		
+		try {
+			text = CustomPlaceholderScripts.runScripts(text, entity);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		text = ChatColorUtils.translateAlternateColorCodes('&', text);
-		
 		
 		List<String> sections = new ArrayList<String>();
 		sections.addAll(Arrays.asList(text.split("(?<=})|(?![^{])")));

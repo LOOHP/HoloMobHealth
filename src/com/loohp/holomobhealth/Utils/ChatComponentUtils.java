@@ -1,13 +1,15 @@
 package com.loohp.holomobhealth.Utils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.bukkit.entity.Player;
 
 import com.loohp.holomobhealth.HoloMobHealth;
 
@@ -272,37 +274,156 @@ public class ChatComponentUtils {
 		return baseComponent;
 	}
 	
-	public static BaseComponent cleanUpLegacyText(BaseComponent basecomponent) {
-		List<BaseComponent> newlist = new LinkedList<BaseComponent>();
-		for (BaseComponent base : CustomStringUtils.loadExtras(basecomponent)) {
-			if (base instanceof TextComponent) {
-				List<TextComponent> texts = Arrays.asList(TextComponent.fromLegacyText(base.toLegacyText())).stream().map(each -> (TextComponent) each).collect(Collectors.toList());
-				for (TextComponent each : texts) {
-					if (HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12)) {
-						each = (TextComponent) CustomStringUtils.copyFormattingEventsNoReplace(each, base);
-	 	        	} else {
-	 	        		each.copyFormatting(base, FormatRetention.EVENTS, false);
-	 	        	}
-					if (HoloMobHealth.version.isPost1_16()) {
-						each.setFont(base.getFont());
-					}
-					//Bukkit.getConsoleSender().sendMessage(ComponentSerializer.toString(each).replace("§", "&"));
-				}
-				newlist.addAll(texts);
-			} else {
-				newlist.add(base);
+	public static BaseComponent preventFurtherInheritanceFormatting(BaseComponent baseComponent) {
+		baseComponent.setBold(baseComponent.isBold());
+		baseComponent.setColor(baseComponent.getColor());
+		baseComponent.setItalic(baseComponent.isItalic());
+		baseComponent.setObfuscated(baseComponent.isObfuscated());
+		baseComponent.setStrikethrough(baseComponent.isStrikethrough());
+		baseComponent.setUnderlined(baseComponent.isUnderlined());
+		return baseComponent;
+	}
+	
+	public static BaseComponent removeFormattingColor(BaseComponent baseComponent) {
+		baseComponent.setColor(ChatColor.RESET);
+		baseComponent = removeHoverEventColor(baseComponent);
+		List<BaseComponent> extras = baseComponent.getExtra();
+		if (extras != null) {
+			for (BaseComponent extra : extras) {
+				removeFormattingColor(extra);
 			}
 		}
+		return baseComponent;
+	}
+	
+	public static BaseComponent cleanUpLegacyText(BaseComponent basecomponent, Player player) {
+		List<BaseComponent> newlist = new LinkedList<BaseComponent>();
+		List<BaseComponent> list = CustomStringUtils.loadExtras(basecomponent);
+		if (list.isEmpty()) {
+			return new TextComponent("");
+		}
+		
+		BaseComponent current = null;
+		for (BaseComponent base : CustomStringUtils.loadExtras(basecomponent)) {
+			List<BaseComponent> thislist = new LinkedList<BaseComponent>();
+			if (base instanceof TextComponent) {
+				List<TextComponent> texts = Stream.of(TextComponent.fromLegacyText(base.toLegacyText())).map(each -> (TextComponent) each).collect(Collectors.toList());
+				if (!texts.isEmpty()) {
+					TextComponent current2 = texts.get(0);
+					if (HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12)) {
+						current2 = (TextComponent) CustomStringUtils.copyFormattingEventsNoReplace(current2, base);
+	 	        	} else {
+	 	        		current2.copyFormatting(base, FormatRetention.EVENTS, false);
+	 	        	}
+					if (HoloMobHealth.version.isPost1_16()) {
+						current2.setFont(base.getFont());
+					}
+					
+					for (TextComponent each : texts.subList(1, texts.size())) {
+						if (areEventsSimilar(current2, each)) {
+							each = (TextComponent) preventFurtherInheritanceFormatting(each);
+							current2.addExtra(each);
+						} else {
+							thislist.add(current2);
+							current2 = each;
+							
+							if (HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12)) {
+								current2 = (TextComponent) CustomStringUtils.copyFormattingEventsNoReplace(current2, base);
+			 	        	} else {
+			 	        		current2.copyFormatting(base, FormatRetention.EVENTS, false);
+			 	        	}
+							if (HoloMobHealth.version.isPost1_16()) {
+								current2.setFont(base.getFont());
+							}
+							//Bukkit.getConsoleSender().sendMessage(ComponentSerializer.toString(each).replace("§", "&"));
+						}
+					}
+					thislist.add(current2);
+				}
+			} else {
+				thislist.add(base);
+			}
+			
+			if (current == null) {
+				current = new TextComponent("");
+				if (HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12)) {
+					current = (TextComponent) CustomStringUtils.copyFormattingEventsNoReplace(current, base);
+ 	        	} else {
+ 	        		current.copyFormatting(base, FormatRetention.EVENTS, false);
+ 	        	}
+				if (HoloMobHealth.version.isPost1_16()) {
+					current.setFont(base.getFont());
+				}
+				
+				for (BaseComponent each : thislist) {
+					each.setClickEvent(null);
+					each.setHoverEvent(null);
+					each = (TextComponent) preventFurtherInheritanceFormatting(each);
+					current.addExtra(each);
+				}
+			} else if (areEventsSimilar(current, base)) {
+				for (BaseComponent each : thislist) {
+					each.setClickEvent(null);
+					each.setHoverEvent(null);
+					current.addExtra(each);
+				}
+			} else {
+				newlist.add(current);
+				
+				current = new TextComponent("");
+				if (HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12)) {
+					current = (TextComponent) CustomStringUtils.copyFormattingEventsNoReplace(current, base);
+ 	        	} else {
+ 	        		current.copyFormatting(base, FormatRetention.EVENTS, false);
+ 	        	}
+				if (HoloMobHealth.version.isPost1_16()) {
+					current.setFont(base.getFont());
+				}
+				
+				for (BaseComponent each : thislist) {
+					each.setClickEvent(null);
+					each.setHoverEvent(null);
+					current.addExtra(each);
+				}
+			}
+		}
+		if (current != null) {
+			newlist.add(current);
+		}
 
+		//ColorSettings colorsEnabled = ClientSettingPackets.getSettings(player);
 		TextComponent product = new TextComponent("");
 		for (int i = 0; i < newlist.size(); i++) {
 			BaseComponent each = newlist.get(i);
+			//if (colorsEnabled.equals(ColorSettings.OFF)) {
+			//	removeFormattingColor(each);
+			//}
 			product.addExtra(each);
 		}
 
 		return product;
 	}
-	
+	/*
+	public static BaseComponent respectClientColorSettingsWithoutCleanUp(BaseComponent basecomponent, Player player) {
+		List<BaseComponent> newlist = CustomStringUtils.loadExtras(basecomponent);
+		
+		ColorSettings colorsEnabled = ClientSettingPackets.getSettings(player);
+		TextComponent product = new TextComponent("");
+		for (int i = 0; i < newlist.size(); i++) {
+			BaseComponent each = newlist.get(i);
+			if (colorsEnabled.equals(ColorSettings.OFF)) {
+				each.setColor(ChatColor.WHITE);
+				if (each instanceof TextComponent) {
+					((TextComponent) each).setText(((TextComponent) each).getText().replaceAll("§[0-9a-e]", "§f"));
+				}
+				each = removeHoverEventColor(each);
+			}
+			product.addExtra(each);
+		}
+		
+		return product;
+	}
+	*/
 	public static BaseComponent join(BaseComponent... toJoin) {
 		if (toJoin.length <= 0) {
 			return new TextComponent("");

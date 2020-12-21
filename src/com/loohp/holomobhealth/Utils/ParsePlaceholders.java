@@ -90,11 +90,13 @@ public class ParsePlaceholders {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
+		text = ChatColorUtils.translateAlternateColorCodes('&', text);
+
 		if (HoloMobHealth.PlaceholderAPIHook) {
 			text = PlaceholderAPI.setPlaceholders(player, text);
 		}
-
+		
 		text = ChatColorUtils.translateAlternateColorCodes('&', text);
 		
 		List<String> sections = new ArrayList<String>();
@@ -148,7 +150,7 @@ public class ParsePlaceholders {
 		}
 		
 		if (HoloMobHealth.version.isPost1_16()) {
-			product = ChatComponentUtils.cleanUpLegacyText(ChatComponentUtils.translatePluginFontFormatting(product));
+			product = ChatComponentUtils.cleanUpLegacyText(ChatComponentUtils.translatePluginFontFormatting(product), player);
 		}
 		
 		//Bukkit.getConsoleSender().sendMessage(ComponentSerializer.toString(product));

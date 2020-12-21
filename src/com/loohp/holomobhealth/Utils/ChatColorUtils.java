@@ -18,6 +18,8 @@ public class ChatColorUtils {
 	private static Pattern colorFormating = Pattern.compile("(?=(?<!\\\\)|(?<=\\\\\\\\))\\[[^\\]]*?color=#[0-9a-fA-F]{6}[^\\[]*?\\]");
 	private static Pattern colorEscape = Pattern.compile("\\\\\\[ *?color=#[0-9a-fA-F]{6} *?\\]");
 	
+	private static String validColorHex = "^#[0-9a-fA-F]{6}$";
+	
 	static {
 		colors.add('0');
 		colors.add('1');
@@ -48,10 +50,10 @@ public class ChatColorUtils {
 	}
 	
 	public static String filterIllegalColorCodes(String string) {
-		return HoloMobHealth.version.isPost1_16() ? string.replaceAll("§[^0-9A-Fa-fk-or]", "") : string.replaceAll("§[^0-9a-fk-or]", "");
+		return HoloMobHealth.version.isPost1_16() ? string.replaceAll("§[^0-9A-Fa-fk-orx]", "") : string.replaceAll("§[^0-9a-fk-or]", "");
 	}
 	
-	public static String getLastColors(String input) {
+    public static String getLastColors(String input) {
         String result = "";
         
         for (int i = input.length() - 1; i > 0; i--) {
@@ -85,7 +87,7 @@ public class ChatColorUtils {
         String color = "";
         while (i < input.length()) {
         	color = String.valueOf(input.charAt(i - 1)) + String.valueOf(input.charAt(i));
-        	if (input.charAt(i) == 'x') {
+        	if (input.charAt(i - 1) == '§' && input.charAt(i) == 'x' && input.length() > i + 13) {
         		color = input.substring(i - 1, i + 13);
         		i += 13;
         	}
@@ -182,12 +184,13 @@ public class ChatColorUtils {
     }
     
     public static String hexToColorCode(String hex) {
+    	hex = hex.toUpperCase();
     	if (hex == null) {
     		return hex;
     	}
     	
     	int pos = hex.indexOf("#");
-    	if (pos < 0 || hex.length() < (pos + 7)) {
+    	if (!hex.matches(validColorHex) || pos < 0 || hex.length() < (pos + 7)) {
     		return "§x§F§F§F§F§F§F";
     	}
     	return "§x§" + String.valueOf(hex.charAt(1)) + "§" + String.valueOf(hex.charAt(2)) + "§" + String.valueOf(hex.charAt(3)) + "§" + String.valueOf(hex.charAt(4)) + "§" + String.valueOf(hex.charAt(5)) + "§" + String.valueOf(hex.charAt(6));
@@ -228,10 +231,10 @@ public class ChatColorUtils {
 	    	    	sb.deleteCharAt(absPos - 1);
 	    	    	sb.deleteCharAt(absPos - 1);
 	    	    	
-		    	    if (absPos > 2 && sb.charAt(absPos - 2) == '\\' && sb.charAt(absPos - 3) == '\\') {
+	    	    	if (absPos > 2 && sb.charAt(absPos - 2) == '\\' && sb.charAt(absPos - 3) == '\\') {
 		    	    	sb.deleteCharAt(absPos - 2);
 		    	    }
-	    	    }	    	    
+	    	    }	    	  
 	    	    
 	    	    text = sb.toString();	    	    
     		} else {

@@ -50,15 +50,17 @@ public class EntityMetadata {
 		packet.getIntegers().write(0, entity.getEntityId());
 		packet.getWatchableCollectionModifier().write(0, WrappedDataWatcher.getEntityWatcher(entity).getWatchableObjects());
 		
-		for (Player player : players) {
-			if (player.getWorld().equals(entity.getWorld())) {
-				try {
-					HoloMobHealth.protocolManager.sendServerPacket(player, packet);
-				} catch (Exception e) {
-					e.printStackTrace();
+		Bukkit.getScheduler().runTaskAsynchronously(HoloMobHealth.plugin, () -> {
+			for (Player player : players) {
+				if (player.getWorld().equals(entity.getWorld())) {
+					try {
+						HoloMobHealth.protocolManager.sendServerPacket(player, packet);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}
-		}
+		});
 	}
 	
 	public static void sendMetadataPacket(Entity entity, String entityNameJson, boolean visible, List<Player> players, boolean quiet) {

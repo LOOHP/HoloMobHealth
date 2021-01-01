@@ -59,7 +59,7 @@ public class Events implements Listener {
 		}
 		
 		Entity entity = event.getEntity();
-		UUID uuid = entity.getUniqueId();		
+		UUID uuid = entity.getUniqueId();
 		HoloMobHealth.altShowHealth.put(uuid, System.currentTimeMillis() + HoloMobHealth.AltHealthDisplayTime * 1000);
 		EntityMetadata.updateEntity(entity.getWorld().getPlayers(), entity);
 		Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {

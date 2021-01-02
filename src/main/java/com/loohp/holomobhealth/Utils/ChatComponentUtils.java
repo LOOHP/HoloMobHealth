@@ -58,7 +58,7 @@ public class ChatComponentUtils {
 		if (base1.isUnderlined() != base2.isUnderlined()) {
 			return false;
 		}
-		if (HoloMobHealth.version.isPost1_16()) {
+		if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_16)) {
 			if ((base1.getFont() == null && base2.getFont() != null) || (base1.getFont() != null && base2.getFont() == null)) {
 				return false;
 			}
@@ -98,7 +98,7 @@ public class ChatComponentUtils {
 		if (base1.isUnderlined() != base2.isUnderlined()) {
 			return false;
 		}
-		if (HoloMobHealth.version.isPost1_16()) {
+		if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_16)) {
 			if ((base1.getFont() == null && base2.getFont() != null) || (base1.getFont() != null && base2.getFont() == null)) {
 				return false;
 			}
@@ -115,7 +115,7 @@ public class ChatComponentUtils {
 	}
 	
 	public static boolean areFontsSimilar(BaseComponent base1, BaseComponent base2) {
-		if (HoloMobHealth.version.isPost1_16()) {
+		if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_16)) {
 			if ((base1.getFont() == null && base2.getFont() != null) || (base1.getFont() != null && base2.getFont() == null)) {
 				return false;
 			}
@@ -315,7 +315,7 @@ public class ChatComponentUtils {
 	 	        	} else {
 	 	        		current2.copyFormatting(base, FormatRetention.EVENTS, false);
 	 	        	}
-					if (HoloMobHealth.version.isPost1_16()) {
+					if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_16)) {
 						current2.setFont(base.getFont());
 					}
 					
@@ -332,7 +332,7 @@ public class ChatComponentUtils {
 			 	        	} else {
 			 	        		current2.copyFormatting(base, FormatRetention.EVENTS, false);
 			 	        	}
-							if (HoloMobHealth.version.isPost1_16()) {
+							if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_16)) {
 								current2.setFont(base.getFont());
 							}
 							//Bukkit.getConsoleSender().sendMessage(ComponentSerializer.toString(each).replace("§", "&"));
@@ -351,7 +351,7 @@ public class ChatComponentUtils {
  	        	} else {
  	        		current.copyFormatting(base, FormatRetention.EVENTS, false);
  	        	}
-				if (HoloMobHealth.version.isPost1_16()) {
+				if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_16)) {
 					current.setFont(base.getFont());
 				}
 				
@@ -376,7 +376,7 @@ public class ChatComponentUtils {
  	        	} else {
  	        		current.copyFormatting(base, FormatRetention.EVENTS, false);
  	        	}
-				if (HoloMobHealth.version.isPost1_16()) {
+				if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_16)) {
 					current.setFont(base.getFont());
 				}
 				

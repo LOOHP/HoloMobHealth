@@ -149,7 +149,7 @@ public class ParsePlaceholders {
 			product.addExtra(each);
 		}
 		
-		if (HoloMobHealth.version.isPost1_16()) {
+		if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_16)) {
 			product = ChatComponentUtils.cleanUpLegacyText(ChatComponentUtils.translatePluginFontFormatting(product), player);
 		}
 		

@@ -230,7 +230,7 @@ public class CustomStringUtils {
 				set.setInsertion(get.getInsertion());
 			}
 		}
-		if (HoloMobHealth.version.isPost1_16()) {
+		if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_16)) {
 			if (set.getFontRaw() == null) {
 				set.setFont(get.getFontRaw());
 			}
@@ -260,7 +260,7 @@ public class CustomStringUtils {
 		set.setObfuscated(get.isObfuscated());
 		set.setStrikethrough(get.isStrikethrough());
 		set.setUnderlined(get.isUnderlined());
-		if (HoloMobHealth.version.isPost1_16()) {
+		if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_16)) {
 			set.setFont(get.getFontRaw());
 		}
 		return set;

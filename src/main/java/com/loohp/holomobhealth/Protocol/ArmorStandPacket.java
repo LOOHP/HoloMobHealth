@@ -247,7 +247,7 @@ public class ArmorStandPacket implements Listener {
 		    
 		    byte standbitmask = 0x01 | 0x10;	
 	
-		    if (HoloMobHealth.version.isPost1_15()) {
+		    if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_15)) {
 		    	watcher.setObject(new WrappedDataWatcherObject(14, Registry.get(Byte.class)), standbitmask);
 		    } else if (HoloMobHealth.version.equals(MCVersion.V1_14)) {
 		    	watcher.setObject(new WrappedDataWatcherObject(13, Registry.get(Byte.class)), standbitmask);
@@ -270,7 +270,7 @@ public class ArmorStandPacket implements Listener {
 				watcher.setObject(4, (byte) 1);
 			}
 	
-		    if (HoloMobHealth.version.isPost1_15()) {
+		    if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_15)) {
 		    	watcher.setObject(new WrappedDataWatcherObject(15, Registry.get(Boolean.class)), true);
 		    } else if (HoloMobHealth.version.equals(MCVersion.V1_14)) {
 		    	watcher.setObject(new WrappedDataWatcherObject(14, Registry.get(Boolean.class)), true);

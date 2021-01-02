@@ -41,7 +41,7 @@ public class BoundingBoxUtils {
 	}
 	
 	public static BoundingBox getBoundingBox(Entity entity) {
-		if (HoloMobHealth.version.isPost1_16() || HoloMobHealth.version.equals(MCVersion.V1_15) || HoloMobHealth.version.equals(MCVersion.V1_14)) {
+		if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_14)) {
 			org.bukkit.util.BoundingBox bukkitBox = entity.getBoundingBox();
 			return BoundingBox.of(bukkitBox.getMin(), bukkitBox.getMax());
 		} else {

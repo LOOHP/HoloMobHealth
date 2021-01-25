@@ -32,12 +32,7 @@ public class RangeModule {
 	}
 	
 	public static boolean isEntityInRangeOfPlayer(Player player, Entity entity) {
-		if (Bukkit.isPrimaryThread()) {
-			return player.getNearbyEntities(distance, distance, distance).contains(entity);
-		} else {
-			List<Entity> nearby = current.get(player);
-			return nearby == null ? false : nearby.contains(entity);
-		}
+		return player.getNearbyEntities(distance, distance, distance).contains(entity);
 	}
 	
 	public static void run() {
@@ -72,8 +67,8 @@ public class RangeModule {
 	private static void compareEntities() {
 		for (Entry<Player, List<Entity>> entry : upcomming.entrySet()) {
 			Player player = entry.getKey();
-			List<Entity> last = current.get(player);
-			if (last == null) {
+			List<Entity> last1 = current.get(player);
+			if (last1 == null) {
 				List<Entity> now1 = new ArrayList<>(entry.getValue());
 				Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () ->  {
 					for (Entity entity : now1) {
@@ -81,7 +76,6 @@ public class RangeModule {
 					}
 				}, 1);
 			} else {
-				List<Entity> last1 = new ArrayList<>(last);
 				List<Entity> now1 = new ArrayList<>(entry.getValue());
 				List<Entity> now2 = new ArrayList<>(entry.getValue());
 				now1.removeAll(last1);

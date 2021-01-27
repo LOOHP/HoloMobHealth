@@ -86,6 +86,9 @@ Options:
     #Refresh rate of the detection of mobs within range in ticks
     #20 ticks = 1 second
     UpdateRate: 20
+  #The default language
+  #Doesn't do anything on Minecraft 1.13+
+  Language: en_us
 
   #Enable EXPERIEMENTAL multi-line mob name tag
   #Note that it is a bit more performance heavy

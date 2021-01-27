@@ -109,7 +109,7 @@ public class ParsePlaceholders {
 		String lastColor = "";
 		for (String section : sections) {
 			if (section.equals("{Mob_Type}")) {
-				TranslatableComponent textcomp = new TranslatableComponent(EntityTypeUtils.getTranslationKey(entity));
+				TranslatableComponent textcomp = new TranslatableComponent(LanguageUtils.getTranslationKey(entity));
 				textcomp = (TranslatableComponent) ChatColorUtils.applyColor(textcomp, lastColor);
 				baselist.add(textcomp);
 			} else if (section.equals("{Mob_Name}")) {
@@ -123,7 +123,7 @@ public class ParsePlaceholders {
 				if (customName != null) {
 					baselist.add(customName);
 				} else {
-					TranslatableComponent textcomp = new TranslatableComponent(EntityTypeUtils.getTranslationKey(entity));
+					TranslatableComponent textcomp = new TranslatableComponent(LanguageUtils.getTranslationKey(entity));
 					textcomp = (TranslatableComponent) ChatColorUtils.applyColor(textcomp, lastColor);
 					baselist.add(textcomp);
 				}

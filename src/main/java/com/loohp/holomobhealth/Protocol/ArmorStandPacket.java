@@ -33,6 +33,7 @@ import com.comphenix.protocol.wrappers.WrappedDataWatcher.Serializer;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObject;
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.Holders.HoloMobArmorStand;
+import com.loohp.holomobhealth.Utils.LanguageUtils;
 import com.loohp.holomobhealth.Utils.MCVersion;
 
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -215,11 +216,11 @@ public class ArmorStandPacket implements Listener {
 			
 			if (json != null) {
 		    	if (HoloMobHealth.version.isOld()) {
-			    	watcher.setObject(2, json);
+			    	watcher.setObject(2, LanguageUtils.convert(ComponentSerializer.parse(json)[0], HoloMobHealth.language).toLegacyText());
 		    	} else if (HoloMobHealth.version.isLegacy()) {
 			    	Serializer serializer = Registry.get(String.class);
 			    	WrappedDataWatcherObject object = new WrappedDataWatcherObject(2, serializer);
-			    	watcher.setObject(object, json);
+			    	watcher.setObject(object, LanguageUtils.convert(ComponentSerializer.parse(json)[0], HoloMobHealth.language).toLegacyText());
 			    } else {
 			    	Optional<?> opt = Optional.of(WrappedChatComponent.fromJson(json).getHandle());
 			    	watcher.setObject(new WrappedDataWatcherObject(2, Registry.getChatComponentSerializer(true)), opt);

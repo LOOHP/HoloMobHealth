@@ -41,6 +41,7 @@ import com.loohp.holomobhealth.Updater.Updater;
 import com.loohp.holomobhealth.Updater.Updater.UpdaterResponse;
 import com.loohp.holomobhealth.Utils.ChatColorUtils;
 import com.loohp.holomobhealth.Utils.JarUtils;
+import com.loohp.holomobhealth.Utils.LanguageUtils;
 import com.loohp.holomobhealth.Utils.JarUtils.CopyOption;
 import com.loohp.holomobhealth.Utils.LegacyPlaceholdersConverter;
 import com.loohp.holomobhealth.Utils.MCVersion;
@@ -57,6 +58,7 @@ public class HoloMobHealth extends JavaPlugin {
 	
 	public static Plugin plugin = null;
 	
+	public static String exactMinecraftVersion;
 	public static MCVersion version;
 	
 	public static ProtocolManager protocolManager;
@@ -125,11 +127,13 @@ public class HoloMobHealth extends JavaPlugin {
 	public static boolean legacyChatAPI = false;
 	
 	public static boolean updaterEnabled = true;
+	public static String language = "en_us";
 	
 	@Override
 	public void onEnable() {	
 		plugin = this;
 		
+		exactMinecraftVersion = Bukkit.getVersion().substring(Bukkit.getVersion().indexOf("(") + 5, Bukkit.getVersion().indexOf(")"));
 		version = MCVersion.fromPackageName(getServer().getClass().getPackage().getName());
 		
 		getServer().getPluginManager().registerEvents(new Debug(), this);
@@ -365,8 +369,12 @@ public class HoloMobHealth extends JavaPlugin {
 		
 		updaterEnabled = plugin.getConfig().getBoolean("Updater.Enable");
 		
+		language = plugin.getConfig().getString("Options.Language");
+		
 		CustomPlaceholderScripts.clearScripts();
 		CustomPlaceholderScripts.loadScriptsFromFolder(new File(plugin.getDataFolder(), "placeholder_scripts"));
+		
+		LanguageUtils.loadTranslations();
 	}
 	
 	public static int getUpdateRange(World world) {

@@ -27,6 +27,7 @@ import com.loohp.holomobhealth.Utils.ChatColorUtils;
 import com.loohp.holomobhealth.Utils.CitizensUtils;
 import com.loohp.holomobhealth.Utils.CustomNameUtils;
 import com.loohp.holomobhealth.Utils.EntityTypeUtils;
+import com.loohp.holomobhealth.Utils.LanguageUtils;
 import com.loohp.holomobhealth.Utils.MCVersion;
 import com.loohp.holomobhealth.Utils.MyPetUtils;
 import com.loohp.holomobhealth.Utils.MythicMobsUtils;
@@ -227,11 +228,11 @@ public class NameTagDisplay {
 
 			if (json != null) {
 				if (HoloMobHealth.version.isOld()) {
-					watcher.setObject(2, ComponentSerializer.parse(json)[0].toLegacyText());
+					watcher.setObject(2, LanguageUtils.convert(ComponentSerializer.parse(json)[0], HoloMobHealth.language).toLegacyText());
 				} else if (HoloMobHealth.version.isLegacy()) {
 					Serializer serializer = Registry.get(String.class);
 					WrappedDataWatcherObject object = new WrappedDataWatcherObject(2, serializer);
-					watcher.setObject(object, ComponentSerializer.parse(json)[0].toLegacyText());
+					watcher.setObject(object, LanguageUtils.convert(ComponentSerializer.parse(json)[0], HoloMobHealth.language).toLegacyText());
 				} else {
 					Optional<?> opt = Optional.of(WrappedChatComponent.fromJson(json).getHandle());
 					watcher.setObject(

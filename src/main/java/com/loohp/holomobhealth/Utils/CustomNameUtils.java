@@ -23,7 +23,7 @@ public class CustomNameUtils {
 	private static Method legacyMythicMobsDisplayNameMethod;
 	
 	static {
-		if (HoloMobHealth.MythicHook) {
+		if (HoloMobHealth.mythicHook) {
 			try {
 				Class<?> clazz = Class.forName("io.lumine.xikage.mythicmobs.mobs.ActiveMob");
 				clazz.getMethod("getDisplayName");
@@ -40,7 +40,7 @@ public class CustomNameUtils {
 	}
 	
 	public static String getMobCustomName(Entity entity) {
-		if (HoloMobHealth.MythicHook) {
+		if (HoloMobHealth.mythicHook) {
 			Optional<ActiveMob> optmob = MythicMobs.inst().getMobManager().getActiveMob(entity.getUniqueId());
 			if (optmob.isPresent()) {
 				if (legacyMythicMobs) {
@@ -54,7 +54,7 @@ public class CustomNameUtils {
 				}
 			}
 		}
-		if (HoloMobHealth.CitizensHook) {
+		if (HoloMobHealth.citizensHook) {
 			NPC npc = CitizensAPI.getNPCRegistry().getNPC(entity);
 			if (npc != null) {
 				try {
@@ -62,13 +62,13 @@ public class CustomNameUtils {
 				} catch (Exception ignore) {}
 			}
 		}
-		if (HoloMobHealth.ShopkeepersHook) {
+		if (HoloMobHealth.shopkeepersHook) {
 			Shopkeeper keeper = ShopkeepersAPI.getShopkeeperRegistry().getShopkeeperByEntity(entity);
 			if (keeper != null) {
 				return keeper.getName();
 			}
 		}
-		if (HoloMobHealth.MyPetHook) {
+		if (HoloMobHealth.myPetHook) {
 			if (entity instanceof MyPetBukkitEntity) {
 				MyPet mypet = ((MyPetBukkitEntity) entity).getMyPet();
 				return mypet.getPetName();

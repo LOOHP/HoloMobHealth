@@ -42,7 +42,7 @@ public class RangeModule {
 	
 	public static void run() {
 		for (World world : Bukkit.getWorlds()) {
-			if (!HoloMobHealth.DisabledWorlds.contains(world.getName())) {
+			if (!HoloMobHealth.disabledWorlds.contains(world.getName())) {
 				for (Player player : world.getPlayers()) {
 					updateQueue.add(player);
 				}

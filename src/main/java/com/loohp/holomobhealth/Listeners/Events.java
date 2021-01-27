@@ -46,21 +46,21 @@ public class Events implements Listener {
 	
 	@EventHandler
 	public void onAttack(EntityDamageEvent event) {	
-		if (!HoloMobHealth.UseAlterHealth) {
+		if (!HoloMobHealth.useAlterHealth) {
 			return;
 		}
 		
-		if (HoloMobHealth.DisabledWorlds.contains(event.getEntity().getWorld().getName())) {
+		if (HoloMobHealth.disabledWorlds.contains(event.getEntity().getWorld().getName())) {
 			return;
 		}
 		
-		if (HoloMobHealth.AltOnlyPlayer) {
+		if (HoloMobHealth.altOnlyPlayer) {
 			return;
 		}
 		
 		Entity entity = event.getEntity();
 		UUID uuid = entity.getUniqueId();
-		HoloMobHealth.altShowHealth.put(uuid, System.currentTimeMillis() + HoloMobHealth.AltHealthDisplayTime * 1000);
+		HoloMobHealth.altShowHealth.put(uuid, System.currentTimeMillis() + HoloMobHealth.altHealthDisplayTime * 1000);
 		EntityMetadata.updateEntity(entity.getWorld().getPlayers(), entity);
 		Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {
 			Long timeout = HoloMobHealth.altShowHealth.get(uuid);
@@ -68,20 +68,20 @@ public class Events implements Listener {
 				HoloMobHealth.altShowHealth.remove(uuid);
 				EntityMetadata.updateEntity(entity.getWorld().getPlayers(), entity);
 			}
-		}, HoloMobHealth.AltHealthDisplayTime * 20 + 5);
+		}, HoloMobHealth.altHealthDisplayTime * 20 + 5);
 	}
 	
 	@EventHandler
 	public void onPlayerAttack(EntityDamageByEntityEvent event) {
-		if (!HoloMobHealth.UseAlterHealth) {
+		if (!HoloMobHealth.useAlterHealth) {
 			return;
 		}
 		
-		if (HoloMobHealth.DisabledWorlds.contains(event.getEntity().getWorld().getName())) {
+		if (HoloMobHealth.disabledWorlds.contains(event.getEntity().getWorld().getName())) {
 			return;
 		}
 		
-		if (!HoloMobHealth.AltOnlyPlayer) {
+		if (!HoloMobHealth.altOnlyPlayer) {
 			return;
 		}
 		
@@ -102,7 +102,7 @@ public class Events implements Listener {
 		
 		Entity entity = event.getEntity();
 		UUID uuid = entity.getUniqueId();		
-		HoloMobHealth.altShowHealth.put(uuid, System.currentTimeMillis() + HoloMobHealth.AltHealthDisplayTime * 1000);
+		HoloMobHealth.altShowHealth.put(uuid, System.currentTimeMillis() + HoloMobHealth.altHealthDisplayTime * 1000);
 		EntityMetadata.updateEntity(entity.getWorld().getPlayers(), entity);
 		Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {
 			Long timeout = HoloMobHealth.altShowHealth.get(uuid);
@@ -110,6 +110,6 @@ public class Events implements Listener {
 				HoloMobHealth.altShowHealth.remove(uuid);
 				EntityMetadata.updateEntity(entity.getWorld().getPlayers(), entity);
 			}
-		}, HoloMobHealth.AltHealthDisplayTime * 20 + 5);
+		}, HoloMobHealth.altHealthDisplayTime * 20 + 5);
 	}
 }

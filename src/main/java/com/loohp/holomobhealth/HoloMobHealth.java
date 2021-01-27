@@ -40,7 +40,6 @@ import com.loohp.holomobhealth.Registries.DisplayTextCacher;
 import com.loohp.holomobhealth.Updater.Updater;
 import com.loohp.holomobhealth.Updater.Updater.UpdaterResponse;
 import com.loohp.holomobhealth.Utils.ChatColorUtils;
-import com.loohp.holomobhealth.Utils.EntityTypeUtils;
 import com.loohp.holomobhealth.Utils.JarUtils;
 import com.loohp.holomobhealth.Utils.JarUtils.CopyOption;
 import com.loohp.holomobhealth.Utils.LegacyPlaceholdersConverter;
@@ -53,6 +52,8 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 
 public class HoloMobHealth extends JavaPlugin {
+	
+	public static final int BSTATS_PLUGIN_ID = 6749;
 	
 	public static Plugin plugin = null;
 	
@@ -69,49 +70,49 @@ public class HoloMobHealth extends JavaPlugin {
 	
 	public static Set<Player> playersEnabled = ConcurrentHashMap.newKeySet();
 	
-	public static String HealthyColor = "&a";
-	public static String HalfColor = "&e";
-	public static String LowColor = "&c";
+	public static String healthyColor = "&a";
+	public static String halfColor = "&e";
+	public static String lowColor = "&c";
 	
-	public static String HealthyChar = "&c❤";
-	public static String HalfChar = "&e❤";
-	public static String EmptyChar = "&7❤";
+	public static String healthyChar = "&c❤";
+	public static String halfChar = "&e❤";
+	public static String emptyChar = "&7❤";
 	
 	public static boolean alwaysShow = true;
 	public static boolean applyToNamed = false;
 	
-	public static String ReloadPlugin = "";	
-	public static String NoPermission = "";
-	public static String PlayersOnly = "";
-	public static String PlayersNotFound = "";
-	public static String ToggleDisplayOn = "";
-	public static String ToggleDisplayOff = "";
+	public static String reloadPluginMessage = "";	
+	public static String noPermissionMessage = "";
+	public static String playersOnlyMessage = "";
+	public static String playersNotFoundMessage = "";
+	public static String toggleDisplayOnMessage = "";
+	public static String toggleDisplayOffMessage = "";
 	
-	public static Set<EntityType> DisabledMobTypes = new HashSet<EntityType>();
-	public static Set<String> DisabledMobNamesAbsolute = new HashSet<String>();
-	public static List<String> DisabledMobNamesContains = new ArrayList<String>();
-	public static Set<String> DisabledWorlds = new HashSet<String>();
+	public static Set<EntityType> disabledMobTypes = new HashSet<EntityType>();
+	public static Set<String> disabledMobNamesAbsolute = new HashSet<String>();
+	public static List<String> disabledMobNamesContains = new ArrayList<String>();
+	public static Set<String> disabledWorlds = new HashSet<String>();
 	
-	public static boolean UseAlterHealth = false;
-	public static int AltHealthDisplayTime = 3;
-	public static boolean AltOnlyPlayer = false;
+	public static boolean useAlterHealth = false;
+	public static int altHealthDisplayTime = 3;
+	public static boolean altOnlyPlayer = false;
 	public static Map<UUID, Long> altShowHealth = new ConcurrentHashMap<>();
 	
-	public static boolean PlaceholderAPIHook = false;
+	public static boolean placeholderAPIHook = false;
 	
-	public static boolean MythicHook = false;
+	public static boolean mythicHook = false;
 	public static boolean showMythicMobs = true;
 	
-	public static boolean CitizensHook = false;
+	public static boolean citizensHook = false;
 	public static boolean showCitizens = true;
 	
-	public static boolean ShopkeepersHook = false;
+	public static boolean shopkeepersHook = false;
 	public static boolean showShopkeepers = true;
 	
-	public static boolean MyPetHook = false;
+	public static boolean myPetHook = false;
 	public static boolean showMyPet = true;
 	
-	public static boolean UltimateStackerHook = false;
+	public static boolean ultimateStackerHook = false;
 	
 	public static boolean armorStandMode = false;
 	public static int armorStandYOffset = 0;
@@ -123,7 +124,7 @@ public class HoloMobHealth extends JavaPlugin {
 	
 	public static boolean legacyChatAPI = false;
 	
-	public static boolean UpdaterEnabled = true;
+	public static boolean updaterEnabled = true;
 	
 	@Override
 	public void onEnable() {	
@@ -133,9 +134,7 @@ public class HoloMobHealth extends JavaPlugin {
 		
 		getServer().getPluginManager().registerEvents(new Debug(), this);
 
-		int pluginId = 6749;
-
-		Metrics metrics = new Metrics(this, pluginId);
+		Metrics metrics = new Metrics(this, BSTATS_PLUGIN_ID);
 		Charts.setup(metrics);
 		
         if (!version.isSupported()) {
@@ -172,36 +171,33 @@ public class HoloMobHealth extends JavaPlugin {
 	    
 	    if (Bukkit.getServer().getPluginManager().getPlugin("Citizens") != null) {
 	    	Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into Citizens!");
-	    	CitizensHook = true;
+	    	citizensHook = true;
 		}
 	    
 	    if (Bukkit.getServer().getPluginManager().getPlugin("MythicMobs") != null) {
 	    	Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into MythicMobs!");
-	    	MythicHook = true;
+	    	mythicHook = true;
 		}
 	    
 	    if (Bukkit.getServer().getPluginManager().getPlugin("Shopkeepers") != null) {
 	    	Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into Shopkeepers!");
-	    	ShopkeepersHook = true;
+	    	shopkeepersHook = true;
 		}
 	    
 	    if (Bukkit.getServer().getPluginManager().getPlugin("MyPet") != null) {
 	    	Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into MyPet!");
-	    	MyPetHook = true;
+	    	myPetHook = true;
 		}
 	    
 	    if (Bukkit.getServer().getPluginManager().getPlugin("UltimateStacker") != null) {
 	    	Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into UltimateStacker!");
-	    	UltimateStackerHook = true;
+	    	ultimateStackerHook = true;
 		}
 	    
 	    if (Bukkit.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
 	    	Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into PlaceholderAPI!");
-	    	PlaceholderAPIHook = true;
+	    	placeholderAPIHook = true;
 		}
-		
-	    EntityTypeUtils.setUpList();
-		EntityTypeUtils.setupLang();
 		
 		try {
 			TextComponent test = new TextComponent("Legacy Bungeecord Chat API Test");
@@ -218,7 +214,7 @@ public class HoloMobHealth extends JavaPlugin {
 			RangeModule.run();
 		}
 		
-		if (UpdaterEnabled) {
+		if (updaterEnabled) {
 			getServer().getPluginManager().registerEvents(new Updater(), this);
 		}
 		
@@ -244,7 +240,7 @@ public class HoloMobHealth extends JavaPlugin {
 		});
 	    
 	    Bukkit.getScheduler().runTaskLaterAsynchronously(this, () -> {
-			if (UpdaterEnabled) {
+			if (updaterEnabled) {
 				UpdaterResponse version = Updater.checkUpdate();
 				if (!version.getResult().equals("latest")) {
 					Updater.sendUpdateMessage(Bukkit.getConsoleSender(), version.getResult(), version.getSpigotPluginId());
@@ -264,12 +260,7 @@ public class HoloMobHealth extends JavaPlugin {
 		if (!Bukkit.getOnlinePlayers().isEmpty()) {
 			if (armorStandMode) {
 				getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "[HoloMobHealth] Plugin reload detected, attempting to despawn all visual entities. If anything went wrong, please restart! (Reloads are always not recommended)");
-				int [] entityIdArray = new int[ArmorStandPacket.active.size()];
-				int i = 0;
-				for (HoloMobArmorStand stand : ArmorStandPacket.active) {
-					entityIdArray[i] = stand.getEntityId();
-					i++;
-				}
+				int [] entityIdArray = ArmorStandPacket.active.stream().mapToInt(each -> each.getEntityId()).toArray();
 				
 				PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
 				packet1.getIntegerArrays().write(0, entityIdArray);
@@ -289,62 +280,50 @@ public class HoloMobHealth extends JavaPlugin {
 	
 	@SuppressWarnings("deprecation")
 	public static void loadConfig() {
-		plugin.getConfig().set("Settings.MobsPerTick", null);
-		plugin.getConfig().set("Settings", null);
-		plugin.saveConfig();
-		
 		rangeEnabled = plugin.getConfig().getBoolean("Options.Range.Use");
 		
 		specialNameOffset.clear();
 		specialTypeOffset.clear();
-		/*
-		if (plugin.getConfig().contains("Options.MultiLine.Enable")) {
-			List<String> list = new ArrayList<String>();
-			list.add(plugin.getConfig().getString("Display.Text"));
-			plugin.getConfig().set("Display.Text", list);
-			plugin.saveConfig();
-		}
-		*/
 		
 		DisplayText = DisplayTextCacher.cacheDecimalFormat(plugin.getConfig().getStringList("Display.Text"));
 		
 		heartScale = plugin.getConfig().getInt("Display.ScaledSymbolSettings.Scale");
 		dynamicScale = plugin.getConfig().getBoolean("Display.ScaledSymbolSettings.DynamicScale");
 		
-		HealthyColor = plugin.getConfig().getString("Display.DynamicColorSettings.HealthyColor");
-		HalfColor = plugin.getConfig().getString("Display.DynamicColorSettings.HalfColor");
-		LowColor = plugin.getConfig().getString("Display.DynamicColorSettings.LowColor");
+		healthyColor = plugin.getConfig().getString("Display.DynamicColorSettings.HealthyColor");
+		halfColor = plugin.getConfig().getString("Display.DynamicColorSettings.HalfColor");
+		lowColor = plugin.getConfig().getString("Display.DynamicColorSettings.LowColor");
 		
-		HealthyChar = plugin.getConfig().getString("Display.ScaledSymbolSettings.HealthyChar");
-		HalfChar = plugin.getConfig().getString("Display.ScaledSymbolSettings.HalfChar");
-		EmptyChar = plugin.getConfig().getString("Display.ScaledSymbolSettings.EmptyChar");
+		healthyChar = plugin.getConfig().getString("Display.ScaledSymbolSettings.HealthyChar");
+		halfChar = plugin.getConfig().getString("Display.ScaledSymbolSettings.HalfChar");
+		emptyChar = plugin.getConfig().getString("Display.ScaledSymbolSettings.EmptyChar");
 		
 		alwaysShow = plugin.getConfig().getBoolean("Options.AlwaysShow");
 		applyToNamed = plugin.getConfig().getBoolean("Options.ApplyToNamed");
 		
-		ReloadPlugin = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.ReloadPlugin"));
-		NoPermission = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.NoPermission"));
-		PlayersOnly = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.PlayersOnly"));
-		PlayersNotFound = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.PlayerNotFound"));
-		ToggleDisplayOn = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.ToggleDisplayOn"));
-		ToggleDisplayOff = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.ToggleDisplayOff"));
+		reloadPluginMessage = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.ReloadPlugin"));
+		noPermissionMessage = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.NoPermission"));
+		playersOnlyMessage = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.PlayersOnly"));
+		playersNotFoundMessage = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.PlayerNotFound"));
+		toggleDisplayOnMessage = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.ToggleDisplayOn"));
+		toggleDisplayOffMessage = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.ToggleDisplayOff"));
 		
 		List<String> types = plugin.getConfig().getStringList("Options.DisabledMobTypes");
 		for (String each : types) {
 			if (version.isLegacy()) {
-				DisabledMobTypes.add(EntityType.fromName(each.toUpperCase()));
+				disabledMobTypes.add(EntityType.fromName(each.toUpperCase()));
 			} else {
-				DisabledMobTypes.add(EntityType.valueOf(each.toUpperCase()));
+				disabledMobTypes.add(EntityType.valueOf(each.toUpperCase()));
 			}
 		}
-		DisabledMobNamesAbsolute = plugin.getConfig().getStringList("Options.DisabledMobNamesAbsolute").stream().collect(Collectors.toSet());
-		DisabledMobNamesContains = plugin.getConfig().getStringList("Options.DisabledMobNamesContains");
+		disabledMobNamesAbsolute = plugin.getConfig().getStringList("Options.DisabledMobNamesAbsolute").stream().collect(Collectors.toSet());
+		disabledMobNamesContains = plugin.getConfig().getStringList("Options.DisabledMobNamesContains");
 		
-		DisabledWorlds = plugin.getConfig().getStringList("Options.DisabledWorlds").stream().collect(Collectors.toSet());
+		disabledWorlds = plugin.getConfig().getStringList("Options.DisabledWorlds").stream().collect(Collectors.toSet());
 		
-		UseAlterHealth = plugin.getConfig().getBoolean("Options.DynamicHealthDisplay.Use");
-		AltHealthDisplayTime = plugin.getConfig().getInt("Options.DynamicHealthDisplay.Timeout");
-		AltOnlyPlayer = plugin.getConfig().getBoolean("Options.DynamicHealthDisplay.OnlyPlayerTrigger");
+		useAlterHealth = plugin.getConfig().getBoolean("Options.DynamicHealthDisplay.Use");
+		altHealthDisplayTime = plugin.getConfig().getInt("Options.DynamicHealthDisplay.Timeout");
+		altOnlyPlayer = plugin.getConfig().getBoolean("Options.DynamicHealthDisplay.OnlyPlayerTrigger");
 		
 		armorStandMode = plugin.getConfig().getBoolean("Options.MultiLine.Enable");
 		armorStandYOffset = plugin.getConfig().getInt("Options.MultiLine.MasterYOffset");
@@ -384,7 +363,7 @@ public class HoloMobHealth extends JavaPlugin {
 		showShopkeepers = plugin.getConfig().getBoolean("Hooks.Shopkeepers.ShowShopkeepersHealth");
 		showMyPet = plugin.getConfig().getBoolean("Hooks.MyPet.ShowMyPetHealth");
 		
-		UpdaterEnabled = plugin.getConfig().getBoolean("Updater.Enable");
+		updaterEnabled = plugin.getConfig().getBoolean("Updater.Enable");
 		
 		CustomPlaceholderScripts.clearScripts();
 		CustomPlaceholderScripts.loadScriptsFromFolder(new File(plugin.getDataFolder(), "placeholder_scripts"));

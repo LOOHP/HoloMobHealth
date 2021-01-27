@@ -54,11 +54,11 @@ public class ParsePlaceholders {
 		if (text.contains("{DynamicColor}")) {
 			String symbol;
 			if (percentage < 33.33) {
-				symbol = HoloMobHealth.LowColor;
+				symbol = HoloMobHealth.lowColor;
 			} else if (percentage < 66.67) {
-				symbol = HoloMobHealth.HalfColor;
+				symbol = HoloMobHealth.halfColor;
 			} else {
-				symbol = HoloMobHealth.HealthyColor;
+				symbol = HoloMobHealth.healthyColor;
 			}
 			text = text.replace("{DynamicColor}", symbol);
 		}
@@ -67,19 +67,19 @@ public class ParsePlaceholders {
 			double healthpercentagescaled = percentage / 100.0 * (double) heartScale;
 			int fullhearts = (int) Math.floor(healthpercentagescaled);
 			for (int i = 0; i < fullhearts; i++) {
-				symbol.append(HoloMobHealth.HealthyChar);
+				symbol.append(HoloMobHealth.healthyChar);
 			}
 			if (fullhearts < heartScale) {
 				double leftover = healthpercentagescaled - (double) fullhearts;
 				if (leftover > 0.67) {
-					symbol.append(HoloMobHealth.HealthyChar);
+					symbol.append(HoloMobHealth.healthyChar);
 				} else if (leftover > 0.33) {
-					symbol.append(HoloMobHealth.HalfChar);
+					symbol.append(HoloMobHealth.halfChar);
 				} else {
-					symbol.append(HoloMobHealth.EmptyChar);
+					symbol.append(HoloMobHealth.emptyChar);
 				}
 				for (int i = fullhearts + 1; i < heartScale; i++) {
-					symbol.append(HoloMobHealth.EmptyChar);
+					symbol.append(HoloMobHealth.emptyChar);
 				}
 			}
 			text = text.replace("{ScaledSymbols}", symbol);
@@ -93,7 +93,7 @@ public class ParsePlaceholders {
 
 		text = ChatColorUtils.translateAlternateColorCodes('&', text);
 
-		if (HoloMobHealth.PlaceholderAPIHook) {
+		if (HoloMobHealth.placeholderAPIHook) {
 			text = PlaceholderAPI.setPlaceholders(player, text);
 		}
 		
@@ -109,14 +109,9 @@ public class ParsePlaceholders {
 		String lastColor = "";
 		for (String section : sections) {
 			if (section.equals("{Mob_Type}")) {
-				if (!HoloMobHealth.version.isLegacy()) {
-					TranslatableComponent textcomp = new TranslatableComponent(EntityTypeUtils.getMinecraftLangName(entity));
-					textcomp = (TranslatableComponent) ChatColorUtils.applyColor(textcomp, lastColor);
-					baselist.add(textcomp);
-				} else {
-					TextComponent textcomp = new TextComponent(EntityTypeUtils.getMinecraftLangName(entity));
-					baselist.add(textcomp);
-				}
+				TranslatableComponent textcomp = new TranslatableComponent(EntityTypeUtils.getTranslationKey(entity));
+				textcomp = (TranslatableComponent) ChatColorUtils.applyColor(textcomp, lastColor);
+				baselist.add(textcomp);
 			} else if (section.equals("{Mob_Name}")) {
 				if (customName != null) {
 					baselist.add(customName);
@@ -128,14 +123,9 @@ public class ParsePlaceholders {
 				if (customName != null) {
 					baselist.add(customName);
 				} else {
-					if (!HoloMobHealth.version.isLegacy()) {
-						TranslatableComponent textcomp = new TranslatableComponent(EntityTypeUtils.getMinecraftLangName(entity));
-						textcomp = (TranslatableComponent) ChatColorUtils.applyColor(textcomp, lastColor);
-						baselist.add(textcomp);
-					} else {
-						TextComponent textcomp = new TextComponent(EntityTypeUtils.getMinecraftLangName(entity));
-						baselist.add(textcomp);
-					}
+					TranslatableComponent textcomp = new TranslatableComponent(EntityTypeUtils.getTranslationKey(entity));
+					textcomp = (TranslatableComponent) ChatColorUtils.applyColor(textcomp, lastColor);
+					baselist.add(textcomp);
 				}
 			} else {
 				baselist.addAll(Arrays.asList(TextComponent.fromLegacyText(section)));

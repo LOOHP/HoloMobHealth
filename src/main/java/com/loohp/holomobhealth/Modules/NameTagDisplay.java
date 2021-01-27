@@ -163,7 +163,7 @@ public class NameTagDisplay {
 			return null;
 		}
 		
-		if (HoloMobHealth.DisabledMobTypes.contains(entity.getType())) {
+		if (HoloMobHealth.disabledMobTypes.contains(entity.getType())) {
 			return null;
 		}
 		
@@ -173,40 +173,40 @@ public class NameTagDisplay {
 			return null;
 		}
 		
-		if (HoloMobHealth.UseAlterHealth && !HoloMobHealth.altShowHealth.containsKey(entityUUID)) {
+		if (HoloMobHealth.useAlterHealth && !HoloMobHealth.altShowHealth.containsKey(entityUUID)) {
 			return null;
 		}
 
-		if (!HoloMobHealth.DisabledWorlds.contains(world.getName())) {
+		if (!HoloMobHealth.disabledWorlds.contains(world.getName())) {
 			
-			if (!HoloMobHealth.showCitizens && HoloMobHealth.CitizensHook) {
+			if (!HoloMobHealth.showCitizens && HoloMobHealth.citizensHook) {
 				if (CitizensUtils.isNPC(entity)) {
 					return null;
 				}
 			}
-			if (!HoloMobHealth.showMythicMobs && HoloMobHealth.MythicHook) {
+			if (!HoloMobHealth.showMythicMobs && HoloMobHealth.mythicHook) {
 				if (MythicMobsUtils.isMythicMob(entity)) {
 					return null;
 				}
 			}
-			if (!HoloMobHealth.showShopkeepers && HoloMobHealth.ShopkeepersHook) {
+			if (!HoloMobHealth.showShopkeepers && HoloMobHealth.shopkeepersHook) {
 				if (ShopkeepersUtils.isShopkeeper(entity)) {
 					return null;
 				}
 			}
-			if (!HoloMobHealth.showMyPet && HoloMobHealth.MyPetHook) {
+			if (!HoloMobHealth.showMyPet && HoloMobHealth.myPetHook) {
 				if (MyPetUtils.isMyPet(entity)) {
 					return null;
 				}
 			}
 			
 			if (customName != null) {
-				for (String each : HoloMobHealth.DisabledMobNamesAbsolute) {
+				for (String each : HoloMobHealth.disabledMobNamesAbsolute) {
 					if (customName.equals(ChatColorUtils.translateAlternateColorCodes('&', each))) {
 						return null;
 					}
 				}
-				for (String each : HoloMobHealth.DisabledMobNamesContains) {
+				for (String each : HoloMobHealth.disabledMobNamesContains) {
 					if (ChatColorUtils.stripColor(customName.toLowerCase()).contains(ChatColorUtils.stripColor(ChatColorUtils.translateAlternateColorCodes('&', each).toLowerCase()))) {
 						return null;
 					}

@@ -18,7 +18,6 @@ import com.loohp.holomobhealth.Protocol.EntityMetadata;
 import com.loohp.holomobhealth.Updater.Updater;
 import com.loohp.holomobhealth.Updater.Updater.UpdaterResponse;
 import com.loohp.holomobhealth.Utils.ChatColorUtils;
-import com.loohp.holomobhealth.Utils.EntityTypeUtils;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -39,7 +38,6 @@ public class Commands implements CommandExecutor, TabCompleter {
 			if (sender.hasPermission("holomobhealth.reload")) {
 				HoloMobHealth.plugin.reloadConfig();
 				HoloMobHealth.loadConfig();
-				EntityTypeUtils.reloadLang();
 				RangeModule.reloadNumbers();
 				for (World world : Bukkit.getWorlds()) {
 					List<Player> playersInWorld = world.getPlayers();
@@ -47,9 +45,9 @@ public class Commands implements CommandExecutor, TabCompleter {
 						EntityMetadata.updateEntity(playersInWorld, entity);
 					}
 				}
-				sender.sendMessage(HoloMobHealth.ReloadPlugin);
+				sender.sendMessage(HoloMobHealth.reloadPluginMessage);
 			} else {
-				sender.sendMessage(HoloMobHealth.NoPermission);
+				sender.sendMessage(HoloMobHealth.noPermissionMessage);
 			}
 			return true;
 		}
@@ -60,31 +58,31 @@ public class Commands implements CommandExecutor, TabCompleter {
 					if (sender instanceof Player) {
 						Player player = (Player) sender;
 						if (Database.toggle(player)) {
-							sender.sendMessage(HoloMobHealth.ToggleDisplayOn);
+							sender.sendMessage(HoloMobHealth.toggleDisplayOnMessage);
 						} else {
-							sender.sendMessage(HoloMobHealth.ToggleDisplayOff);
+							sender.sendMessage(HoloMobHealth.toggleDisplayOffMessage);
 						}
 					} else {
-						sender.sendMessage(HoloMobHealth.PlayersOnly);
+						sender.sendMessage(HoloMobHealth.playersOnlyMessage);
 					}
 				} else {
 					if (sender.hasPermission("holomobhealth.toggle.others")) {
 						Player player = Bukkit.getPlayer(args[1]);
 						if (player != null) {
 							if (Database.toggle(player)) {
-								sender.sendMessage(HoloMobHealth.ToggleDisplayOn);
+								sender.sendMessage(HoloMobHealth.toggleDisplayOnMessage);
 							} else {
-								sender.sendMessage(HoloMobHealth.ToggleDisplayOff);
+								sender.sendMessage(HoloMobHealth.toggleDisplayOffMessage);
 							}
 						} else {
-							sender.sendMessage(HoloMobHealth.PlayersNotFound);
+							sender.sendMessage(HoloMobHealth.playersNotFoundMessage);
 						}
 					} else {
-						sender.sendMessage(HoloMobHealth.NoPermission);
+						sender.sendMessage(HoloMobHealth.noPermissionMessage);
 					}
 				}
 			} else {
-				sender.sendMessage(HoloMobHealth.NoPermission);
+				sender.sendMessage(HoloMobHealth.noPermissionMessage);
 			}
 			return true;
 		}
@@ -106,7 +104,7 @@ public class Commands implements CommandExecutor, TabCompleter {
 					}
 				});
 			} else {
-				sender.sendMessage(HoloMobHealth.NoPermission);
+				sender.sendMessage(HoloMobHealth.noPermissionMessage);
 			}
 			return true;
 		}

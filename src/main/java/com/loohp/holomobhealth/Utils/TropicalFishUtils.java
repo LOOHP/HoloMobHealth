@@ -11,7 +11,7 @@ public class TropicalFishUtils {
 		EntityType type = entity.getType();
 		if (type.equals(EntityType.TROPICAL_FISH)) {
 			TropicalFish fish = (TropicalFish) entity;
-			path = new StringBuilder().append(path).append(".type.").append(fish.getPattern().toString().toLowerCase()).toString();
+			path += ".type." + fish.getPattern().toString().toLowerCase();
 		}		
 		return path;
 	}

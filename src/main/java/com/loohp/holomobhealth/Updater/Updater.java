@@ -24,7 +24,7 @@ public class Updater implements Listener {
 	@EventHandler
 	public void onJoin(PlayerJoinEvent event) {
 		Bukkit.getScheduler().runTaskLaterAsynchronously(HoloMobHealth.plugin, () -> {
-			if (HoloMobHealth.UpdaterEnabled) {
+			if (HoloMobHealth.updaterEnabled) {
 				Player player = event.getPlayer();
 				if (player.hasPermission("HoloMobHealth.update")) {
 					UpdaterResponse version = Updater.checkUpdate();

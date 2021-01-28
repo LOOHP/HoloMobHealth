@@ -3,6 +3,7 @@ package com.loohp.holomobhealth.Utils;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -15,7 +16,6 @@ import java.util.Set;
 import java.util.zip.ZipInputStream;
 
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.libs.jline.internal.InputStreamReader;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;

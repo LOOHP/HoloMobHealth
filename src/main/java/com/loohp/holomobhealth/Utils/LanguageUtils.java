@@ -3,7 +3,6 @@ package com.loohp.holomobhealth.Utils;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -82,7 +81,9 @@ public class LanguageUtils {
 		    	    pw.flush();
 		    	    pw.close();
 		    	}
-		    	JSONObject data = (JSONObject) new JSONParser().parse(new FileReader(hashFile));
+		    	InputStreamReader hashStream = new InputStreamReader(new FileInputStream(hashFile), StandardCharsets.UTF_8);
+		    	JSONObject data = (JSONObject) new JSONParser().parse(hashStream);
+		    	hashStream.close();
 				
 				JSONObject manifest = HTTPRequestUtils.getJSONResponse(VERSION_MANIFEST_URL);
 				if (manifest == null) {
@@ -282,11 +283,15 @@ public class LanguageUtils {
 	}
 	
 	public static String getTranslation(String translationKey, String language) {
-		if (HoloMobHealth.version.isLegacy() && translationKey.equals("item.skull.player.name")) {
-			return "%s's Head";
+		try {
+			if (HoloMobHealth.version.isLegacy() && translationKey.equals("item.skull.player.name")) {
+				return "%s's Head";
+			}
+			Map<String, String> mapping = translations.get(language);
+			return mapping == null ? new TranslatableComponent(translationKey).toPlainText() : mapping.getOrDefault(translationKey, translationKey);
+		} catch (Exception e) {
+			return translationKey;
 		}
-		Map<String, String> mapping = translations.get(language);
-		return mapping == null ? new TranslatableComponent(translationKey).toPlainText() : mapping.getOrDefault(translationKey, translationKey);
 	}
 	
 	public static BaseComponent[] convert(BaseComponent[] baseComponent, String language) {

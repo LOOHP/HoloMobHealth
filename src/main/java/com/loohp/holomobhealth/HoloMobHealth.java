@@ -211,12 +211,14 @@ public class HoloMobHealth extends JavaPlugin {
 		} catch (Throwable e) {
 			legacyChatAPI = true;
 			Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[HoloMobHealth] Legacy Bungeecord Chat API detected, using legacy methods...");
-		};
+		}
 		
 		if (rangeEnabled) {
 			RangeModule.reloadNumbers();
 			RangeModule.run();
 		}
+		
+		Database.setup();
 		
 		if (updaterEnabled) {
 			getServer().getPluginManager().registerEvents(new Updater(), this);

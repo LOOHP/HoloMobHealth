@@ -376,7 +376,7 @@ public class HoloMobHealth extends JavaPlugin {
 		CustomPlaceholderScripts.clearScripts();
 		CustomPlaceholderScripts.loadScriptsFromFolder(new File(plugin.getDataFolder(), "placeholder_scripts"));
 		
-		LanguageUtils.loadTranslations();
+		LanguageUtils.loadTranslations(language);
 	}
 	
 	public static int getUpdateRange(World world) {

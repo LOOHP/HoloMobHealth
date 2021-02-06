@@ -1,8 +1,3 @@
-function placeholder() {
-	//This is the your defined placeholder
-	return "{VerticalStripedSymbols}";
-}
-
 //When HoloMobHealth parses your placeholder, it will replace your defined placeholder text
 //with the return value of this function
 //The provide args are
@@ -12,7 +7,11 @@ function placeholder() {
 //maxhealth -> the max health of this mob
 
 //In this example we will create a health bar out of vertical stripe characters
-function parse(customname, mobtype, health, maxhealth) {
+function parse() {
+	var customname = DisplayText;
+    var health = Health;
+    var maxhealth = MaxHealth;
+
 	var healthyChar = "&a|";
 	var halfChar = "&e|";
 	var emptyChar = "&7|";
@@ -43,3 +42,5 @@ function parse(customname, mobtype, health, maxhealth) {
 	}
 	return text;
 }
+
+parse();

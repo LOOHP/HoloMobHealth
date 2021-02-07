@@ -24,7 +24,6 @@ import org.bukkit.entity.LivingEntity;
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.Utils.CustomNameUtils;
 
-import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;
 
 public class CustomPlaceholderScripts {
@@ -64,7 +63,6 @@ public class CustomPlaceholderScripts {
 		reader.close();
         engine.put("BukkitServer", Bukkit.getServer());
         engine.put("Placeholder", placeholder);
-        engine.put("PlaceholderAPI", PlaceholderAPI.class);
 		scripts.put(placeholder, new JavaScriptPlaceholder(engine, placeholder, script));
 	}
 	

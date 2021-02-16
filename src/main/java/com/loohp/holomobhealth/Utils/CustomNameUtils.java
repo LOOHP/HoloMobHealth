@@ -47,7 +47,7 @@ public class CustomNameUtils {
 					try {
 						return legacyMythicMobsDisplayNameMethod.invoke(optmob.get().getType()).toString();
 					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
-						e1.printStackTrace();
+						
 					}
 				} else {
 					return optmob.get().getDisplayName();

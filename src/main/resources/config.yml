@@ -123,6 +123,11 @@ Messages:
   ToggleDisplayOn: "&aEnabled Mob Health Display!"
   ToggleDisplayOff: "&cDisabled Mob Health Display!"
 
+CustomPlaceholderScript:
+  SilentClassNotFound: true
+  AdditionClasses:
+    MythicMobs: "io.lumine.xikage.mythicmobs.MythicMobs"
+
 Database:
   #Player data storage type, MYSQL or SQLITE
   Type: SQLITE

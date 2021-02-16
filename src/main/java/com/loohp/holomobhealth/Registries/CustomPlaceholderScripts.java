@@ -6,8 +6,10 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -24,6 +26,7 @@ import org.bukkit.entity.LivingEntity;
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.Utils.CustomNameUtils;
 
+import io.lumine.xikage.mythicmobs.MythicMobs;
 import net.md_5.bungee.api.ChatColor;
 
 public class CustomPlaceholderScripts {
@@ -32,6 +35,7 @@ public class CustomPlaceholderScripts {
 	public static final Pattern pattern = Pattern.compile("//.*|/\\*[\\S\\s]*?\\*/|%([^%]+)%");
 	
 	private static Map<String, JavaScriptPlaceholder> scripts = new HashMap<>();
+	private static Map<String, Class<?>> scriptDataTypes = new ConcurrentHashMap<>();
 	
 	public static void loadScriptsFromFolder(File folder) {
 		File index = new File(folder, "scripts.yml");
@@ -78,6 +82,10 @@ public class CustomPlaceholderScripts {
             engine.put("CustomName", customname);
             engine.put("MobType", mobtype);
             engine.put("LivingEntity", entity);
+            for (Entry<String, Class<?>> entry : scriptDataTypes.entrySet()) {
+            	engine.put(entry.getKey(), entry.getValue());
+            }
+            MythicMobs.inst().getMobManager().getActiveMob(null).get().getLevel();
             Object result = engine.eval(script);
             return result != null ? result.toString() : "";
         } catch (ScriptException e) {
@@ -114,6 +122,24 @@ public class CustomPlaceholderScripts {
 	
 	public static int getScriptsCount() {
 		return scripts.size();
+	}
+	
+	public static void registerClass(String identifier, Class<?> clazz) {
+		scriptDataTypes.put(identifier, clazz);
+	}
+	
+	public static boolean containsClass(String identifier) {
+		return scriptDataTypes.containsKey(identifier);
+	}
+	
+	public static boolean containsClass(Class<?> clazz) {
+		Iterator<Entry<String, Class<?>>> itr = scriptDataTypes.entrySet().iterator();
+		while (itr.hasNext()) {
+			if (itr.next().getValue().equals(clazz)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public static class JavaScriptPlaceholder {

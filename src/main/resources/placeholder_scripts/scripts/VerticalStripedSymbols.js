@@ -1,10 +1,5 @@
 //When HoloMobHealth parses your placeholder, it will replace your defined placeholder text
 //with the return value of this function
-//The provide args are
-//customname -> the customname of this mob (if there is one)
-//mobtype -> the type of the mob
-//health -> the current health of this mob
-//maxhealth -> the max health of this mob
 
 //In this example we will create a health bar out of vertical stripe characters
 function parse() {

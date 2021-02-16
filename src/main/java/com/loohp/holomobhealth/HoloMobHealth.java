@@ -25,6 +25,7 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
+import com.loohp.holomobhealth.API.HoloMobHealthAPI;
 import com.loohp.holomobhealth.Database.Database;
 import com.loohp.holomobhealth.Debug.Debug;
 import com.loohp.holomobhealth.Holders.HoloMobArmorStand;
@@ -375,6 +376,19 @@ public class HoloMobHealth extends JavaPlugin {
 		
 		CustomPlaceholderScripts.clearScripts();
 		CustomPlaceholderScripts.loadScriptsFromFolder(new File(plugin.getDataFolder(), "placeholder_scripts"));
+		
+		boolean silentClassNotFound = plugin.getConfig().getBoolean("CustomPlaceholderScript.SilentClassNotFound");
+		for (String key : plugin.getConfig().getConfigurationSection("CustomPlaceholderScript.AdditionClasses").getValues(false).keySet()) {
+			String classPath = plugin.getConfig().getString("CustomPlaceholderScript.AdditionClasses." + key);
+			try {
+				Class<?> clazz = Class.forName(classPath);
+				HoloMobHealthAPI.registerClassToCustomPlaceholderScript(key, clazz);
+			} catch (ClassNotFoundException e) {
+				if (!silentClassNotFound) {
+					e.printStackTrace();
+				}
+			}
+		}
 		
 		LanguageUtils.loadTranslations(language);
 	}

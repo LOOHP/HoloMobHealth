@@ -77,9 +77,9 @@ public class HoloMobHealth extends JavaPlugin {
 	public static String halfColor = "&e";
 	public static String lowColor = "&c";
 	
-	public static String healthyChar = "&c❤";
-	public static String halfChar = "&e❤";
-	public static String emptyChar = "&7❤";
+	public static String healthyChar = "&câ¤";
+	public static String halfChar = "&eâ¤";
+	public static String emptyChar = "&7â¤";
 	
 	public static boolean alwaysShow = true;
 	public static boolean applyToNamed = false;

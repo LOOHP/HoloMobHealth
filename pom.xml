@@ -1,33 +1,41 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.loohp</groupId>
 	<artifactId>HoloMobHealth</artifactId>
+	<name>HoloMobHealth</name>
 	<version>2.0.14.0</version>
+
+	<description>Customize how you would like to display mob health above its head!</description>
+	<url>https://github.com/LOOHP/HoloMobHealth</url>
+	<packaging>jar</packaging>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.build.number></project.build.number>
+		<project.fullVersion>${project.version}</project.fullVersion>
+	</properties>
+
 	<build>
+		<defaultGoal>clean install</defaultGoal>
 		<sourceDirectory>src/main/java</sourceDirectory>
+		<testSourceDirectory>src/test/java</testSourceDirectory>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
 			</resource>
 		</resources>
+
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.7.0</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-					<encoding>ISO-8859-1</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.1.0</version>
+				<version>3.2.4</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
@@ -35,13 +43,111 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
+							<shadedArtifactAttached>false</shadedArtifactAttached>
 							<createDependencyReducedPom>false</createDependencyReducedPom>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
+
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.2.0</version>
+				<configuration>
+					<failOnError>false</failOnError>
+					<encoding>ISO-8859-1</encoding>
+					<doctitle>HoloMobHealth JavaDocs</doctitle>
+					<windowtitle>HoloMobHealth JavaDocs</windowtitle>
+					<additionalOptions>
+						<additionalOption>-Xdoclint:none</additionalOption>
+					</additionalOptions>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>install</phase>
+						<goals>
+							<goal>aggregate</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>jenkins</id>
+			<activation>
+				<property>
+					<name>env.BUILD_NUMBER</name>
+				</property>
+			</activation>
+			<properties>
+				<project.build.number>-b${env.BUILD_NUMBER}</project.build.number>
+				<!--<project.fullVersion>${project.version}${project.build.number}</project.fullVersion> -->
+				<project.fullVersion>${project.version}</project.fullVersion>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>release-sign-artifacts</id>
+			<activation>
+				<property>
+					<name>performRelease</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<properties>
+				<project.fullVersion>${project.version}</project.fullVersion>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>3.2.1</version>
+						<configuration>
+							<encoding>${project.build.sourceEncoding}</encoding>
+						</configuration>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>3.2.0</version>
+						<configuration>
+							<encoding>${project.build.sourceEncoding}</encoding>
+						</configuration>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 	<repositories>
 		<repository>
@@ -66,7 +172,7 @@
 		</repository>
 		<repository>
 			<id>dmulloy2-repo</id>
-			<url>https://repo.dmulloy2.net/nexus/repository/public/</url>
+			<url>https://repo.dmulloy2.net/repository/public/</url>
 		</repository>
 		<repository>
 			<id>everything</id>
@@ -101,7 +207,7 @@
 		<dependency>
 			<groupId>com.comphenix.protocol</groupId>
 			<artifactId>ProtocolLib</artifactId>
-			<version>4.5.1</version>
+			<version>4.6.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -118,10 +224,10 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-		    <groupId>com.github.libraryaddict</groupId>
-		    <artifactId>LibsDisguises</artifactId>
-		    <version>10.0.20</version>
-		    <scope>provided</scope>
+			<groupId>com.github.libraryaddict</groupId>
+			<artifactId>LibsDisguises</artifactId>
+			<version>10.0.20</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>ModelEngineAPI</groupId>

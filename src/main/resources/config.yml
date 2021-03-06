@@ -24,6 +24,7 @@ Display:
   #Only one line is allowed (Unless you enabled ***EXPERIMENTAL*** multi-line which is not recommended)
   Text: 
     - "&b{Mob_Type_Or_Name}: {DynamicColor}{Health_0.0}&f/{MaxHealth_0.0}"
+    - "If Multiline is enabled, you will see this line"
 
   #Settings for the {DynamicColor} Placeholder
   DynamicColorSettings:
@@ -71,12 +72,20 @@ Options:
     - PhantomShield
   #Settings for an alternate way of showing health
   DynamicHealthDisplay:
-    #Whether or not HoloMobHealth should only apply health display when the mob is under attack
+    #Whether or not HoloMobHealth should only apply health display when the mob is taking damage
     Use: false
     #How long should health be shown after the mob has been attack (in seconds)
     Timeout: 3
     #Should health be triggered only from attacks from players
     OnlyPlayerTrigger: false
+
+    IdleDisplay:
+      #Whether to display an alternative foramt when a mob is not taking damage
+      Use: false
+      #Placeholders are the same as the main display
+      Text: 
+        - "&b{Mob_Type_Or_Name}"
+        - "If Multiline is enabled, you will see this line"
   #Settings for the range detection module
   #Note that disabling it saves performance
   #Restart to see changes
@@ -100,6 +109,38 @@ Options:
     Special:
       - "Name:^Special Name:2"
       - "Type:ENDERMITE:1"
+
+DamageIndicator:
+  #Whether the damage indicator module should be used
+  Enabled: true
+  #Should the damage indicator only be triggered by player actions
+  OnlyPlayerTriggered: false
+  #Visible range of the indicator
+  VisibleRange: 64
+  #When will the indicator disappear
+  #In ticks -> 20 ticks = 1 second
+  Timeout: 40
+
+  Damage: 
+    #Should the damage indicator be enabled for health losts
+    Enabled: true
+    #Play the indicator animation
+    Animation: true
+    #The text which will be displayed
+    #Placeholders are the same as the main display with these additional placeholders:
+    #{Indicator_<DecimalFormat>} <- to show the amount of health lost/gained
+    HoloText: "&c{Indicator_0.#}"
+
+  Regen:
+    #Should the damage indicator be enabled for health gains
+    Enabled: true
+    #Play the indicator animation
+    Animation: true
+    #The text which will be displayed
+    #Placeholders are the same as the main display with these additional placeholders:
+    #{Indicator_<DecimalFormat>} <- to show the amount of health lost/gained
+    HoloText: "&a{Indicator_0.#}"
+
 
 Hooks:
   Citizens:

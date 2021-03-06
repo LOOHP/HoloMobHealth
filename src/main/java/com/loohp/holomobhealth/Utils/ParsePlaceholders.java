@@ -23,8 +23,16 @@ import net.md_5.bungee.chat.ComponentSerializer;
 
 public class ParsePlaceholders {
 	
+	public static String parse(LivingEntity entity, String text, double healthchange) {
+		return parse(null, entity, text, healthchange);
+	}
+	
+	public static String parse(Player player, LivingEntity entity, String text) {
+		return parse(player, entity, text, 0);
+	}
+	
 	@SuppressWarnings("deprecation")
-	public static String parse(Player player, LivingEntity entity, String text) {	
+	public static String parse(Player player, LivingEntity entity, String text, double healthchange) {
 		double health = entity.getHealth();
 		double maxhealth = 0.0;
 		if (!HoloMobHealth.version.isLegacy()) {
@@ -47,6 +55,9 @@ public class ParsePlaceholders {
 				break;
 			case PERCENTAGEHEALTH:
 				text = text.replace(entry.getKey(), String.valueOf(data.getFormatter().format(percentage)));
+				break;
+			case INDICATOR:
+				text = text.replace(entry.getKey(), String.valueOf(data.getFormatter().format(healthchange)));
 				break;
 			}
 		}
@@ -93,7 +104,7 @@ public class ParsePlaceholders {
 
 		text = ChatColorUtils.translateAlternateColorCodes('&', text);
 
-		if (HoloMobHealth.placeholderAPIHook) {
+		if (HoloMobHealth.placeholderAPIHook && player != null) {
 			text = PlaceholderAPI.setPlaceholders(player, text);
 		}
 		
@@ -105,7 +116,7 @@ public class ParsePlaceholders {
 		String rawName = CustomNameUtils.getMobCustomName(entity);
 		BaseComponent customName = rawName != null ? ChatComponentUtils.join(TextComponent.fromLegacyText(ChatColor.RESET + rawName)) : null;
 		
-		List<BaseComponent> baselist = new ArrayList<BaseComponent>();
+		List<BaseComponent> baselist = new ArrayList<>();
 		String lastColor = "";
 		for (String section : sections) {
 			if (section.equals("{Mob_Type}")) {
@@ -140,7 +151,7 @@ public class ParsePlaceholders {
 		}
 		
 		if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_16)) {
-			product = ChatComponentUtils.cleanUpLegacyText(ChatComponentUtils.translatePluginFontFormatting(product), player);
+			product = ChatComponentUtils.cleanUpLegacyText(ChatComponentUtils.translatePluginFontFormatting(product));
 		}
 		
 		//Bukkit.getConsoleSender().sendMessage(ComponentSerializer.toString(product));

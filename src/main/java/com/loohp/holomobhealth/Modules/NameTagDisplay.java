@@ -174,8 +174,12 @@ public class NameTagDisplay {
 			return null;
 		}
 		
+		boolean useIdle = false;
 		if (HoloMobHealth.useAlterHealth && !HoloMobHealth.altShowHealth.containsKey(entityUUID)) {
-			return null;
+			if (!HoloMobHealth.idleUse) {
+				return null;
+			}
+			useIdle = true;
 		}
 
 		if (!HoloMobHealth.disabledWorlds.contains(world.getName())) {
@@ -223,7 +227,7 @@ public class NameTagDisplay {
 			List<WrappedWatchableObject> data = packet.getWatchableCollectionModifier().read(0);
 			WrappedDataWatcher watcher = new WrappedDataWatcher(data);
 			
-			String json = ParsePlaceholders.parse(player, (LivingEntity) entity, HoloMobHealth.DisplayText.get(0));
+			String json = ParsePlaceholders.parse(player, (LivingEntity) entity, useIdle ? HoloMobHealth.idleDisplayText.get(0) : HoloMobHealth.displayText.get(0));
 			boolean visible = HoloMobHealth.alwaysShow;
 
 			if (json != null) {

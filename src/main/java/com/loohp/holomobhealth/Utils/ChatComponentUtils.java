@@ -9,8 +9,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.bukkit.entity.Player;
-
 import com.loohp.holomobhealth.HoloMobHealth;
 
 import net.md_5.bungee.api.ChatColor;
@@ -296,7 +294,7 @@ public class ChatComponentUtils {
 		return baseComponent;
 	}
 	
-	public static BaseComponent cleanUpLegacyText(BaseComponent basecomponent, Player player) {
+	public static BaseComponent cleanUpLegacyText(BaseComponent basecomponent) {
 		List<BaseComponent> newlist = new LinkedList<BaseComponent>();
 		List<BaseComponent> list = CustomStringUtils.loadExtras(basecomponent);
 		if (list.isEmpty()) {

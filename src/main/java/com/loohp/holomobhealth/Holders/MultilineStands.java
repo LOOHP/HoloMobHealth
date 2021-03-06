@@ -17,14 +17,14 @@ import com.loohp.holomobhealth.Protocol.ArmorStandPacket;
 
 public class MultilineStands {
 	
-	List<HoloMobArmorStand> stands;
-	List<HoloMobArmorStand> eachentity;
-	Location location;
-	Entity entity;
-	UUID uuid;
-	int id;
-	int offset;
-	int gctask;
+	private List<HoloMobArmorStand> stands;
+	private List<HoloMobArmorStand> eachentity;
+	private Location location;
+	private Entity entity;
+	private UUID uuid;
+	private int id;
+	private int offset;
+	private int gctask;
 	
 	public MultilineStands(Entity entity) {
 		Location location = entity.getLocation().clone();
@@ -48,7 +48,7 @@ public class MultilineStands {
 		stands = new ArrayList<HoloMobArmorStand>();
 		eachentity = new ArrayList<HoloMobArmorStand>();
 		int mountId = entity.getEntityId();
-		for (int i = 0; i < HoloMobHealth.DisplayText.size() + offset; i++) {
+		for (int i = 0; i < HoloMobHealth.displayText.size() + offset; i++) {
 			HoloMobArmorStand stand = new HoloMobArmorStand(standloc, EntityType.ARMOR_STAND, mountId);
 			mountId = stand.getEntityId();
 			if (offset - 1 < i) {

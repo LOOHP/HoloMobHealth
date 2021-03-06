@@ -33,6 +33,7 @@ import com.loohp.holomobhealth.Listeners.Events;
 import com.loohp.holomobhealth.Metrics.Charts;
 import com.loohp.holomobhealth.Metrics.Metrics;
 import com.loohp.holomobhealth.Modules.ArmorstandDisplay;
+import com.loohp.holomobhealth.Modules.DamageIndicator;
 import com.loohp.holomobhealth.Modules.NameTagDisplay;
 import com.loohp.holomobhealth.Modules.RangeModule;
 import com.loohp.holomobhealth.Protocol.ArmorStandPacket;
@@ -66,7 +67,7 @@ public class HoloMobHealth extends JavaPlugin {
 	
 	public static int activeShowHealthTaskID = -1;
 	
-	public static List<String> DisplayText = new ArrayList<String>();
+	public static List<String> displayText = new ArrayList<String>();
 	
 	public static int heartScale = 10;
 	public static boolean dynamicScale = true;
@@ -100,6 +101,20 @@ public class HoloMobHealth extends JavaPlugin {
 	public static int altHealthDisplayTime = 3;
 	public static boolean altOnlyPlayer = false;
 	public static Map<UUID, Long> altShowHealth = new ConcurrentHashMap<>();
+	
+	public static boolean idleUse = false;
+	public static List<String> idleDisplayText = new ArrayList<String>();
+	
+	public static boolean useDamageIndicator = true;
+	public static boolean damageIndicatorPlayerTriggered = false;
+	public static int damageIndicatorVisibleRange = 64;
+	public static int damageIndicatorTimeout = 40;
+	public static boolean damageIndicatorDamageEnabled = true;
+	public static boolean damageIndicatorDamageAnimation = true;
+	public static String damageIndicatorDamageText = "";
+	public static boolean damageIndicatorRegenEnabled = true;
+	public static boolean damageIndicatorRegenAnimation = true;
+	public static String damageIndicatorRegenText = "";
 	
 	public static boolean placeholderAPIHook = false;
 	
@@ -138,6 +153,9 @@ public class HoloMobHealth extends JavaPlugin {
 		version = MCVersion.fromPackageName(getServer().getClass().getPackage().getName());
 		
 		getServer().getPluginManager().registerEvents(new Debug(), this);
+		if (version.isNewerOrEqualTo(MCVersion.V1_11)) {
+			getServer().getPluginManager().registerEvents(new DamageIndicator(), this);
+		}
 
 		Metrics metrics = new Metrics(this, BSTATS_PLUGIN_ID);
 		Charts.setup(metrics);
@@ -292,7 +310,7 @@ public class HoloMobHealth extends JavaPlugin {
 		specialNameOffset.clear();
 		specialTypeOffset.clear();
 		
-		DisplayText = DisplayTextCacher.cacheDecimalFormat(plugin.getConfig().getStringList("Display.Text"));
+		displayText = DisplayTextCacher.cacheDecimalFormat(plugin.getConfig().getStringList("Display.Text"));
 		
 		heartScale = plugin.getConfig().getInt("Display.ScaledSymbolSettings.Scale");
 		dynamicScale = plugin.getConfig().getBoolean("Display.ScaledSymbolSettings.DynamicScale");
@@ -332,6 +350,9 @@ public class HoloMobHealth extends JavaPlugin {
 		altHealthDisplayTime = plugin.getConfig().getInt("Options.DynamicHealthDisplay.Timeout");
 		altOnlyPlayer = plugin.getConfig().getBoolean("Options.DynamicHealthDisplay.OnlyPlayerTrigger");
 		
+		idleUse = plugin.getConfig().getBoolean("Options.DynamicHealthDisplay.IdleDisplay.Use");
+		idleDisplayText = DisplayTextCacher.cacheDecimalFormat(plugin.getConfig().getStringList("Options.DynamicHealthDisplay.IdleDisplay.Text"));
+		
 		armorStandMode = plugin.getConfig().getBoolean("Options.MultiLine.Enable");
 		armorStandYOffset = plugin.getConfig().getInt("Options.MultiLine.MasterYOffset");
 		List<String> armorStandSpecial = plugin.getConfig().getStringList("Options.MultiLine.Special");
@@ -364,6 +385,17 @@ public class HoloMobHealth extends JavaPlugin {
 		} else {
 			ArmorstandDisplay.entityMetadataPacketListener();
 		}
+		
+		useDamageIndicator = plugin.getConfig().getBoolean("DamageIndicator.Enabled");
+		damageIndicatorVisibleRange = plugin.getConfig().getInt("DamageIndicator.VisibleRange");
+		damageIndicatorTimeout = plugin.getConfig().getInt("DamageIndicator.Timeout");
+		damageIndicatorPlayerTriggered = plugin.getConfig().getBoolean("DamageIndicator.OnlyPlayerTriggered");
+		damageIndicatorDamageEnabled = plugin.getConfig().getBoolean("DamageIndicator.Damage.Enabled");
+		damageIndicatorDamageAnimation = plugin.getConfig().getBoolean("DamageIndicator.Damage.Animation");
+		damageIndicatorDamageText = DisplayTextCacher.cacheDecimalFormat(ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("DamageIndicator.Damage.HoloText")));
+		damageIndicatorRegenEnabled = plugin.getConfig().getBoolean("DamageIndicator.Regen.Enabled");
+		damageIndicatorRegenAnimation = plugin.getConfig().getBoolean("DamageIndicator.Regen.Animation");
+		damageIndicatorRegenText = DisplayTextCacher.cacheDecimalFormat(ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("DamageIndicator.Regen.HoloText")));
 		
 		showCitizens = plugin.getConfig().getBoolean("Hooks.Citizens.ShowNPCMobHealth");		
 		showMythicMobs = plugin.getConfig().getBoolean("Hooks.MythicMobs.ShowMythicMobsHealth");

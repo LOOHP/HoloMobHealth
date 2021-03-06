@@ -8,11 +8,11 @@ import org.bukkit.entity.EntityType;
 
 public class HoloMobArmorStand {
 	
-	int id;
-	UUID uuid;
-	EntityType type;
-	Location location;
-	int mountId;
+	private int id;
+	private UUID uuid;
+	private EntityType type;
+	private Location location;
+	private int mountId;
 	
 	public HoloMobArmorStand(Location location, EntityType type, int mountId) {
 		this.id = (int) (Math.random() * Integer.MAX_VALUE);

@@ -146,7 +146,7 @@ public class ArmorStandPacket implements Listener {
         
         PacketContainer packet3 = protocolManager.createPacket(PacketType.Play.Server.MOUNT);
     	packet3.getIntegers().write(0, entity.getMountId());
-    	packet3.getIntegerArrays().write(0, new int[]{entity.getEntityId()});
+    	packet3.getIntegerArrays().write(0, new int[] {entity.getEntityId()});
         
     	try {
         	for (Player player : playersInRange) {
@@ -172,10 +172,15 @@ public class ArmorStandPacket implements Listener {
 	        WrappedDataWatcher wpw = buildWarppedDataWatcher(entity, json, visible);
 	        packet1.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
 	        
+	        PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.MOUNT);
+	    	packet2.getIntegers().write(0, entity.getMountId());
+	    	packet2.getIntegerArrays().write(0, new int[] {entity.getEntityId()});
+	        
 	        Bukkit.getScheduler().runTask(plugin, () -> {		
 		        try {
 		        	for (Player player : playersInRange) {
 						protocolManager.sendServerPacket(player, packet1);
+						protocolManager.sendServerPacket(player, packet2);
 					}
 				} catch (InvocationTargetException e) {
 					e.printStackTrace();

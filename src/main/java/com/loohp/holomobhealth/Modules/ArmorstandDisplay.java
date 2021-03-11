@@ -103,6 +103,7 @@ public class ArmorstandDisplay implements Listener {
 
 	public static void entityMetadataPacketListener() {
 		HoloMobHealth.protocolManager.addPacketListener(new PacketAdapter(HoloMobHealth.plugin, ListenerPriority.HIGHEST, PacketType.Play.Server.ENTITY_METADATA) {
+			@SuppressWarnings("deprecation")
 			@Override
 			public void onPacketSending(PacketEvent event) {
 				try {
@@ -151,7 +152,7 @@ public class ArmorstandDisplay implements Listener {
 							String customName = data.getCustomName();
 							
 							if (EntityTypeUtils.getMobsTypesSet().contains(entity.getType())) { 
-								if ((!HoloMobHealth.applyToNamed && customName != null) || (HoloMobHealth.useAlterHealth && !HoloMobHealth.idleUse && !HoloMobHealth.altShowHealth.containsKey(entity.getUniqueId())) || (HoloMobHealth.rangeEnabled && !RangeModule.isEntityInRangeOfPlayer(player, entity))) {
+								if (entity.getPassenger() != null || (!HoloMobHealth.applyToNamed && customName != null) || (HoloMobHealth.useAlterHealth && !HoloMobHealth.idleUse && !HoloMobHealth.altShowHealth.containsKey(entity.getUniqueId())) || (HoloMobHealth.rangeEnabled && !RangeModule.isEntityInRangeOfPlayer(player, entity))) {
 									String name = customName != null && !customName.equals("") ? ComponentSerializer.toString(new TextComponent(customName)) : "";
 									boolean visible = entity.isCustomNameVisible();
 									EntityMetadata.sendMetadataPacket(entity, name, visible, Arrays.asList(player), true);

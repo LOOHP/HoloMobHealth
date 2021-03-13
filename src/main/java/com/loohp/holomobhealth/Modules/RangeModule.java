@@ -33,7 +33,7 @@ public class RangeModule {
 	
 	public static boolean isEntityInRangeOfPlayer(Player player, Entity entity) {
 		if (Bukkit.isPrimaryThread()) {
-			return player.getNearbyEntities(distance, distance, distance).contains(entity);
+			return player.getLocation().distanceSquared(entity.getLocation()) < (distance * distance);
 		} else {
 			List<Entity> nearby = current.get(player);
 			return nearby == null ? false : nearby.contains(entity);

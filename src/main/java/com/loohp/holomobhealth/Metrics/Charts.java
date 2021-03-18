@@ -4,6 +4,7 @@ import java.util.concurrent.Callable;
 
 import org.bukkit.Bukkit;
 
+import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.Registries.CustomPlaceholderScripts;
 
 public class Charts {
@@ -23,6 +24,28 @@ public class Charts {
                 return CustomPlaceholderScripts.getScriptsCount();
             }
         }));
+		
+		metrics.addCustomChart(new Metrics.SimplePie("damage_indicator_enabled", new Callable<String>() {
+	        @Override
+	        public String call() throws Exception {
+	        	String string = "Disabled";
+	        	if (HoloMobHealth.useDamageIndicator) {
+	        		string = "Enabled";
+	        	}
+	            return string;
+	        }
+	    }));
+		
+		metrics.addCustomChart(new Metrics.SimplePie("range_module_enabled", new Callable<String>() {
+	        @Override
+	        public String call() throws Exception {
+	        	String string = "Disabled";
+	        	if (HoloMobHealth.rangeEnabled) {
+	        		string = "Enabled";
+	        	}
+	            return string;
+	        }
+	    }));
 	}
 
 }

@@ -138,7 +138,7 @@ public class DamageIndicator implements Listener {
 				}
 			}
 			
-			if (entity instanceof LivingEntity && EntityTypeUtils.getMobsTypesSet().contains(entity.getType())) {
+			if (entity instanceof LivingEntity && (EntityTypeUtils.getMobsTypesSet().contains(entity.getType()) || entity.getType().equals(EntityType.PLAYER))) {
 				damage((LivingEntity) entity, event.getFinalDamage());
 			}
 		}

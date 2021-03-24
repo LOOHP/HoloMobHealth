@@ -175,7 +175,7 @@ Database:
   MYSQL:
     Host: localhost
     Port: 3306
-    Database: InteractionVisualizer
+    Database: HoloMobHealth
     Username: mysql
     Password: password
 

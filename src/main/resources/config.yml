@@ -131,7 +131,7 @@ DamageIndicator:
     #The text which will be displayed
     #Placeholders are the same as the main display with these additional placeholders:
     #{Indicator_<DecimalFormat>} <- to show the amount of health lost/gained
-    HoloText: "&c{Indicator_0.#}"
+    HoloText: "&c&l{Indicator_0.#}"
 
   Regen:
     #Should the damage indicator be enabled for health gains
@@ -143,7 +143,7 @@ DamageIndicator:
     #The text which will be displayed
     #Placeholders are the same as the main display with these additional placeholders:
     #{Indicator_<DecimalFormat>} <- to show the amount of health lost/gained
-    HoloText: "&a{Indicator_0.#}"
+    HoloText: "&a&l{Indicator_0.#}"
 
 
 Hooks:

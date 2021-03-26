@@ -306,7 +306,7 @@ public class DamageIndicator implements Listener {
 		}
 		
 		Vector velocity;
-		location.add(0, y, 0);
+		location.add(0, y + HoloMobHealth.damageIndicatorDamageY, 0);
 		Location indicator = location.clone().add(x, 0, z);
 		if (HoloMobHealth.damageIndicatorDamageAnimation) {
 			velocity = indicator.toVector().subtract(location.toVector()).normalize().multiply(0.15).add(new Vector(0, 0.1, 0));
@@ -333,7 +333,7 @@ public class DamageIndicator implements Listener {
 			z = random.nextBoolean() ? width : -width;
 		}
 		
-		location.add(x, height / 2 + (random.nextDouble() - 1) * 0.5, z);
+		location.add(x, (height / 2 + (random.nextDouble() - 1) * 0.5) + HoloMobHealth.damageIndicatorRegenY, z);
 		
 		Vector velocity = HoloMobHealth.damageIndicatorRegenAnimation ? new Vector(0, 0.2, 0) : vectorZero;
 		

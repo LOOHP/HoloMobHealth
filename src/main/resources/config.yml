@@ -126,6 +126,8 @@ DamageIndicator:
     Enabled: true
     #Play the indicator animation
     Animation: true
+    #Where should the number spawn
+    Y-Offset: 0
     #The text which will be displayed
     #Placeholders are the same as the main display with these additional placeholders:
     #{Indicator_<DecimalFormat>} <- to show the amount of health lost/gained
@@ -136,6 +138,8 @@ DamageIndicator:
     Enabled: true
     #Play the indicator animation
     Animation: true
+    #Where should the number spawn
+    Y-Offset: 0
     #The text which will be displayed
     #Placeholders are the same as the main display with these additional placeholders:
     #{Indicator_<DecimalFormat>} <- to show the amount of health lost/gained

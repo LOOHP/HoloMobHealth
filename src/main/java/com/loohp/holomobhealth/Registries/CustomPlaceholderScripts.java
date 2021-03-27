@@ -26,7 +26,6 @@ import org.bukkit.entity.LivingEntity;
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.Utils.CustomNameUtils;
 
-import io.lumine.xikage.mythicmobs.MythicMobs;
 import net.md_5.bungee.api.ChatColor;
 
 public class CustomPlaceholderScripts {
@@ -85,7 +84,6 @@ public class CustomPlaceholderScripts {
             for (Entry<String, Class<?>> entry : scriptDataTypes.entrySet()) {
             	engine.put(entry.getKey(), entry.getValue());
             }
-            MythicMobs.inst().getMobManager().getActiveMob(null).get().getLevel();
             Object result = engine.eval(script);
             return result != null ? result.toString() : "";
         } catch (ScriptException e) {

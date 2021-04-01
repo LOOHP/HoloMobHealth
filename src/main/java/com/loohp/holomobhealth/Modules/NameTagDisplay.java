@@ -228,15 +228,16 @@ public class NameTagDisplay {
 			WrappedDataWatcher watcher = new WrappedDataWatcher(data);
 			
 			String json = ParsePlaceholders.parse(player, (LivingEntity) entity, useIdle ? HoloMobHealth.idleDisplayText.get(0) : HoloMobHealth.displayText.get(0));
+			BaseComponent[] components = json == null ? null : ComponentSerializer.parse(json);
 			boolean visible = HoloMobHealth.alwaysShow;
 
-			if (json != null) {
+			if (json != null && components != null && components.length > 0) {
 				if (HoloMobHealth.version.isOld()) {
-					watcher.setObject(2, LanguageUtils.convert(ComponentSerializer.parse(json)[0], HoloMobHealth.language).toLegacyText());
+					watcher.setObject(2, LanguageUtils.convert(components[0], HoloMobHealth.language).toLegacyText());
 				} else if (HoloMobHealth.version.isLegacy()) {
 					Serializer serializer = Registry.get(String.class);
 					WrappedDataWatcherObject object = new WrappedDataWatcherObject(2, serializer);
-					watcher.setObject(object, LanguageUtils.convert(ComponentSerializer.parse(json)[0], HoloMobHealth.language).toLegacyText());
+					watcher.setObject(object, LanguageUtils.convert(components[0], HoloMobHealth.language).toLegacyText());
 				} else {
 					Optional<?> opt = Optional.of(WrappedChatComponent.fromJson(json).getHandle());
 					watcher.setObject(

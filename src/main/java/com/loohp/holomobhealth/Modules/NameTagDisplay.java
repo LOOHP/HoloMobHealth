@@ -35,6 +35,7 @@ import com.loohp.holomobhealth.Utils.NMSUtils;
 import com.loohp.holomobhealth.Utils.ParsePlaceholders;
 import com.loohp.holomobhealth.Utils.ShopkeepersUtils;
 
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
 public class NameTagDisplay {

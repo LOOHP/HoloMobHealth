@@ -230,13 +230,6 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>ModelEngineAPI</groupId>
-			<artifactId>ModelEngineAPI</artifactId>
-			<scope>system</scope>
-			<version>1.0</version>
-			<systemPath>${basedir}/lib/Model-Engine-API-r2.1.0.jar</systemPath>
-		</dependency>
-		<dependency>
 			<groupId>Shopkeepers</groupId>
 			<artifactId>Shopkeepers</artifactId>
 			<scope>system</scope>

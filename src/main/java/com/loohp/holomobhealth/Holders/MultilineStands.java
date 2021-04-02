@@ -14,11 +14,13 @@ import org.bukkit.util.Vector;
 
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.Protocol.ArmorStandPacket;
+import com.loohp.holomobhealth.Utils.NMSUtils;
 
 public class MultilineStands {
 	
+	private static final Vector SPACING = new Vector(0, 0.27, 0);
+	
 	private List<HoloMobArmorStand> stands;
-	private List<HoloMobArmorStand> eachentity;
 	private Location location;
 	private Entity entity;
 	private UUID uuid;
@@ -45,22 +47,18 @@ public class MultilineStands {
 		}
 		this.location = location.clone();
 		Location standloc = location.clone();
-		stands = new ArrayList<HoloMobArmorStand>();
-		eachentity = new ArrayList<HoloMobArmorStand>();
-		int mountId = entity.getEntityId();
-		for (int i = 0; i < HoloMobHealth.displayText.size() + offset; i++) {
-			HoloMobArmorStand stand = new HoloMobArmorStand(standloc, EntityType.ARMOR_STAND, mountId);
-			mountId = stand.getEntityId();
-			if (offset - 1 < i) {
-				stands.add(stand);
-			}
-			HoloMobArmorStand spacing = new HoloMobArmorStand(standloc, EntityType.RABBIT, mountId);
-			eachentity.add(stand);
-			eachentity.add(spacing);
-			mountId = spacing.getEntityId();
+		stands = new ArrayList<>();
+		for (int i = 0; i < HoloMobHealth.displayText.size(); i++) {
+			HoloMobArmorStand stand = new HoloMobArmorStand(standloc, EntityType.ARMOR_STAND);
+			stands.add(stand);
+		}
+		Location base = entity.getLocation().add(0, NMSUtils.getEntityHeight(entity), 0);
+		for (int i = 0; i < stands.size(); i++) {
+			HoloMobArmorStand stand = stands.get(i);
+			stand.setLocation(base.clone());
+			base.add(SPACING);
 		}
 		Collections.reverse(stands);
-		Collections.reverse(eachentity);
 		this.entity = entity;
 		this.uuid = entity.getUniqueId();
 		this.id = entity.getEntityId();
@@ -83,15 +81,12 @@ public class MultilineStands {
 		return stands;
 	}
 	
-	public List<HoloMobArmorStand> getAllRelatedEntities() {
-		return eachentity;
-	}
-	
 	public void setLocation(Location location) {
-		Vector vector = location.toVector().subtract(this.location.clone().toVector());
-		this.location = location.clone();
-		for (HoloMobArmorStand stand : stands) {
-			stand.teleport(stand.getLocation().add(vector));
+		Location base = entity.getLocation().add(0, NMSUtils.getEntityHeight(entity), 0);
+		for (int i = stands.size() - 1; i >= 0; i--) {
+			HoloMobArmorStand stand = stands.get(i);
+			stand.setLocation(base.clone());
+			base.add(SPACING);
 		}
 	}
 	
@@ -112,7 +107,7 @@ public class MultilineStands {
 	}
 	
 	public void remove() {
-		for (HoloMobArmorStand stand : eachentity) {
+		for (HoloMobArmorStand stand : stands) {
 			Bukkit.getScheduler().runTask(HoloMobHealth.plugin, () -> ArmorStandPacket.removeArmorStand(Bukkit.getOnlinePlayers(), stand, true, false));
 		}
 		Bukkit.getScheduler().cancelTask(gctask);

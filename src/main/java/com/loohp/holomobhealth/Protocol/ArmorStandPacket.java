@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -144,15 +145,10 @@ public class ArmorStandPacket implements Listener {
         WrappedDataWatcher wpw = buildWarppedDataWatcher(entity, json, visible);
         packet2.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
         
-        PacketContainer packet3 = protocolManager.createPacket(PacketType.Play.Server.MOUNT);
-    	packet3.getIntegers().write(0, entity.getMountId());
-    	packet3.getIntegerArrays().write(0, new int[] {entity.getEntityId()});
-        
     	try {
         	for (Player player : playersInRange) {
 				protocolManager.sendServerPacket(player, packet1);
 				protocolManager.sendServerPacket(player, packet2);
-				protocolManager.sendServerPacket(player, packet3);
 			}
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
@@ -172,9 +168,13 @@ public class ArmorStandPacket implements Listener {
 	        WrappedDataWatcher wpw = buildWarppedDataWatcher(entity, json, visible);
 	        packet1.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
 	        
-	        PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.MOUNT);
-	    	packet2.getIntegers().write(0, entity.getMountId());
-	    	packet2.getIntegerArrays().write(0, new int[] {entity.getEntityId()});
+	        PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);
+	        packet2.getIntegers().write(0, entity.getEntityId());
+	        packet2.getDoubles().write(0, entity.getLocation().getX());
+	        packet2.getDoubles().write(1, entity.getLocation().getY());
+	        packet2.getDoubles().write(2, entity.getLocation().getZ());
+	        packet2.getBytes().write(0, (byte) (int) (entity.getLocation().getYaw() * 256.0F / 360.0F));
+	        packet2.getBytes().write(1, (byte) (int) (entity.getLocation().getPitch() * 256.0F / 360.0F));
 	        
 	        Bukkit.getScheduler().runTask(plugin, () -> {		
 		        try {
@@ -187,6 +187,64 @@ public class ArmorStandPacket implements Listener {
 				}
 			});
 		});
+	}
+	
+	public static void updateArmorStand(Entity host, HoloMobArmorStand entity, String json, boolean visible) {
+		PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
+		packet1.getIntegers().write(0, entity.getEntityId());	
+	    WrappedDataWatcher wpw = buildWarppedDataWatcher(entity, json, visible);
+	    packet1.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
+	    
+	    PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);
+	    packet2.getIntegers().write(0, entity.getEntityId());
+	    packet2.getDoubles().write(0, entity.getLocation().getX());
+	    packet2.getDoubles().write(1, entity.getLocation().getY());
+	    packet2.getDoubles().write(2, entity.getLocation().getZ());
+	    packet2.getBytes().write(0, (byte) (int) (entity.getLocation().getYaw() * 256.0F / 360.0F));
+	    packet2.getBytes().write(1, (byte) (int) (entity.getLocation().getPitch() * 256.0F / 360.0F));
+	    
+	    protocolManager.broadcastServerPacket(packet1, host, false);
+	    protocolManager.broadcastServerPacket(packet2, host, false);
+	}
+	
+	public static void updateArmorStandLocation(Collection<? extends Player> players, HoloMobArmorStand entity) {
+		if (players.isEmpty()) {
+			return;
+		}
+			
+		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+			World world = entity.getWorld();
+			List<Player> playersInRange = players.stream().filter(each -> (each.getWorld().equals(world)) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.getUpdateRange(world) * HoloMobHealth.getUpdateRange(world)))).collect(Collectors.toList());	        
+	        PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);
+	        packet1.getIntegers().write(0, entity.getEntityId());
+	        packet1.getDoubles().write(0, entity.getLocation().getX());
+	        packet1.getDoubles().write(1, entity.getLocation().getY());
+	        packet1.getDoubles().write(2, entity.getLocation().getZ());
+	        packet1.getBytes().write(0, (byte) (int) (entity.getLocation().getYaw() * 256.0F / 360.0F));
+	        packet1.getBytes().write(1, (byte) (int) (entity.getLocation().getPitch() * 256.0F / 360.0F));
+	        
+	        Bukkit.getScheduler().runTask(plugin, () -> {		
+		        try {
+		        	for (Player player : playersInRange) {
+						protocolManager.sendServerPacket(player, packet1);
+					}
+				} catch (InvocationTargetException e) {
+					e.printStackTrace();
+				}
+			});
+		});
+	}
+	
+	public static void updateArmorStandLocation(Entity host, HoloMobArmorStand entity) {  
+        PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);
+        packet1.getIntegers().write(0, entity.getEntityId());
+        packet1.getDoubles().write(0, entity.getLocation().getX());
+        packet1.getDoubles().write(1, entity.getLocation().getY());
+        packet1.getDoubles().write(2, entity.getLocation().getZ());
+        packet1.getBytes().write(0, (byte) (int) (entity.getLocation().getYaw() * 256.0F / 360.0F));
+        packet1.getBytes().write(1, (byte) (int) (entity.getLocation().getPitch() * 256.0F / 360.0F));
+        
+        protocolManager.broadcastServerPacket(packet1, host, false);
 	}
 	
 	public static void removeArmorStand(Collection<? extends Player> players, HoloMobArmorStand entity, boolean removeFromActive, boolean bypassFilter) {

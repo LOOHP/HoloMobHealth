@@ -138,8 +138,9 @@ public class DamageIndicator implements Listener {
 				}
 			}
 			
-			if (entity instanceof LivingEntity && (EntityTypeUtils.getMobsTypesSet().contains(entity.getType()) || entity.getType().equals(EntityType.PLAYER))) {
-				damage((LivingEntity) entity, event.getFinalDamage());
+			double finalDamage = event.getFinalDamage();
+			if (finalDamage >= HoloMobHealth.damageIndicatorDamageMinimum && entity instanceof LivingEntity && (EntityTypeUtils.getMobsTypesSet().contains(entity.getType()) || entity.getType().equals(EntityType.PLAYER))) {
+				damage((LivingEntity) entity, finalDamage);
 			}
 		}
 	}
@@ -204,8 +205,9 @@ public class DamageIndicator implements Listener {
 				}
 			}
 			
-			if (entity instanceof LivingEntity && (EntityTypeUtils.getMobsTypesSet().contains(entity.getType()) || entity.getType().equals(EntityType.PLAYER))) {
-				damage((LivingEntity) entity, event.getFinalDamage());
+			double finalDamage = event.getFinalDamage();
+			if (finalDamage >= HoloMobHealth.damageIndicatorDamageMinimum && entity instanceof LivingEntity && (EntityTypeUtils.getMobsTypesSet().contains(entity.getType()) || entity.getType().equals(EntityType.PLAYER))) {
+				damage((LivingEntity) entity, finalDamage);
 			}
 		}
 	}
@@ -265,7 +267,7 @@ public class DamageIndicator implements Listener {
 					}
 					
 					double gain = Math.min(maxhealth - health, event.getAmount());
-					if (gain > 0) {
+					if (gain >= HoloMobHealth.damageIndicatorRegenMinimum) {
 						regen(livingentity, gain);
 					}
 				}
@@ -281,7 +283,7 @@ public class DamageIndicator implements Listener {
 					}
 					
 					double gain = Math.min(maxhealth - health, event.getAmount());
-					if (gain > 0) {
+					if (gain >= HoloMobHealth.damageIndicatorRegenMinimum) {
 						regen(livingentity, gain);
 					}
 				}

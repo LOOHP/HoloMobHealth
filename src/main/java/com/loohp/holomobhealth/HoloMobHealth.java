@@ -113,10 +113,12 @@ public class HoloMobHealth extends JavaPlugin {
 	public static boolean damageIndicatorDamageAnimation = true;
 	public static String damageIndicatorDamageText = "";
 	public static double damageIndicatorDamageY = 0;
+	public static double damageIndicatorDamageMinimum = 0.5;
 	public static boolean damageIndicatorRegenEnabled = true;
 	public static boolean damageIndicatorRegenAnimation = true;
 	public static String damageIndicatorRegenText = "";
 	public static double damageIndicatorRegenY = 0;
+	public static double damageIndicatorRegenMinimum = 0.5;
 	
 	public static boolean placeholderAPIHook = false;
 	
@@ -396,10 +398,12 @@ public class HoloMobHealth extends JavaPlugin {
 		damageIndicatorDamageAnimation = plugin.getConfig().getBoolean("DamageIndicator.Damage.Animation");
 		damageIndicatorDamageText = DisplayTextCacher.cacheDecimalFormat(ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("DamageIndicator.Damage.HoloText")));
 		damageIndicatorDamageY = plugin.getConfig().getDouble("DamageIndicator.Damage.Y-Offset");
+		damageIndicatorDamageMinimum = plugin.getConfig().getDouble("DamageIndicator.Damage.Minimum");
 		damageIndicatorRegenEnabled = plugin.getConfig().getBoolean("DamageIndicator.Regen.Enabled");
 		damageIndicatorRegenAnimation = plugin.getConfig().getBoolean("DamageIndicator.Regen.Animation");
 		damageIndicatorRegenText = DisplayTextCacher.cacheDecimalFormat(ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("DamageIndicator.Regen.HoloText")));
 		damageIndicatorRegenY = plugin.getConfig().getDouble("DamageIndicator.Regen.Y-Offset");
+		damageIndicatorRegenMinimum = plugin.getConfig().getDouble("DamageIndicator.Regen.Minimum");
 		
 		showCitizens = plugin.getConfig().getBoolean("Hooks.Citizens.ShowNPCMobHealth");		
 		showMythicMobs = plugin.getConfig().getBoolean("Hooks.MythicMobs.ShowMythicMobsHealth");

@@ -35,11 +35,13 @@ public class ParsePlaceholders {
 	public static String parse(Player player, LivingEntity entity, String text, double healthchange) {
 		double health = entity.getHealth();
 		double maxhealth = 0.0;
-		if (!HoloMobHealth.version.isLegacy()) {
-			maxhealth = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-		} else {
-			maxhealth = entity.getMaxHealth();
-		}
+		try {
+			if (!HoloMobHealth.version.isLegacy()) {
+				maxhealth = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+			} else {
+				maxhealth = entity.getMaxHealth();
+			}
+		} catch (Throwable e) {}
 		double percentage = (health / maxhealth) * 100;
 		
 		int heartScale = HoloMobHealth.dynamicScale ? (Math.ceil(maxhealth / 2) > HoloMobHealth.heartScale ? HoloMobHealth.heartScale : (int) Math.ceil(maxhealth / 2)) : HoloMobHealth.heartScale;

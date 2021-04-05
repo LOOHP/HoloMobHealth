@@ -172,6 +172,7 @@ public class HoloMobHealth extends JavaPlugin {
         
         getServer().getPluginManager().registerEvents(new Events(), this);
 		
+        getConfig().options().header("For information on what each option does. Please refer to https://github.com/LOOHP/HoloMobHealth/blob/master/src/main/resources/config.yml");
         getConfig().options().copyDefaults(true);
         saveConfig();
         

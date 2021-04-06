@@ -1,6 +1,6 @@
-package com.loohp.holomobhealth.API;
+package com.loohp.holomobhealth.api;
 
-import com.loohp.holomobhealth.Registries.CustomPlaceholderScripts;
+import com.loohp.holomobhealth.registries.CustomPlaceholderScripts;
 
 public class HoloMobHealthAPI {
 	

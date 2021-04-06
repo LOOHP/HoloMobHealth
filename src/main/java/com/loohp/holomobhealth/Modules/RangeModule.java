@@ -1,4 +1,4 @@
-package com.loohp.holomobhealth.Modules;
+package com.loohp.holomobhealth.modules;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,8 +15,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import com.loohp.holomobhealth.HoloMobHealth;
-import com.loohp.holomobhealth.Protocol.EntityMetadata;
-import com.loohp.holomobhealth.Utils.NMSUtils;
+import com.loohp.holomobhealth.protocol.EntityMetadata;
+import com.loohp.holomobhealth.utils.NMSUtils;
 
 public class RangeModule {
 	

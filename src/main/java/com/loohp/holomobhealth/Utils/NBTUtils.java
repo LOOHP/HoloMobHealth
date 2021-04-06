@@ -1,4 +1,4 @@
-package com.loohp.holomobhealth.Utils;
+package com.loohp.holomobhealth.utils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

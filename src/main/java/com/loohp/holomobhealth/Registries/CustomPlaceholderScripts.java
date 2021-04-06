@@ -1,4 +1,4 @@
-package com.loohp.holomobhealth.Registries;
+package com.loohp.holomobhealth.registries;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -24,7 +24,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.LivingEntity;
 
 import com.loohp.holomobhealth.HoloMobHealth;
-import com.loohp.holomobhealth.Utils.CustomNameUtils;
+import com.loohp.holomobhealth.utils.CustomNameUtils;
 
 import net.md_5.bungee.api.ChatColor;
 

@@ -12,12 +12,12 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import com.loohp.holomobhealth.Database.Database;
-import com.loohp.holomobhealth.Modules.RangeModule;
-import com.loohp.holomobhealth.Protocol.EntityMetadata;
-import com.loohp.holomobhealth.Updater.Updater;
-import com.loohp.holomobhealth.Updater.Updater.UpdaterResponse;
-import com.loohp.holomobhealth.Utils.ChatColorUtils;
+import com.loohp.holomobhealth.database.Database;
+import com.loohp.holomobhealth.modules.RangeModule;
+import com.loohp.holomobhealth.protocol.EntityMetadata;
+import com.loohp.holomobhealth.updater.Updater;
+import com.loohp.holomobhealth.updater.Updater.UpdaterResponse;
+import com.loohp.holomobhealth.utils.ChatColorUtils;
 
 import net.md_5.bungee.api.ChatColor;
 

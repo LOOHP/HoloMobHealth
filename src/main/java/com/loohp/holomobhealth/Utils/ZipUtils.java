@@ -1,4 +1,4 @@
-package com.loohp.holomobhealth.Utils;
+package com.loohp.holomobhealth.utils;
 
 import java.io.BufferedOutputStream;
 import java.io.File;

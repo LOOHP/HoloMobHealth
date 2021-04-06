@@ -1,4 +1,4 @@
-package com.loohp.holomobhealth.Debug;
+package com.loohp.holomobhealth.debug;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -18,9 +18,9 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import com.loohp.holomobhealth.HoloMobHealth;
-import com.loohp.holomobhealth.Utils.CustomNameUtils;
-import com.loohp.holomobhealth.Utils.MCVersion;
-import com.loohp.holomobhealth.Utils.NMSUtils;
+import com.loohp.holomobhealth.utils.CustomNameUtils;
+import com.loohp.holomobhealth.utils.MCVersion;
+import com.loohp.holomobhealth.utils.NMSUtils;
 
 import net.md_5.bungee.api.ChatColor;
 

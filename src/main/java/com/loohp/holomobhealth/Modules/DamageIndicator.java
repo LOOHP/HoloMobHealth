@@ -1,4 +1,4 @@
-package com.loohp.holomobhealth.Modules;
+package com.loohp.holomobhealth.modules;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -31,16 +31,16 @@ import com.comphenix.protocol.wrappers.WrappedDataWatcher.Registry;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.Serializer;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObject;
 import com.loohp.holomobhealth.HoloMobHealth;
-import com.loohp.holomobhealth.Utils.ChatColorUtils;
-import com.loohp.holomobhealth.Utils.CitizensUtils;
-import com.loohp.holomobhealth.Utils.CustomNameUtils;
-import com.loohp.holomobhealth.Utils.EntityTypeUtils;
-import com.loohp.holomobhealth.Utils.LanguageUtils;
-import com.loohp.holomobhealth.Utils.MyPetUtils;
-import com.loohp.holomobhealth.Utils.MythicMobsUtils;
-import com.loohp.holomobhealth.Utils.NMSUtils;
-import com.loohp.holomobhealth.Utils.ParsePlaceholders;
-import com.loohp.holomobhealth.Utils.ShopkeepersUtils;
+import com.loohp.holomobhealth.utils.ChatColorUtils;
+import com.loohp.holomobhealth.utils.CitizensUtils;
+import com.loohp.holomobhealth.utils.CustomNameUtils;
+import com.loohp.holomobhealth.utils.EntityTypeUtils;
+import com.loohp.holomobhealth.utils.LanguageUtils;
+import com.loohp.holomobhealth.utils.MyPetUtils;
+import com.loohp.holomobhealth.utils.MythicMobsUtils;
+import com.loohp.holomobhealth.utils.NMSUtils;
+import com.loohp.holomobhealth.utils.ParsePlaceholders;
+import com.loohp.holomobhealth.utils.ShopkeepersUtils;
 
 import net.md_5.bungee.chat.ComponentSerializer;
 

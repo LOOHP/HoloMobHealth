@@ -1,4 +1,4 @@
-package com.loohp.holomobhealth.Utils;
+package com.loohp.holomobhealth.utils;
 
 import java.util.HashMap;
 import java.util.HashSet;

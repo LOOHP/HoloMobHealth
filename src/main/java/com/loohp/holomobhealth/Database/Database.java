@@ -1,4 +1,4 @@
-package com.loohp.holomobhealth.Database;
+package com.loohp.holomobhealth.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -14,7 +14,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import com.loohp.holomobhealth.HoloMobHealth;
-import com.loohp.holomobhealth.Protocol.EntityMetadata;
+import com.loohp.holomobhealth.protocol.EntityMetadata;
 
 import net.md_5.bungee.api.ChatColor;
 

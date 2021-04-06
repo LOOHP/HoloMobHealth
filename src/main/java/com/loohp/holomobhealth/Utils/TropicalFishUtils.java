@@ -1,4 +1,4 @@
-package com.loohp.holomobhealth.Utils;
+package com.loohp.holomobhealth.utils;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;

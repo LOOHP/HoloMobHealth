@@ -1,4 +1,4 @@
-package com.loohp.holomobhealth.Updater;
+package com.loohp.holomobhealth.updater;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -9,7 +9,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.json.simple.JSONObject;
 
 import com.loohp.holomobhealth.HoloMobHealth;
-import com.loohp.holomobhealth.Utils.HTTPRequestUtils;
+import com.loohp.holomobhealth.utils.HTTPRequestUtils;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;

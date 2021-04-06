@@ -1,4 +1,4 @@
-package com.loohp.holomobhealth.Metrics;
+package com.loohp.holomobhealth.metrics;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;

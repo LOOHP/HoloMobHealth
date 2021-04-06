@@ -1,4 +1,4 @@
-package com.loohp.holomobhealth.Holders;
+package com.loohp.holomobhealth.holders;
 
 import java.util.UUID;
 

@@ -1,4 +1,4 @@
-package com.loohp.holomobhealth.Updater;
+package com.loohp.holomobhealth.updater;
 
 public class Version implements Comparable<Version> {
 

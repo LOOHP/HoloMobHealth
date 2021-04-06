@@ -1,4 +1,4 @@
-package com.loohp.holomobhealth.Protocol;
+package com.loohp.holomobhealth.protocol;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -18,8 +18,8 @@ import com.comphenix.protocol.wrappers.WrappedDataWatcher.Registry;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.Serializer;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObject;
 import com.loohp.holomobhealth.HoloMobHealth;
-import com.loohp.holomobhealth.Utils.EntityTypeUtils;
-import com.loohp.holomobhealth.Utils.LanguageUtils;
+import com.loohp.holomobhealth.utils.EntityTypeUtils;
+import com.loohp.holomobhealth.utils.LanguageUtils;
 
 import net.md_5.bungee.chat.ComponentSerializer;
 

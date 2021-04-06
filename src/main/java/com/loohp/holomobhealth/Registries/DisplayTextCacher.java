@@ -1,4 +1,4 @@
-package com.loohp.holomobhealth.Registries;
+package com.loohp.holomobhealth.registries;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 
-import com.loohp.holomobhealth.Utils.CustomStringUtils;
+import com.loohp.holomobhealth.utils.CustomStringUtils;
 
 import net.md_5.bungee.api.ChatColor;
 

@@ -1,4 +1,4 @@
-package com.loohp.holomobhealth.Holders;
+package com.loohp.holomobhealth.holders;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,8 +13,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
 
 import com.loohp.holomobhealth.HoloMobHealth;
-import com.loohp.holomobhealth.Protocol.ArmorStandPacket;
-import com.loohp.holomobhealth.Utils.NMSUtils;
+import com.loohp.holomobhealth.protocol.ArmorStandPacket;
+import com.loohp.holomobhealth.utils.NMSUtils;
 
 public class MultilineStands {
 	

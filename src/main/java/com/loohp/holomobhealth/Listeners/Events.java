@@ -1,4 +1,4 @@
-package com.loohp.holomobhealth.Listeners;
+package com.loohp.holomobhealth.listeners;
 
 import java.util.UUID;
 
@@ -16,8 +16,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.loohp.holomobhealth.HoloMobHealth;
-import com.loohp.holomobhealth.Database.Database;
-import com.loohp.holomobhealth.Protocol.EntityMetadata;
+import com.loohp.holomobhealth.database.Database;
+import com.loohp.holomobhealth.protocol.EntityMetadata;
 
 public class Events implements Listener {
 	

@@ -1,11 +1,11 @@
-package com.loohp.holomobhealth.Metrics;
+package com.loohp.holomobhealth.metrics;
 
 import java.util.concurrent.Callable;
 
 import org.bukkit.Bukkit;
 
 import com.loohp.holomobhealth.HoloMobHealth;
-import com.loohp.holomobhealth.Registries.CustomPlaceholderScripts;
+import com.loohp.holomobhealth.registries.CustomPlaceholderScripts;
 
 public class Charts {
 	

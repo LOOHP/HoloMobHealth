@@ -1,4 +1,4 @@
-package com.loohp.holomobhealth.Utils;
+package com.loohp.holomobhealth.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,9 +10,9 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import com.loohp.holomobhealth.HoloMobHealth;
-import com.loohp.holomobhealth.Registries.CustomPlaceholderScripts;
-import com.loohp.holomobhealth.Registries.DisplayTextCacher;
-import com.loohp.holomobhealth.Registries.DisplayTextCacher.HealthFormatData;
+import com.loohp.holomobhealth.registries.CustomPlaceholderScripts;
+import com.loohp.holomobhealth.registries.DisplayTextCacher;
+import com.loohp.holomobhealth.registries.DisplayTextCacher.HealthFormatData;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;

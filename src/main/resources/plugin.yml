@@ -1,0 +1,37 @@
+name: HoloMobHealth
+author: loohp
+version: ${project.version}
+api-version: 1.13
+main: com.loohp.holomobhealth.HoloMobHealth
+description: Show Mob Health with packets
+softdepend: 
+  - MythicMobs
+  - Citizens
+  - Shopkeepers
+  - MyPet
+  - PlaceholderAPI
+depend: [ProtocolLib]
+prefix: HoloMobHealth
+
+commands:
+  holomobhealth:
+    usage: /<command>
+    aliases: [hmh]
+    description: Plugin main command
+
+permissions:
+  holomobhealth.reload:
+    description: Allows you to reload the plugin
+    default: op
+  holomobhealth.use:
+    description: Allows you to use see health bars
+    default: true
+  holomobhealth.toggle:
+    description: Allows you to toggle health display for yourself
+    default: true
+  holomobhealth.toggle.others:
+    description: Allows you to toggle health display for others
+    default: op
+  holomobhealth.update:
+    description: Allows you to recieve update notifications
+    default: op

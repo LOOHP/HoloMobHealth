@@ -168,10 +168,6 @@ public class ArmorstandDisplay implements Listener {
 					
 					Player player = event.getPlayer();
 					
-					if (!player.hasPermission("holomobhealth.use") || !HoloMobHealth.playersEnabled.contains(player)) {
-						return;
-					}
-					
 					PacketContainer packet = event.getPacket();
 	
 					World world = player.getWorld();
@@ -180,6 +176,17 @@ public class ArmorstandDisplay implements Listener {
 					UUID entityUUID = NMSUtils.getEntityUUIDFromID(world, entityId);
 					
 					if (entityUUID == null) {
+						return;
+					}
+					
+					if (!player.hasPermission("holomobhealth.use") || !HoloMobHealth.playersEnabled.contains(player)) {
+						MultilineStands multi = mapping.get(entityUUID);
+						if (multi == null) {
+							return;
+						}
+						List<Player> players = new ArrayList<>();
+						players.add(player);
+						multi.getStands().forEach(each -> ArmorStandPacket.removeArmorStand(players, each, false, false));
 						return;
 					}
 
@@ -213,6 +220,12 @@ public class ArmorstandDisplay implements Listener {
 									Collections.reverse(stands);
 									for (HoloMobArmorStand stand : stands) {
 										ArmorStandPacket.sendArmorStandSpawn(HoloMobHealth.playersEnabled, stand, "", HoloMobHealth.alwaysShow);
+									}
+								} else {
+									List<Player> players = new ArrayList<>();
+									players.add(player);
+									for (HoloMobArmorStand stand : multi.getStands()) {				
+										ArmorStandPacket.sendArmorStandSpawnIfNotAlready(players, stand, "", HoloMobHealth.alwaysShow);
 									}
 								}
 								UUID focusing = focusingEntities.getOrDefault(player, EMPTY_UUID);

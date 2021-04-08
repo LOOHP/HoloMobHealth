@@ -86,6 +86,20 @@ public class ArmorStandPacket implements Listener {
 		}, 0, 20);
 	}
 	
+	public static void sendArmorStandSpawnIfNotAlready(Collection<? extends Player> players, HoloMobArmorStand entity, String json, boolean visible) {
+		if (players.isEmpty()) {
+			return;
+		}
+		List<Player> playersNotAlready = new ArrayList<>();
+		for (Player player : players) {
+			Set<HoloMobArmorStand> list = playerStatus.get(player);
+			if (list != null && !list.contains(entity)) {
+				playersNotAlready.add(player);
+			}
+		}
+		sendArmorStandSpawn(playersNotAlready, entity, json, visible);
+	}
+	
 	public static void sendArmorStandSpawn(Collection<? extends Player> players, HoloMobArmorStand entity, String json, boolean visible) {
 		if (players.isEmpty()) {
 			return;

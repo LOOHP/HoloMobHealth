@@ -1,7 +1,5 @@
 package com.loohp.holomobhealth.utils;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Optional;
 
 import org.bukkit.entity.Entity;
@@ -19,38 +17,14 @@ import net.citizensnpcs.api.npc.NPC;
 
 public class CustomNameUtils {
 	
-	private static boolean legacyMythicMobs = false;
-	private static Method legacyMythicMobsDisplayNameMethod;
-	
-	static {
-		if (HoloMobHealth.mythicHook) {
-			try {
-				Class<?> clazz = Class.forName("io.lumine.xikage.mythicmobs.mobs.ActiveMob");
-				clazz.getMethod("getDisplayName");
-			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
-				legacyMythicMobs = true;
-				try {
-					Class<?> clazz = Class.forName("io.lumine.xikage.mythicmobs.mobs.MythicMob");
-					legacyMythicMobsDisplayNameMethod = clazz.getMethod("getDisplayName");
-				} catch (ClassNotFoundException | NoSuchMethodException | SecurityException e1) {
-					e1.printStackTrace();
-				}
-			}
-		}
-	}
-	
 	public static String getMobCustomName(Entity entity) {
 		if (HoloMobHealth.mythicHook) {
 			Optional<ActiveMob> optmob = MythicMobs.inst().getMobManager().getActiveMob(entity.getUniqueId());
 			if (optmob.isPresent()) {
-				if (legacyMythicMobs) {
-					try {
-						return legacyMythicMobsDisplayNameMethod.invoke(optmob.get().getType()).toString();
-					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
-						
-					}
-				} else {
+				try {
 					return optmob.get().getDisplayName();
+				} catch (Throwable e) {
+					return optmob.get().getType().getDisplayName().toString();
 				}
 			}
 		}

@@ -61,6 +61,9 @@ public class CustomPlaceholderScripts {
 	public static void loadScripts(File file, String placeholder) throws Exception {
 		ScriptEngineManager manager = new ScriptEngineManager();
 		ScriptEngine engine = manager.getEngineByName("JavaScript");
+		if (engine == null) {
+			throw new RuntimeException("JavaScript ScriptEngine isn't supported on your JVM! Is your version of Java too new?");
+		}
 		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
 		String script = reader.lines().collect(Collectors.joining("\n"));
 		reader.close();

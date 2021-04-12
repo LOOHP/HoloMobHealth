@@ -84,12 +84,10 @@ public class ParsePlaceholders {
 			}
 			if (fullhearts < heartScale) {
 				double leftover = healthpercentagescaled - (double) fullhearts;
-				if (leftover > 0.67) {
+				if (leftover >= 0.5) {
 					symbol.append(HoloMobHealth.healthyChar);
-				} else if (leftover > 0.33) {
-					symbol.append(HoloMobHealth.halfChar);
 				} else {
-					symbol.append(HoloMobHealth.emptyChar);
+					symbol.append(HoloMobHealth.halfChar);
 				}
 				for (int i = fullhearts + 1; i < heartScale; i++) {
 					symbol.append(HoloMobHealth.emptyChar);

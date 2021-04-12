@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 
+import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.utils.CustomStringUtils;
 
 import net.md_5.bungee.api.ChatColor;
@@ -45,6 +46,7 @@ public class DisplayTextCacher {
 					String matched = matcher.group();
 					try {
 						DecimalFormat formatter = new DecimalFormat(matched.substring(matched.indexOf("_") + 1, matched.lastIndexOf("}")));
+						formatter.setRoundingMode(HoloMobHealth.roundingMode);
 						String placeholder = "%D%" + counter.getAndIncrement() + "%F%";
 						decimalFormatMapping.put(placeholder, new HealthFormatData(formatter, HealthType.fromName(matched.substring(matched.indexOf("{") + 1, matched.indexOf("_")))));
 						text = CustomStringUtils.replaceFromTo(text, start, end, placeholder);

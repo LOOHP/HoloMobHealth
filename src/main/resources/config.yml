@@ -49,6 +49,9 @@ Display:
     EmptyChar: "&7❤"
 
 Options:
+  #Number Rounding Mode
+  #Accepts UP, DOWN, CEILING, FLOOR, HALF_UP, HALF_EVEN, HALF_DOWN
+  NumberRounding: UP
   #Health always visible when in range or only visible when the player is looking at the mob
   AlwaysShow: true
   #Whether or not named mobs should so had their name replaced to show health

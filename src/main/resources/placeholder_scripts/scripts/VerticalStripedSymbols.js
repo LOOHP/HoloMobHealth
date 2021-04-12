@@ -24,12 +24,10 @@ function parse() {
 	}
 	if (fullhearts < heartScale) {
 		var leftover = healthpercentagescaled - fullhearts;
-		if (leftover > 0.67) {
+		if (leftover >= 0.5) {
 			text += healthyChar;
-		} else if (leftover > 0.33) {
-			text += halfChar;
 		} else {
-			text += emptyChar;
+			text += halfChar;
 		}
 		for (i = fullhearts + 1; i < heartScale; i++) {
 			text += emptyChar;

@@ -3,6 +3,7 @@ package com.loohp.holomobhealth;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -67,7 +68,9 @@ public class HoloMobHealth extends JavaPlugin {
 	
 	public static int activeShowHealthTaskID = -1;
 	
-	public static List<String> displayText = new ArrayList<String>();
+	public static RoundingMode roundingMode = RoundingMode.UP;
+	
+	public static List<String> displayText = new ArrayList<>();
 	
 	public static int heartScale = 10;
 	public static boolean dynamicScale = true;
@@ -311,6 +314,8 @@ public class HoloMobHealth extends JavaPlugin {
 	@SuppressWarnings("deprecation")
 	public static void loadConfig() {
 		rangeEnabled = plugin.getConfig().getBoolean("Options.Range.Use");
+		
+		roundingMode = RoundingMode.valueOf(plugin.getConfig().getString("Options.NumberRounding").toUpperCase());
 		
 		specialNameOffset.clear();
 		specialTypeOffset.clear();

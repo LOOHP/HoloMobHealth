@@ -474,6 +474,12 @@ public class ArmorstandDisplay implements Listener {
 				watcher.setObject(new WrappedDataWatcherObject(2, Registry.getChatComponentSerializer(true)), opt);
 			}
 			
+			if (HoloMobHealth.version.isOld()) {
+				watcher.setObject(3, (byte) 0);
+			} else {
+				watcher.setObject(new WrappedDataWatcherObject(3, Registry.get(Boolean.class)), false);
+			}
+			
 			ArmorStandDisplayData newData = new ArmorStandDisplayData(watcher, json, customName);
 			
 			//cache.put(entityUUID, newData);

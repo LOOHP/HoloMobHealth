@@ -145,7 +145,7 @@ public class DamageIndicator implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onEntityDamageEntity(EntityDamageByEntityEvent event) {
 		if (HoloMobHealth.useDamageIndicator && HoloMobHealth.damageIndicatorDamageEnabled && HoloMobHealth.damageIndicatorPlayerTriggered) {
 			if (event.getCause().equals(DamageCause.SUICIDE) || event.getFinalDamage() > Integer.MAX_VALUE) {
@@ -213,7 +213,7 @@ public class DamageIndicator implements Listener {
 	}
 	
 	@SuppressWarnings("deprecation")
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onRegen(EntityRegainHealthEvent event) {
 		if (HoloMobHealth.useDamageIndicator && HoloMobHealth.damageIndicatorRegenEnabled) {
 			

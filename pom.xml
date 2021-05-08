@@ -244,13 +244,6 @@
 			<systemPath>${basedir}/lib/MyPet-3.11-SNAPSHOT-B1556.jar</systemPath>
 		</dependency>
 		<dependency>
-			<groupId>RoseStacker</groupId>
-			<artifactId>RoseStacker</artifactId>
-			<scope>system</scope>
-			<version>1.0</version>
-			<systemPath>${basedir}/lib/RoseStacker-1.2.4.jar</systemPath>
-		</dependency>
-		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>craftbukkit</artifactId>
 			<version>1.16.5-R0.1-SNAPSHOT</version>

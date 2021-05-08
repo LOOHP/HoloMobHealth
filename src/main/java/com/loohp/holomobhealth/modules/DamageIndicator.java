@@ -47,8 +47,11 @@ import net.md_5.bungee.chat.ComponentSerializer;
 
 public class DamageIndicator implements Listener {
 	
+	private static final Random RANDOM = new Random();
+	public static final int ID_OFFSET = 1000000;
+	public static final int ID_BOUND = Integer.MAX_VALUE - ID_OFFSET;
+	
 	private Vector vectorZero = new Vector(0, 0, 0);
-	private Random random = new Random();
 	private int metaversion;
 	private Serializer booleanSerializer;
 	private Serializer stringSerializer;
@@ -298,14 +301,14 @@ public class DamageIndicator implements Listener {
 		double width = NMSUtils.getEntityWidth(entity);
 		
 		double x;
-		double y =  height / 2 + (random.nextDouble() - 0.5) * 0.5;
+		double y =  height / 2 + (RANDOM.nextDouble() - 0.5) * 0.5;
 		double z;
-		if (random.nextBoolean()) {
-			x = random.nextBoolean() ? width : -width;
-			z = (random.nextDouble() * width) - (width / 2); 
+		if (RANDOM.nextBoolean()) {
+			x = RANDOM.nextBoolean() ? width : -width;
+			z = (RANDOM.nextDouble() * width) - (width / 2); 
 		} else {
-			x = (random.nextDouble() * width) - (width / 2); 
-			z = random.nextBoolean() ? width : -width;
+			x = (RANDOM.nextDouble() * width) - (width / 2); 
+			z = RANDOM.nextBoolean() ? width : -width;
 		}
 		
 		Vector velocity;
@@ -328,15 +331,15 @@ public class DamageIndicator implements Listener {
 		
 		double x;
 		double z;
-		if (random.nextBoolean()) {
-			x = random.nextBoolean() ? width : -width;
-			z = (random.nextDouble() * width) - (width / 2); 
+		if (RANDOM.nextBoolean()) {
+			x = RANDOM.nextBoolean() ? width : -width;
+			z = (RANDOM.nextDouble() * width) - (width / 2); 
 		} else {
-			x = (random.nextDouble() * width) - (width / 2); 
-			z = random.nextBoolean() ? width : -width;
+			x = (RANDOM.nextDouble() * width) - (width / 2); 
+			z = RANDOM.nextBoolean() ? width : -width;
 		}
 		
-		location.add(x, (height / 2 + (random.nextDouble() - 1) * 0.5) + HoloMobHealth.damageIndicatorRegenY, z);
+		location.add(x, (height / 2 + (RANDOM.nextDouble() - 1) * 0.5) + HoloMobHealth.damageIndicatorRegenY, z);
 		
 		Vector velocity = HoloMobHealth.damageIndicatorRegenAnimation ? new Vector(0, 0.2, 0) : vectorZero;
 		
@@ -346,7 +349,7 @@ public class DamageIndicator implements Listener {
 	
 	public void playIndicator(String entityNameJson, Location location, Vector velocity, boolean gravity, double fallHeight) {
 		Bukkit.getScheduler().runTaskAsynchronously(HoloMobHealth.plugin, () -> {
-			int entityId = random.nextInt();
+			int entityId = RANDOM.nextInt(ID_BOUND) + ID_OFFSET;
 			Location originalLocation = location.clone();
 			
 			PacketContainer packet1 = HoloMobHealth.protocolManager.createPacket(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
@@ -419,14 +422,16 @@ public class DamageIndicator implements Listener {
 	        	Location loc = each.getLocation();
 	        	return loc.getWorld().equals(location.getWorld()) && loc.distance(location) <= range * range;
 	        }).collect(Collectors.toList());
-	        for (Player player : players) {
-	        	try {
-	        		 HoloMobHealth.protocolManager.sendServerPacket(player, packet1);
-	        		 HoloMobHealth.protocolManager.sendServerPacket(player, packet2);
-	 			} catch (InvocationTargetException e) {
-	 				e.printStackTrace();
-	 			}
-	        }
+	        Bukkit.getScheduler().runTask(HoloMobHealth.plugin, () -> {
+		        for (Player player : players) {
+		        	try {
+		        		 HoloMobHealth.protocolManager.sendServerPacket(player, packet1);
+		        		 HoloMobHealth.protocolManager.sendServerPacket(player, packet2);
+		 			} catch (InvocationTargetException e) {
+		 				e.printStackTrace();
+		 			}
+		        }
+	        });
 	        
 	        Vector downwardAccel = new Vector(0, -0.05, 0);
 	        
@@ -451,24 +456,28 @@ public class DamageIndicator implements Listener {
 						packet3.getBytes().write(0, (byte) 0);
 						packet3.getBytes().write(1, (byte) 0);
 						
-			        	for (Player player : players) {
-			            	try {
-			            		 HoloMobHealth.protocolManager.sendServerPacket(player, packet3);
-			     			} catch (InvocationTargetException e) {
-			     				e.printStackTrace();
-			     			}
-			            }
+						Bukkit.getScheduler().runTask(HoloMobHealth.plugin, () -> {
+				        	for (Player player : players) {
+				            	try {
+				            		 HoloMobHealth.protocolManager.sendServerPacket(player, packet3);
+				     			} catch (InvocationTargetException e) {
+				     				e.printStackTrace();
+				     			}
+				            }
+						});
 					} else if (tick >= HoloMobHealth.damageIndicatorTimeout) {
 						this.cancel();
 						PacketContainer packet3 = HoloMobHealth.protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
 			        	packet3.getIntegerArrays().write(0, new int[] {entityId});
-			        	for (Player player : players) {
-			            	try {
-			            		 HoloMobHealth.protocolManager.sendServerPacket(player, packet3);
-			     			} catch (InvocationTargetException e) {
-			     				e.printStackTrace();
-			     			}
-			            }
+			        	Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {
+				        	for (Player player : players) {
+				            	try {
+				            		 HoloMobHealth.protocolManager.sendServerPacket(player, packet3);
+				     			} catch (InvocationTargetException e) {
+				     				e.printStackTrace();
+				     			}
+				            }
+			        	}, 3);
 					}
 				}
 			}.runTaskTimerAsynchronously(HoloMobHealth.plugin, 0, 1);

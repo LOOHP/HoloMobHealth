@@ -71,20 +71,28 @@ public class NMSUtils {
 	}
 	
 	public static Entity getEntityFromUUID(UUID uuid) {
-		for (World world : Bukkit.getWorlds()) {
-			try {
-				Object craftWorldObject = craftWorldClass.cast(world);
-				Object nmsWorldServerObject = craftWorldGetHandleMethod.invoke(craftWorldObject);
-				Object nmsEntityObject = nmsWorldServerGetEntityByUUIDMethod.invoke(nmsWorldServerObject, uuid);
-				if (nmsEntityObject == null) {
-					continue;
+		Entity entity = null;
+		if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_12)) {
+			entity = Bukkit.getEntity(uuid);
+		} else {
+			for (World world : Bukkit.getWorlds()) {
+				try {
+					Object craftWorldObject = craftWorldClass.cast(world);
+					Object nmsWorldServerObject = craftWorldGetHandleMethod.invoke(craftWorldObject);
+					Object nmsEntityObject = nmsWorldServerGetEntityByUUIDMethod.invoke(nmsWorldServerObject, uuid);
+					if (nmsEntityObject == null) {
+						continue;
+					}
+					return (Entity) nmsEntityGetBukkitEntityMethod.invoke(nmsEntityObject);
+				} catch (Throwable e) {
+					e.printStackTrace();
 				}
-				return (Entity) nmsEntityGetBukkitEntityMethod.invoke(nmsEntityObject);
-			} catch (Throwable e) {
-				e.printStackTrace();
 			}
 		}
-		return null;
+		if (entity == null) {
+			entity = StackerUtils.getEntityFromStack(uuid);
+		}
+		return entity;
 	}
 	
 	public static double getEntityHeight(Entity entity) {

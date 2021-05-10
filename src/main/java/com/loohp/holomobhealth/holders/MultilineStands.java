@@ -67,7 +67,7 @@ public class MultilineStands {
 	
 	private void gc() {
 		gctask = Bukkit.getScheduler().runTaskTimerAsynchronously(HoloMobHealth.plugin, () -> {
-			if (!entity.isValid()) {
+			if (!entity.isValid() || !entity.getUniqueId().equals(uuid)) {
 				remove();
 			}
 		}, 0, 15).getTaskId();

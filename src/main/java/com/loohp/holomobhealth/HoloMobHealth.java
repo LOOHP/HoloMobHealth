@@ -138,6 +138,7 @@ public class HoloMobHealth extends JavaPlugin {
 	public static boolean showMyPet = true;
 	
 	public static boolean ultimateStackerHook = false;
+	public static boolean roseStackerHook = false;
 	
 	public static boolean armorStandMode = false;
 	public static int armorStandYOffset = 0;
@@ -228,6 +229,16 @@ public class HoloMobHealth extends JavaPlugin {
 	    if (Bukkit.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
 	    	Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into PlaceholderAPI!");
 	    	placeholderAPIHook = true;
+		}
+	    
+	    if (Bukkit.getServer().getPluginManager().getPlugin("UltimateStacker") != null) {
+	    	Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into UltimateStacker!");
+	    	ultimateStackerHook = true;
+		}
+	    
+	    if (Bukkit.getServer().getPluginManager().getPlugin("RoseStacker") != null) {
+	    	Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into RoseStacker!");
+	    	roseStackerHook = true;
 		}
 		
 		try {

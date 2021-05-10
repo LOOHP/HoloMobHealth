@@ -10,6 +10,8 @@ softdepend:
   - Shopkeepers
   - MyPet
   - PlaceholderAPI
+  - RoseStacker
+  - UltimateStacker
 depend: [ProtocolLib]
 prefix: HoloMobHealth
 

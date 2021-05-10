@@ -50,24 +50,21 @@ public class NameTagDisplay {
 					if (!event.getPacketType().equals(PacketType.Play.Server.ENTITY_METADATA)) {
 						return;
 					}
-	
+					
 					Player player = event.getPlayer();
 					
 					if (!player.hasPermission("holomobhealth.use") || !HoloMobHealth.playersEnabled.contains(player)) {
 						return;
 					}
-					
 					PacketContainer packet = event.getPacket();
 	
 					World world = player.getWorld();
 					int entityId = packet.getIntegers().read(0);
-					
 					UUID entityUUID = NMSUtils.getEntityUUIDFromID(world, entityId);
 					
 					if (entityUUID == null) {
 						return;
 					}
-
 					WrappedDataWatcher watcher = getWatcher(player, entityUUID, world, packet);
 					
 					if (watcher != null) {
@@ -149,7 +146,7 @@ public class NameTagDisplay {
 		//	return cachedWatcher;
 		//}
 		
-		Entity entity = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(entityUUID) : Bukkit.getEntity(entityUUID);
+		Entity entity = NMSUtils.getEntityFromUUID(entityUUID);
 		
 		if (entity == null || !EntityTypeUtils.getMobsTypesSet().contains(entity.getType())) {
 			return null;

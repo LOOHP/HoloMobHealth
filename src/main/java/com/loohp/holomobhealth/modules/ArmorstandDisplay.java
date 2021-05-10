@@ -196,7 +196,7 @@ public class ArmorstandDisplay implements Listener {
 						if (data.use()) {
 							packet.getWatchableCollectionModifier().write(0, data.getWatcher().getWatchableObjects());
 							
-							Entity entity = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(entityUUID) : Bukkit.getEntity(entityUUID);
+							Entity entity = data.getEntity();							
 							String customName = data.getCustomName();
 							
 							if (EntityTypeUtils.getMobsTypesSet().contains(entity.getType())) { 
@@ -241,7 +241,7 @@ public class ArmorstandDisplay implements Listener {
 								if (multi == null) {
 									return;
 								}
-								Entity entity = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(entityUUID) : Bukkit.getEntity(entityUUID);
+								Entity entity = data.getEntity();
 								String name = NBTUtils.getString(entity, "CustomName");
 								boolean visible = entity.isCustomNameVisible();
 								EntityMetadata.sendMetadataPacket(entity, name, visible, Arrays.asList(player), true);
@@ -269,7 +269,7 @@ public class ArmorstandDisplay implements Listener {
 					if (entityUUID == null) {
 						return;
 					}					
-					Entity entity = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(entityUUID) : Bukkit.getEntity(entityUUID);					
+					Entity entity = NMSUtils.getEntityFromUUID(entityUUID);
 					if (entity == null) {
 						return;
 					}					
@@ -292,7 +292,7 @@ public class ArmorstandDisplay implements Listener {
 					if (entityUUID == null) {
 						return;
 					}
-					Entity entity = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(entityUUID) : Bukkit.getEntity(entityUUID);				
+					Entity entity = NMSUtils.getEntityFromUUID(entityUUID);				
 					if (entity == null) {
 						return;
 					}					
@@ -315,7 +315,7 @@ public class ArmorstandDisplay implements Listener {
 					if (entityUUID == null) {
 						return;
 					}
-					Entity entity = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(entityUUID) : Bukkit.getEntity(entityUUID);				
+					Entity entity = NMSUtils.getEntityFromUUID(entityUUID);				
 					if (entity == null) {
 						return;
 					}
@@ -343,7 +343,7 @@ public class ArmorstandDisplay implements Listener {
 					if (entityUUID == null) {
 						return;
 					}
-					Entity entity = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(entityUUID) : Bukkit.getEntity(entityUUID);				
+					Entity entity = NMSUtils.getEntityFromUUID(entityUUID);				
 					if (entity == null) {
 						return;
 					}
@@ -371,7 +371,7 @@ public class ArmorstandDisplay implements Listener {
 					if (entityUUID == null) {
 						return;
 					}
-					Entity entity = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(entityUUID) : Bukkit.getEntity(entityUUID);				
+					Entity entity = NMSUtils.getEntityFromUUID(entityUUID);				
 					if (entity == null) {
 						return;
 					}
@@ -392,7 +392,7 @@ public class ArmorstandDisplay implements Listener {
 		//	return cahcedData;
 		//}
 		
-		Entity entity = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(entityUUID) : Bukkit.getEntity(entityUUID);
+		Entity entity = NMSUtils.getEntityFromUUID(entityUUID);;
 		
 		if (entity == null || !EntityTypeUtils.getMobsTypesSet().contains(entity.getType())) {
 			return null;
@@ -480,7 +480,7 @@ public class ArmorstandDisplay implements Listener {
 				watcher.setObject(new WrappedDataWatcherObject(3, Registry.get(Boolean.class)), false);
 			}
 			
-			ArmorStandDisplayData newData = new ArmorStandDisplayData(watcher, json, customName);
+			ArmorStandDisplayData newData = new ArmorStandDisplayData(watcher, json, customName, entity);
 			
 			//cache.put(entityUUID, newData);
 			//Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> cache.remove(entityUUID), 1);
@@ -503,12 +503,14 @@ public class ArmorstandDisplay implements Listener {
 		private List<String> json;
 		private String customName;
 		private boolean use;
+		private Entity entity;
 		
-		public ArmorStandDisplayData(WrappedDataWatcher watcher, List<String> json, String customName) {
+		public ArmorStandDisplayData(WrappedDataWatcher watcher, List<String> json, String customName, Entity entity) {
 			this.watcher = watcher;
 			this.json = json;
 			this.customName = customName;
 			this.use = true;
+			this.entity = entity;
 		}
 		
 		public ArmorStandDisplayData() {
@@ -530,5 +532,10 @@ public class ArmorstandDisplay implements Listener {
 		public boolean use() {
 			return use;
 		}
+		
+		public Entity getEntity() {
+			return entity;	
+		}
+		
 	}
 }

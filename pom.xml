@@ -45,6 +45,12 @@
 						<configuration>
 							<shadedArtifactAttached>false</shadedArtifactAttached>
 							<createDependencyReducedPom>false</createDependencyReducedPom>
+							<relocations>
+								<relocation>
+									<pattern>org.apache.commons.lang3</pattern>
+									<shadedPattern>com.loohp.interactivechat.Utils</shadedPattern>
+								</relocation>
+							</relocations>
 						</configuration>
 					</execution>
 				</executions>

@@ -12,6 +12,8 @@
 	<packaging>jar</packaging>
 
 	<properties>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.build.number></project.build.number>
 		<project.fullVersion>${project.version}</project.fullVersion>
@@ -194,13 +196,13 @@
 			<url>https://repo.rosewooddev.io/repository/public/</url>
 		</repository>
 		<repository>
-            <id>public</id>
-            <url>http://repo.songoda.com/repository/public/</url>
-        </repository>
-        <repository>
-            <id>rose-repo</id>
-            <url>https://nexus.lichtspiele.org/repository/releases/</url>
-        </repository>
+			<id>public</id>
+			<url>http://repo.songoda.com/repository/public/</url>
+		</repository>
+		<repository>
+			<id>rose-repo</id>
+			<url>https://nexus.lichtspiele.org/repository/releases/</url>
+		</repository>
 	</repositories>
 
 	<dependencies>

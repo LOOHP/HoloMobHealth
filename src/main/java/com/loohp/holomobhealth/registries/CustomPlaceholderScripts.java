@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,9 +13,11 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
+import javax.script.ScriptEngineFactory;
 import javax.script.ScriptException;
 
+import org.apache.commons.lang3.JavaVersion;
+import org.apache.commons.lang3.SystemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -31,10 +32,23 @@ import net.md_5.bungee.api.ChatColor;
 public class CustomPlaceholderScripts {
 	
 	public static final String PLACEHOLDER_FUNCTION = "placeholder";
-	public static final Pattern pattern = Pattern.compile("//.*|/\\*[\\S\\s]*?\\*/|%([^%]+)%");
+	public static final Pattern PATTERN = Pattern.compile("//.*|/\\*[\\S\\s]*?\\*/|%([^%]+)%");
 	
-	private static Map<String, JavaScriptPlaceholder> scripts = new HashMap<>();
+	private static ScriptEngineFactory scriptEngineFactory; 
+	private static Map<String, JavaScriptPlaceholder> scripts = new ConcurrentHashMap<>();
 	private static Map<String, Class<?>> scriptDataTypes = new ConcurrentHashMap<>();
+	
+	static {
+		if (SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_11)) {
+			scriptEngineFactory = new org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory();
+		} else {
+			try {
+				scriptEngineFactory = (ScriptEngineFactory) Class.forName("jdk.nashorn.api.scripting.NashornScriptEngineFactory").getConstructor().newInstance();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	
 	public static void loadScriptsFromFolder(File folder) {
 		File index = new File(folder, "scripts.yml");
@@ -59,8 +73,7 @@ public class CustomPlaceholderScripts {
 	}
 	
 	public static void loadScripts(File file, String placeholder) throws Exception {
-		ScriptEngineManager manager = new ScriptEngineManager();
-		ScriptEngine engine = manager.getEngineByName("JavaScript");
+		ScriptEngine engine = scriptEngineFactory.getScriptEngine();
 		if (engine == null) {
 			throw new RuntimeException("JavaScript ScriptEngine isn't supported on your JVM! Is your version of Java too new?");
 		}

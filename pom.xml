@@ -5,7 +5,7 @@
 	<groupId>com.loohp</groupId>
 	<artifactId>HoloMobHealth</artifactId>
 	<name>HoloMobHealth</name>
-	<version>2.1.0.19</version>
+	<version>2.1.0.20</version>
 
 	<description>Customize how you would like to display mob health above its head!</description>
 	<url>https://github.com/LOOHP/HoloMobHealth</url>
@@ -183,9 +183,33 @@
 			<name>Lumine Releases</name>
 			<url>https://mvn.lumine.io/repository/maven-public/</url>
 		</repository>
+		<repository>
+			<id>rosewood-repo</id>
+			<url>https://repo.rosewooddev.io/repository/public/</url>
+		</repository>
+		<repository>
+            <id>public</id>
+            <url>http://repo.songoda.com/repository/public/</url>
+        </repository>
+        <repository>
+            <id>rose-repo</id>
+            <url>https://nexus.lichtspiele.org/repository/releases/</url>
+        </repository>
 	</repositories>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.12.0</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openjdk.nashorn</groupId>
+			<artifactId>nashorn-core</artifactId>
+			<version>15.2</version>
+			<scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>me.clip</groupId>
 			<artifactId>placeholderapi</artifactId>
@@ -230,13 +254,6 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>Shopkeepers</groupId>
-			<artifactId>Shopkeepers</artifactId>
-			<scope>system</scope>
-			<version>1.0</version>
-			<systemPath>${basedir}/lib/Shopkeepers-2.10.0.jar</systemPath>
-		</dependency>
-		<dependency>
 			<groupId>MyPet</groupId>
 			<artifactId>MyPet</artifactId>
 			<scope>system</scope>
@@ -244,18 +261,22 @@
 			<systemPath>${basedir}/lib/MyPet-3.11-SNAPSHOT-B1556.jar</systemPath>
 		</dependency>
 		<dependency>
-			<groupId>RoseStacker</groupId>
-			<artifactId>RoseStacker</artifactId>
-			<scope>system</scope>
-			<version>1.0</version>
-			<systemPath>${basedir}/lib/RoseStacker-1.2.4.jar</systemPath>
+			<groupId>com.nisovin.shopkeepers</groupId>
+			<artifactId>Shopkeepers</artifactId>
+			<version>2.12.0</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>UltimateStacker</groupId>
+			<groupId>com.songoda</groupId>
 			<artifactId>UltimateStacker</artifactId>
-			<scope>system</scope>
-			<version>1.0</version>
-			<systemPath>${basedir}/lib/UltimateStacker-2.1.5.jar</systemPath>
+			<version>2.1.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>dev.rosewood</groupId>
+			<artifactId>rosestacker</artifactId>
+			<version>1.2.2</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.bukkit</groupId>

@@ -39,7 +39,7 @@ public class CustomPlaceholderScripts {
 	private static Map<String, Class<?>> scriptDataTypes = new ConcurrentHashMap<>();
 	
 	static {
-		if (SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_11)) {
+		if (SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_15)) {
 			scriptEngineFactory = new org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory();
 		} else {
 			try {

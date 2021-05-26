@@ -192,6 +192,10 @@
 			<url>https://mvn.lumine.io/repository/maven-public/</url>
 		</repository>
 		<repository>
+			<id>md_5-public</id>
+			<url>https://repo.md-5.net/content/groups/public/</url>
+		</repository>
+		<repository>
 			<id>rosewood-repo</id>
 			<url>https://repo.rosewooddev.io/repository/public/</url>
 		</repository>
@@ -250,15 +254,15 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>io.lumine.xikage.</groupId>
+			<groupId>io.lumine.xikage</groupId>
 			<artifactId>MythicMobs</artifactId>
 			<version>4.11.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.github.libraryaddict</groupId>
+			<groupId>LibsDisguises</groupId>
 			<artifactId>LibsDisguises</artifactId>
-			<version>10.0.20</version>
+			<version>10.0.24</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

@@ -91,7 +91,7 @@ public class TropicalFishUtils {
 	}
 	
 	private static int validateAndFixTropicalFishVariant(int data) {
-		byte[] bytes = new byte[] {(byte) ((data >> 24) & 0xFF), (byte) ((data >> 16) & 0xFF), (byte) ((data >> 8) & 0xFF), (byte) (data & 0xFF)};
+		byte[] bytes = new byte[] {(byte) (data >> 24), (byte) (data >> 16), (byte) (data >> 8), (byte) data};
 		if (bytes.length != 4) {
 			return 0;
 		}
@@ -109,4 +109,5 @@ public class TropicalFishUtils {
 		}
 		return ((bytes[0] & 0xFF) << 24) | ((bytes[1] & 0xFF) << 16) | ((bytes[2] & 0xFF) << 8) | (bytes[3] & 0xFF);
 	}
+	
 }

@@ -420,7 +420,7 @@ public class DamageIndicator implements Listener {
 	        int range = HoloMobHealth.damageIndicatorVisibleRange;
 	        List<Player> players = location.getWorld().getPlayers().stream().filter(each -> {
 	        	Location loc = each.getLocation();
-	        	return loc.getWorld().equals(location.getWorld()) && loc.distance(location) <= range * range;
+	        	return loc.getWorld().equals(location.getWorld()) && loc.distance(location) <= range * range && HoloMobHealth.playersEnabled.contains(each);
 	        }).collect(Collectors.toList());
 	        Bukkit.getScheduler().runTask(HoloMobHealth.plugin, () -> {
 		        for (Player player : players) {

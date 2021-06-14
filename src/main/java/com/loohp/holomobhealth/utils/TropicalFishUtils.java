@@ -5,7 +5,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.TropicalFish.Pattern;
@@ -26,11 +25,11 @@ public class TropicalFishUtils {
 	static {
 		if (!HoloMobHealth.version.isLegacy()) {
 			try {
-				craftEntityClass = getNMSClass("org.bukkit.craftbukkit.", "entity.CraftEntity");
+				craftEntityClass = NMSUtils.getNMSClass("org.bukkit.craftbukkit.%s.entity.CraftEntity");
 				getNmsEntityMethod = craftEntityClass.getMethod("getHandle");
-				nmsEntityTropicalFishClass = getNMSClass("net.minecraft.server.", "EntityTropicalFish");
+				nmsEntityTropicalFishClass = NMSUtils.getNMSClass("net.minecraft.server.%s.EntityTropicalFish", "net.minecraft.world.entity.animal.EntityTropicalFish");
 				getTropicalFishVarianceMethod = nmsEntityTropicalFishClass.getMethod("getVariant");
-				craftTropicalFishClass = getNMSClass("org.bukkit.craftbukkit.", "entity.CraftTropicalFish");
+				craftTropicalFishClass = NMSUtils.getNMSClass("org.bukkit.craftbukkit.%s.entity.CraftTropicalFish");
 				getTropicalFishPatternMethod = craftTropicalFishClass.getMethod("getPattern", int.class);
 			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
 				e.printStackTrace();
@@ -60,12 +59,6 @@ public class TropicalFishUtils {
 			predefined.put(67371009, 21);
 		}
 	}
-	
-	private static Class<?> getNMSClass(String prefix, String nmsClassString) throws ClassNotFoundException {	
-        String version = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3] + ".";
-        String name = prefix + version + nmsClassString;
-        return Class.forName(name);
-    }
 
 	public static String addTropicalFishType(Entity entity, String toAppend) {
 		String path = toAppend;

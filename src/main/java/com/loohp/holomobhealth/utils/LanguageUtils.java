@@ -46,9 +46,9 @@ public class LanguageUtils {
 	static {
 		if (HoloMobHealth.version.isLegacy()) {
 			try {
-				craftEntityClass = getNMSClass("org.bukkit.craftbukkit.", "entity.CraftEntity");
-				nmsEntityClass = getNMSClass("net.minecraft.server.", "Entity");
-				nmsEntityTypesClass = getNMSClass("net.minecraft.server.", "EntityTypes");
+				craftEntityClass = NMSUtils.getNMSClass("org.bukkit.craftbukkit.%s.entity.CraftEntity");
+				nmsEntityClass = NMSUtils.getNMSClass("net.minecraft.server.%s.Entity", "net.minecraft.world.entity.Entity");
+				nmsEntityTypesClass = NMSUtils.getNMSClass("net.minecraft.server.%s.EntityTypes");
 				getNmsEntityMethod = craftEntityClass.getMethod("getHandle");
 				getEntityKeyMethod = nmsEntityTypesClass.getMethod("b", nmsEntityClass);
 			} catch (Exception e) {
@@ -56,12 +56,6 @@ public class LanguageUtils {
 			}
 		}
 	}
-	
-	private static Class<?> getNMSClass(String prefix, String nmsClassString) throws ClassNotFoundException {	
-        String version = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3] + ".";
-        String name = prefix + version + nmsClassString;
-        return Class.forName(name);
-    }
 	
 	public static final String VERSION_MANIFEST_URL = "https://launchermeta.mojang.com/mc/game/version_manifest.json";
 	public static final String RESOURCES_URL = "http://resources.download.minecraft.net/";

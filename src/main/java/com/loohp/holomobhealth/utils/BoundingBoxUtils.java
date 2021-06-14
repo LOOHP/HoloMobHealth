@@ -6,7 +6,6 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
@@ -23,21 +22,15 @@ public class BoundingBoxUtils {
 	
 	private static void _init_() {
 		try {
-			craftEntityClass = getNMSClass("org.bukkit.craftbukkit.", "entity.CraftEntity");
-			nmsEntityClass = getNMSClass("net.minecraft.server.", "Entity");
+			craftEntityClass = NMSUtils.getNMSClass("org.bukkit.craftbukkit.%s.entity.CraftEntity");
+			nmsEntityClass = NMSUtils.getNMSClass("net.minecraft.server.%s.Entity", "net.minecraft.world.entity.Entity");
 			craftEntityGetHandlerMethod = craftEntityClass.getMethod("getHandle");
-			nmsAxisAlignedBBClass = getNMSClass("net.minecraft.server.", "AxisAlignedBB");
+			nmsAxisAlignedBBClass = NMSUtils.getNMSClass("net.minecraft.server.%s.AxisAlignedBB", "net.minecraft.world.phys.AxisAlignedBB");
 			nmsEntityGetBoundingBoxMethod = nmsEntityClass.getMethod("getBoundingBox");
 			nmsAxisAlignedBBFields = Arrays.asList(nmsAxisAlignedBBClass.getFields());
 		} catch (ClassNotFoundException | NoSuchMethodException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	private static Class<?> getNMSClass(String prefix, String nmsClassString) throws ClassNotFoundException {
-		String version = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3] + ".";
-	    String name = prefix + version + nmsClassString;
-	    return Class.forName(name);
 	}
 	
 	public static BoundingBox getBoundingBox(Entity entity) {

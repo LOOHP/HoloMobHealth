@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
@@ -69,6 +70,9 @@ public class DamageIndicator implements Listener {
 		}
 		
 		switch (HoloMobHealth.version) {
+		case V1_17:
+			metaversion = 4;
+			break;
 		case V1_16_4:
 		case V1_16_2:
 		case V1_16:
@@ -350,10 +354,14 @@ public class DamageIndicator implements Listener {
 	public void playIndicator(String entityNameJson, Location location, Vector velocity, boolean gravity, double fallHeight) {
 		Bukkit.getScheduler().runTaskAsynchronously(HoloMobHealth.plugin, () -> {
 			int entityId = RANDOM.nextInt(ID_BOUND) + ID_OFFSET;
+			UUID uuid = UUID.randomUUID();
 			Location originalLocation = location.clone();
 			
 			PacketContainer packet1 = HoloMobHealth.protocolManager.createPacket(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
 			packet1.getIntegers().write(0, entityId);
+			if (packet1.getUUIDs().size() > 0) {
+				packet1.getUUIDs().write(0, uuid);
+			}
 			packet1.getIntegers().write(1, HoloMobHealth.version.isLegacy() ? 30 : 1);
 			packet1.getDoubles().write(0, location.getX());
 			packet1.getDoubles().write(1, location.getY());
@@ -413,6 +421,9 @@ public class DamageIndicator implements Listener {
 			case 3:
 				watcher.setObject(new WrappedDataWatcherObject(14, byteSerializer), standbitmask);
 				break;
+			case 4:
+				watcher.setObject(new WrappedDataWatcherObject(15, byteSerializer), standbitmask);
+				break;
 			}
 			
 	        packet2.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects());
@@ -468,7 +479,11 @@ public class DamageIndicator implements Listener {
 					} else if (tick >= HoloMobHealth.damageIndicatorTimeout) {
 						this.cancel();
 						PacketContainer packet3 = HoloMobHealth.protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
-			        	packet3.getIntegerArrays().write(0, new int[] {entityId});
+						if (metaversion >= 4) {
+							packet3.getIntegers().write(0, entityId);
+						} else {
+							packet3.getIntegerArrays().write(0, new int[] {entityId});	
+						}
 			        	Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {
 				        	for (Player player : players) {
 				            	try {

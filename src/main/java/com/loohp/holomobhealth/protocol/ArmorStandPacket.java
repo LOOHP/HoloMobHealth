@@ -123,6 +123,7 @@ public class ArmorStandPacket implements Listener {
 		PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
 		packet1.getIntegers().write(0, entity.getEntityId());
 		switch (HoloMobHealth.version) {
+		case V1_17:
 		case V1_16_4:
 		case V1_16_2:
 			packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 1 : 66);
@@ -143,6 +144,9 @@ public class ArmorStandPacket implements Listener {
 		default:
 			packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 30 : 101);
 			break;
+		}
+		if (packet1.getUUIDs().size() > 0) {
+			packet1.getUUIDs().write(0, entity.getUniqueId());
 		}
 		packet1.getIntegers().write(2, 0);
 		packet1.getIntegers().write(3, 0);
@@ -204,21 +208,34 @@ public class ArmorStandPacket implements Listener {
 	}
 	
 	public static void updateArmorStand(Entity host, HoloMobArmorStand entity, String json, boolean visible) {
-		PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
-		packet1.getIntegers().write(0, entity.getEntityId());	
-	    WrappedDataWatcher wpw = buildWarppedDataWatcher(entity, json, visible);
-	    packet1.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
-	    
-	    PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);
-	    packet2.getIntegers().write(0, entity.getEntityId());
-	    packet2.getDoubles().write(0, entity.getLocation().getX());
-	    packet2.getDoubles().write(1, entity.getLocation().getY());
-	    packet2.getDoubles().write(2, entity.getLocation().getZ());
-	    packet2.getBytes().write(0, (byte) (int) (entity.getLocation().getYaw() * 256.0F / 360.0F));
-	    packet2.getBytes().write(1, (byte) (int) (entity.getLocation().getPitch() * 256.0F / 360.0F));
-	    
-	    protocolManager.broadcastServerPacket(packet1, host, false);
-	    protocolManager.broadcastServerPacket(packet2, host, false);
+		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+			World world = entity.getWorld();
+			List<Player> playersInRange = Bukkit.getOnlinePlayers().stream().filter(each -> (each.getWorld().equals(world)) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.getUpdateRange(world) * HoloMobHealth.getUpdateRange(world)))).collect(Collectors.toList());
+
+			PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
+			packet1.getIntegers().write(0, entity.getEntityId());	
+		    WrappedDataWatcher wpw = buildWarppedDataWatcher(entity, json, visible);
+		    packet1.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
+		    
+		    PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);
+		    packet2.getIntegers().write(0, entity.getEntityId());
+		    packet2.getDoubles().write(0, entity.getLocation().getX());
+		    packet2.getDoubles().write(1, entity.getLocation().getY());
+		    packet2.getDoubles().write(2, entity.getLocation().getZ());
+		    packet2.getBytes().write(0, (byte) (int) (entity.getLocation().getYaw() * 256.0F / 360.0F));
+		    packet2.getBytes().write(1, (byte) (int) (entity.getLocation().getPitch() * 256.0F / 360.0F));
+		    
+		    Bukkit.getScheduler().runTask(plugin, () -> {		
+		        try {
+		        	for (Player player : playersInRange) {
+						protocolManager.sendServerPacket(player, packet1, false);
+						protocolManager.sendServerPacket(player, packet2, false);
+					}
+				} catch (InvocationTargetException e) {
+					e.printStackTrace();
+				}
+			});
+		});
 	}
 	
 	public static void updateArmorStandLocation(Collection<? extends Player> players, HoloMobArmorStand entity) {
@@ -249,16 +266,29 @@ public class ArmorStandPacket implements Listener {
 		});
 	}
 	
-	public static void updateArmorStandLocation(Entity host, HoloMobArmorStand entity) {  
-        PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);
-        packet1.getIntegers().write(0, entity.getEntityId());
-        packet1.getDoubles().write(0, entity.getLocation().getX());
-        packet1.getDoubles().write(1, entity.getLocation().getY());
-        packet1.getDoubles().write(2, entity.getLocation().getZ());
-        packet1.getBytes().write(0, (byte) (int) (entity.getLocation().getYaw() * 256.0F / 360.0F));
-        packet1.getBytes().write(1, (byte) (int) (entity.getLocation().getPitch() * 256.0F / 360.0F));
-        
-        protocolManager.broadcastServerPacket(packet1, host, false);
+	public static void updateArmorStandLocation(Entity host, HoloMobArmorStand entity) {
+		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+			World world = entity.getWorld();
+			List<Player> playersInRange = Bukkit.getOnlinePlayers().stream().filter(each -> (each.getWorld().equals(world)) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.getUpdateRange(world) * HoloMobHealth.getUpdateRange(world)))).collect(Collectors.toList());
+
+	        PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);
+	        packet1.getIntegers().write(0, entity.getEntityId());
+	        packet1.getDoubles().write(0, entity.getLocation().getX());
+	        packet1.getDoubles().write(1, entity.getLocation().getY());
+	        packet1.getDoubles().write(2, entity.getLocation().getZ());
+	        packet1.getBytes().write(0, (byte) (int) (entity.getLocation().getYaw() * 256.0F / 360.0F));
+	        packet1.getBytes().write(1, (byte) (int) (entity.getLocation().getPitch() * 256.0F / 360.0F));
+	        
+	        Bukkit.getScheduler().runTask(plugin, () -> {		
+		        try {
+		        	for (Player player : playersInRange) {
+						protocolManager.sendServerPacket(player, packet1, false);
+					}
+				} catch (InvocationTargetException e) {
+					e.printStackTrace();
+				}
+			});
+		});
 	}
 	
 	public static void removeArmorStand(Collection<? extends Player> players, HoloMobArmorStand entity, boolean removeFromActive, boolean bypassFilter) {
@@ -295,7 +325,11 @@ public class ArmorStandPacket implements Listener {
 			}
 			
 			PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
-			packet1.getIntegerArrays().write(0, new int[]{entity.getEntityId()});
+			if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_17)) {
+				packet1.getIntegers().write(0, entity.getEntityId());
+			} else {
+				packet1.getIntegerArrays().write(0, new int[]{entity.getEntityId()});
+			}
 			
 			Bukkit.getScheduler().runTask(plugin, () -> {
 				try {
@@ -355,7 +389,9 @@ public class ArmorStandPacket implements Listener {
 		    
 		    byte standbitmask = 0x01 | 0x10;	
 	
-		    if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_15)) {
+		    if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_17)) {
+		    	watcher.setObject(new WrappedDataWatcherObject(15, Registry.get(Byte.class)), standbitmask);
+		    } else if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_15)) {
 		    	watcher.setObject(new WrappedDataWatcherObject(14, Registry.get(Byte.class)), standbitmask);
 		    } else if (HoloMobHealth.version.equals(MCVersion.V1_14)) {
 		    	watcher.setObject(new WrappedDataWatcherObject(13, Registry.get(Byte.class)), standbitmask);
@@ -378,7 +414,9 @@ public class ArmorStandPacket implements Listener {
 				watcher.setObject(4, (byte) 1);
 			}
 	
-		    if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_15)) {
+			if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_17)) {
+				watcher.setObject(new WrappedDataWatcherObject(16, Registry.get(Boolean.class)), true);
+			} else if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_15)) {
 		    	watcher.setObject(new WrappedDataWatcherObject(15, Registry.get(Boolean.class)), true);
 		    } else if (HoloMobHealth.version.equals(MCVersion.V1_14)) {
 		    	watcher.setObject(new WrappedDataWatcherObject(14, Registry.get(Boolean.class)), true);

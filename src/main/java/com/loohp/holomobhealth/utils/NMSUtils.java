@@ -28,24 +28,57 @@ public class NMSUtils {
 	private static Class<?> nmsAxisAlignedBBClass;
 	private static Field[] nmsAxisAlignedBBFields;
 	
+	private static Field nmsWorldEntityManagerField;
+	private static Method nmsEntityManagerGetEntityGetterMethod;
+	private static Class<?> nmsLevelEntityGetterClass;
+	private static Method nmsLevelEntityGetterGetEntityByIDMethod;
+	private static Method nmsLevelEntityGetterGetEntityByUUIDMethod;
+	
 	static {
-		try {craftWorldClass = getNMSClass("org.bukkit.craftbukkit.", "CraftWorld");} catch (Exception e) {}
-		try {craftEntityClass = getNMSClass("org.bukkit.craftbukkit.", "entity.CraftEntity");} catch (Exception e) {}
-		try {nmsEntityClass = getNMSClass("net.minecraft.server.", "Entity");} catch (Exception e) {}
-		try {nmsWorldServerClass = getNMSClass("net.minecraft.server.", "WorldServer");} catch (Exception e) {}
-		try {craftWorldGetHandleMethod = craftWorldClass.getMethod("getHandle");} catch (Exception e) {}
-		try {nmsWorldServerGetEntityByIDMethod = nmsWorldServerClass.getMethod("getEntity", int.class);} catch (Exception e) {}
-		try {nmsWorldServerGetEntityByUUIDMethod = nmsWorldServerClass.getMethod("getEntity", UUID.class);} catch (Exception e) {}
-		try {nmsEntityGetBukkitEntityMethod = nmsEntityClass.getMethod("getBukkitEntity");} catch (Exception e) {}
-		try {nmsEntityGetUniqueIDMethod = nmsEntityClass.getMethod("getUniqueID");} catch (Exception e) {}		
-		try {nmsEntityGetBoundingBox = nmsEntityClass.getMethod("getBoundingBox");} catch (Exception e) {}
-		try {nmsEntityGetHandle = craftEntityClass.getMethod("getHandle");} catch (Exception e) {}
-		try {nmsAxisAlignedBBClass = getNMSClass("net.minecraft.server.", "AxisAlignedBB");} catch (Exception e) {}
-		try {nmsAxisAlignedBBFields = nmsAxisAlignedBBClass.getFields();} catch (Exception e) {}
+		try {
+			craftWorldClass = getNMSClass("org.bukkit.craftbukkit.%s.CraftWorld");
+			craftEntityClass = getNMSClass("org.bukkit.craftbukkit.%s.entity.CraftEntity");
+			nmsEntityClass = getNMSClass("net.minecraft.server.%s.Entity", "net.minecraft.world.entity.Entity");
+			nmsWorldServerClass = getNMSClass("net.minecraft.server.%s.WorldServer", "net.minecraft.server.level.WorldServer");
+			craftWorldGetHandleMethod = craftWorldClass.getMethod("getHandle");
+			nmsWorldServerGetEntityByIDMethod = nmsWorldServerClass.getMethod("getEntity", int.class);
+			nmsWorldServerGetEntityByUUIDMethod = nmsWorldServerClass.getMethod("getEntity", UUID.class);
+			nmsEntityGetBukkitEntityMethod = nmsEntityClass.getMethod("getBukkitEntity");
+			nmsEntityGetUniqueIDMethod = nmsEntityClass.getMethod("getUniqueID");		
+			nmsEntityGetBoundingBox = nmsEntityClass.getMethod("getBoundingBox");
+			nmsEntityGetHandle = craftEntityClass.getMethod("getHandle");
+			nmsAxisAlignedBBClass = getNMSClass("net.minecraft.server.%s.AxisAlignedBB", "net.minecraft.world.phys.AxisAlignedBB");
+			nmsAxisAlignedBBFields = nmsAxisAlignedBBClass.getFields();
+			if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_17)) {
+				nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("G");
+				nmsEntityManagerGetEntityGetterMethod = nmsWorldEntityManagerField.getType().getMethod("d");
+				nmsLevelEntityGetterClass = Class.forName("net.minecraft.world.level.entity.LevelEntityGetterAdapter");
+				nmsLevelEntityGetterGetEntityByIDMethod = nmsLevelEntityGetterClass.getMethod("a", int.class);
+				nmsLevelEntityGetterGetEntityByUUIDMethod = nmsLevelEntityGetterClass.getMethod("a", UUID.class);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static UUID getEntityUUIDFromID(World world, int id) {
-		if (HoloMobHealth.version.isOld()) {
+		if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_17)) {
+			try {
+				Object craftWorldObject = craftWorldClass.cast(world);
+				Object nmsWorldServerObject = craftWorldGetHandleMethod.invoke(craftWorldObject);
+				nmsWorldEntityManagerField.setAccessible(true);
+				Object nmsEntityManagerObject = nmsWorldEntityManagerField.get(nmsWorldServerObject);
+				Object nmsLevelEntityGetterObject = nmsEntityManagerGetEntityGetterMethod.invoke(nmsEntityManagerObject);
+				Object nmsEntityObject = nmsLevelEntityGetterGetEntityByIDMethod.invoke(nmsLevelEntityGetterObject, id);
+				if (nmsEntityObject == null) {
+					return null;
+				}
+				return (UUID) nmsEntityGetUniqueIDMethod.invoke(nmsEntityObject);
+			} catch (Throwable e) {
+				e.printStackTrace();
+			}
+			return null;
+		} else if (HoloMobHealth.version.isOld()) {
 			List<Entity> entities = world.getEntities();
 			for (int i = 0; i < entities.size(); i++) {
 				Entity entity = entities.get(i);
@@ -72,7 +105,24 @@ public class NMSUtils {
 	
 	public static Entity getEntityFromUUID(UUID uuid) {
 		Entity entity = null;
-		if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_12)) {
+		if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_17)) {
+			for (World world : Bukkit.getWorlds()) {
+				try {
+					Object craftWorldObject = craftWorldClass.cast(world);
+					Object nmsWorldServerObject = craftWorldGetHandleMethod.invoke(craftWorldObject);
+					nmsWorldEntityManagerField.setAccessible(true);
+					Object nmsEntityManagerObject = nmsWorldEntityManagerField.get(nmsWorldServerObject);
+					Object nmsLevelEntityGetterObject = nmsEntityManagerGetEntityGetterMethod.invoke(nmsEntityManagerObject);
+					Object nmsEntityObject = nmsLevelEntityGetterGetEntityByUUIDMethod.invoke(nmsLevelEntityGetterObject, uuid);
+					if (nmsEntityObject == null) {
+						continue;
+					}
+					return (Entity) nmsEntityGetBukkitEntityMethod.invoke(nmsEntityObject);
+				} catch (Throwable e) {
+					e.printStackTrace();
+				}
+			}
+		} else if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_12)) {
 			entity = Bukkit.getEntity(uuid);
 		} else {
 			for (World world : Bukkit.getWorlds()) {
@@ -123,10 +173,22 @@ public class NMSUtils {
 		return -1;
 	}
 	
-	private static Class<?> getNMSClass(String prefix, String nmsClassString) throws ClassNotFoundException {
-        String version = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3] + ".";
-        String name = prefix + version + nmsClassString;
-        return Class.forName(name);
+	public static Class<?> getNMSClass(String path, String... paths) throws ClassNotFoundException {	
+        String version = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
+        ClassNotFoundException error = null;
+        try {
+    		return Class.forName(path.replace("%s", version));
+    	} catch (ClassNotFoundException e) {
+    		error = e;
+    	}
+        for (String classpath : paths) {
+        	try {
+        		return Class.forName(classpath.replace("%s", version));
+        	} catch (ClassNotFoundException e) {
+        		error = e;
+        	}
+        }
+        throw error;
     }
 
 }

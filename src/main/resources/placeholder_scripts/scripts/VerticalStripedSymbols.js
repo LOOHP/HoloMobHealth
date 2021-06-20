@@ -3,7 +3,7 @@
 
 //In this example we will create a health bar out of vertical stripe characters
 function parse() {
-	var customname = DisplayText;
+	var customname = CustomName;
     var health = Health;
     var maxhealth = MaxHealth;
 

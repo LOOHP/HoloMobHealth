@@ -29,8 +29,8 @@ public class RangeModule {
 	protected static double distance = 15;
 	
 	public static void reloadNumbers() {
-		rate = HoloMobHealth.plugin.getConfig().getInt("Options.Range.UpdateRate");
-		distance = HoloMobHealth.plugin.getConfig().getDouble("Options.Range.Distance");
+		rate = HoloMobHealth.getConfiguration().getInt("Options.Range.UpdateRate");
+		distance = HoloMobHealth.getConfiguration().getDouble("Options.Range.Distance");
 	}
 	
 	public static boolean isEntityInRangeOfPlayer(Player player, Entity entity) {

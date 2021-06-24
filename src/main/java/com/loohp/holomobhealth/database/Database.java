@@ -10,8 +10,8 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.simpleyaml.configuration.file.FileConfiguration;
 
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.protocol.EntityMetadata;
@@ -23,7 +23,7 @@ public class Database {
 	public static boolean isMYSQL = false;
 	
 	private static Connection connection;
-	private static FileConfiguration config = HoloMobHealth.plugin.getConfig();
+	private static FileConfiguration config = HoloMobHealth.getConfiguration();
 	private static String host, database, username, password;
 	private static String table = "HoloMobHealth_USER_PERFERENCES";
 	private static int port;

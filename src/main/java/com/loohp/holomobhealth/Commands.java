@@ -36,7 +36,6 @@ public class Commands implements CommandExecutor, TabCompleter {
 		
 		if (args[0].equalsIgnoreCase("reload")) {
 			if (sender.hasPermission("holomobhealth.reload")) {
-				HoloMobHealth.plugin.reloadConfig();
 				HoloMobHealth.loadConfig();
 				RangeModule.reloadNumbers();
 				for (World world : Bukkit.getWorlds()) {

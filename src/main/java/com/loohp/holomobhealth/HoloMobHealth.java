@@ -21,12 +21,15 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.simpleyaml.configuration.comments.CommentType;
+import org.simpleyaml.configuration.file.FileConfiguration;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.loohp.holomobhealth.api.HoloMobHealthAPI;
+import com.loohp.holomobhealth.config.Config;
 import com.loohp.holomobhealth.database.Database;
 import com.loohp.holomobhealth.debug.Debug;
 import com.loohp.holomobhealth.holders.HoloMobArmorStand;
@@ -44,10 +47,10 @@ import com.loohp.holomobhealth.updater.Updater;
 import com.loohp.holomobhealth.updater.Updater.UpdaterResponse;
 import com.loohp.holomobhealth.utils.ChatColorUtils;
 import com.loohp.holomobhealth.utils.JarUtils;
+import com.loohp.holomobhealth.utils.JarUtils.CopyOption;
 import com.loohp.holomobhealth.utils.LanguageUtils;
 import com.loohp.holomobhealth.utils.LegacyPlaceholdersConverter;
 import com.loohp.holomobhealth.utils.MCVersion;
-import com.loohp.holomobhealth.utils.JarUtils.CopyOption;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -58,6 +61,7 @@ import net.md_5.bungee.api.chat.hover.content.Text;
 public class HoloMobHealth extends JavaPlugin {
 	
 	public static final int BSTATS_PLUGIN_ID = 6749;
+	public static final String CONFIG_ID = "config";
 	
 	public static Plugin plugin = null;
 	
@@ -176,9 +180,10 @@ public class HoloMobHealth extends JavaPlugin {
         
         getServer().getPluginManager().registerEvents(new Events(), this);
 		
-        getConfig().options().header("For information on what each option does. Please refer to https://github.com/LOOHP/HoloMobHealth/blob/master/src/main/resources/config.yml");
-        getConfig().options().copyDefaults(true);
-        saveConfig();
+        if (!getDataFolder().exists()) {
+        	getDataFolder().mkdirs();
+        }
+        Config.loadConfig(CONFIG_ID, new File(getDataFolder(), "config.yml"), getClass().getClassLoader().getResourceAsStream("config.yml"), getClass().getClassLoader().getResourceAsStream("config.yml"), CommentType.BLOCK);
         
         try {
 			JarUtils.copyFolderFromJar("placeholder_scripts", getDataFolder(), CopyOption.COPY_IF_NOT_EXIST);
@@ -187,7 +192,7 @@ public class HoloMobHealth extends JavaPlugin {
 		}
         
         //Legacy Placeholders Converter
-        List<String> lines = plugin.getConfig().getStringList("Display.Text");
+        List<String> lines = getConfiguration().getStringList("Display.Text");
         if (LegacyPlaceholdersConverter.getLegacyPlaceholderSet().stream().anyMatch(each -> lines.stream().anyMatch(line -> line.contains(each)))) {
         	LegacyPlaceholdersConverter.convert();
         }
@@ -336,39 +341,46 @@ public class HoloMobHealth extends JavaPlugin {
 		getServer().getConsoleSender().sendMessage(ChatColor.RED + "[HoloMobHealth] HoloMobHealth has been Disabled!");
 	}
 	
+	public static FileConfiguration getConfiguration() {
+		return Config.getConfig(CONFIG_ID).getConfiguration();
+	}
+	
 	@SuppressWarnings("deprecation")
 	public static void loadConfig() {
-		rangeEnabled = plugin.getConfig().getBoolean("Options.Range.Use");
+		Config config = Config.getConfig(CONFIG_ID);
+		config.reload();
 		
-		roundingMode = RoundingMode.valueOf(plugin.getConfig().getString("Options.NumberRounding").toUpperCase());
+		rangeEnabled = config.getConfiguration().getBoolean("Options.Range.Use");
+		
+		roundingMode = RoundingMode.valueOf(config.getConfiguration().getString("Options.NumberRounding").toUpperCase());
 		
 		specialNameOffset.clear();
 		specialTypeOffset.clear();
 		
-		displayText = DisplayTextCacher.cacheDecimalFormat(plugin.getConfig().getStringList("Display.Text"));
+		displayText = DisplayTextCacher.cacheDecimalFormat(config.getConfiguration().getStringList("Display.Text"));
 		
-		heartScale = plugin.getConfig().getInt("Display.ScaledSymbolSettings.Scale");
-		dynamicScale = plugin.getConfig().getBoolean("Display.ScaledSymbolSettings.DynamicScale");
+		heartScale = config.getConfiguration().getInt("Display.ScaledSymbolSettings.Scale");
+		dynamicScale = config.getConfiguration().getBoolean("Display.ScaledSymbolSettings.DynamicScale");
 		
-		healthyColor = plugin.getConfig().getString("Display.DynamicColorSettings.HealthyColor");
-		halfColor = plugin.getConfig().getString("Display.DynamicColorSettings.HalfColor");
-		lowColor = plugin.getConfig().getString("Display.DynamicColorSettings.LowColor");
+		healthyColor = config.getConfiguration().getString("Display.DynamicColorSettings.HealthyColor");
+		halfColor = config.getConfiguration().getString("Display.DynamicColorSettings.HalfColor");
+		lowColor = config.getConfiguration().getString("Display.DynamicColorSettings.LowColor");
 		
-		healthyChar = plugin.getConfig().getString("Display.ScaledSymbolSettings.HealthyChar");
-		halfChar = plugin.getConfig().getString("Display.ScaledSymbolSettings.HalfChar");
-		emptyChar = plugin.getConfig().getString("Display.ScaledSymbolSettings.EmptyChar");
+		healthyChar = config.getConfiguration().getString("Display.ScaledSymbolSettings.HealthyChar");
+		halfChar = config.getConfiguration().getString("Display.ScaledSymbolSettings.HalfChar");
+		emptyChar = config.getConfiguration().getString("Display.ScaledSymbolSettings.EmptyChar");
 		
-		alwaysShow = plugin.getConfig().getBoolean("Options.AlwaysShow");
-		applyToNamed = plugin.getConfig().getBoolean("Options.ApplyToNamed");
+		alwaysShow = config.getConfiguration().getBoolean("Options.AlwaysShow");
+		applyToNamed = config.getConfiguration().getBoolean("Options.ApplyToNamed");
 		
-		reloadPluginMessage = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.ReloadPlugin"));
-		noPermissionMessage = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.NoPermission"));
-		playersOnlyMessage = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.PlayersOnly"));
-		playersNotFoundMessage = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.PlayerNotFound"));
-		toggleDisplayOnMessage = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.ToggleDisplayOn"));
-		toggleDisplayOffMessage = ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("Messages.ToggleDisplayOff"));
+		reloadPluginMessage = ChatColorUtils.translateAlternateColorCodes('&', config.getConfiguration().getString("Messages.ReloadPlugin"));
+		noPermissionMessage = ChatColorUtils.translateAlternateColorCodes('&', config.getConfiguration().getString("Messages.NoPermission"));
+		playersOnlyMessage = ChatColorUtils.translateAlternateColorCodes('&', config.getConfiguration().getString("Messages.PlayersOnly"));
+		playersNotFoundMessage = ChatColorUtils.translateAlternateColorCodes('&', config.getConfiguration().getString("Messages.PlayerNotFound"));
+		toggleDisplayOnMessage = ChatColorUtils.translateAlternateColorCodes('&', config.getConfiguration().getString("Messages.ToggleDisplayOn"));
+		toggleDisplayOffMessage = ChatColorUtils.translateAlternateColorCodes('&', config.getConfiguration().getString("Messages.ToggleDisplayOff"));
 		
-		List<String> types = plugin.getConfig().getStringList("Options.DisabledMobTypes");
+		List<String> types = config.getConfiguration().getStringList("Options.DisabledMobTypes");
 		for (String each : types) {
 			if (version.isLegacy()) {
 				disabledMobTypes.add(EntityType.fromName(each.toUpperCase()));
@@ -376,21 +388,21 @@ public class HoloMobHealth extends JavaPlugin {
 				disabledMobTypes.add(EntityType.valueOf(each.toUpperCase()));
 			}
 		}
-		disabledMobNamesAbsolute = plugin.getConfig().getStringList("Options.DisabledMobNamesAbsolute").stream().collect(Collectors.toSet());
-		disabledMobNamesContains = plugin.getConfig().getStringList("Options.DisabledMobNamesContains");
+		disabledMobNamesAbsolute = config.getConfiguration().getStringList("Options.DisabledMobNamesAbsolute").stream().collect(Collectors.toSet());
+		disabledMobNamesContains = config.getConfiguration().getStringList("Options.DisabledMobNamesContains");
 		
-		disabledWorlds = plugin.getConfig().getStringList("Options.DisabledWorlds").stream().collect(Collectors.toSet());
+		disabledWorlds = config.getConfiguration().getStringList("Options.DisabledWorlds").stream().collect(Collectors.toSet());
 		
-		useAlterHealth = plugin.getConfig().getBoolean("Options.DynamicHealthDisplay.Use");
-		altHealthDisplayTime = plugin.getConfig().getInt("Options.DynamicHealthDisplay.Timeout");
-		altOnlyPlayer = plugin.getConfig().getBoolean("Options.DynamicHealthDisplay.OnlyPlayerTrigger");
+		useAlterHealth = config.getConfiguration().getBoolean("Options.DynamicHealthDisplay.Use");
+		altHealthDisplayTime = config.getConfiguration().getInt("Options.DynamicHealthDisplay.Timeout");
+		altOnlyPlayer = config.getConfiguration().getBoolean("Options.DynamicHealthDisplay.OnlyPlayerTrigger");
 		
-		idleUse = plugin.getConfig().getBoolean("Options.DynamicHealthDisplay.IdleDisplay.Use");
-		idleDisplayText = DisplayTextCacher.cacheDecimalFormat(plugin.getConfig().getStringList("Options.DynamicHealthDisplay.IdleDisplay.Text"));
+		idleUse = config.getConfiguration().getBoolean("Options.DynamicHealthDisplay.IdleDisplay.Use");
+		idleDisplayText = DisplayTextCacher.cacheDecimalFormat(config.getConfiguration().getStringList("Options.DynamicHealthDisplay.IdleDisplay.Text"));
 		
-		armorStandMode = plugin.getConfig().getBoolean("Options.MultiLine.Enable");
-		armorStandYOffset = plugin.getConfig().getInt("Options.MultiLine.MasterYOffset");
-		List<String> armorStandSpecial = plugin.getConfig().getStringList("Options.MultiLine.Special");
+		armorStandMode = config.getConfiguration().getBoolean("Options.MultiLine.Enable");
+		armorStandYOffset = config.getConfiguration().getInt("Options.MultiLine.MasterYOffset");
+		List<String> armorStandSpecial = config.getConfiguration().getStringList("Options.MultiLine.Special");
 		for (String cases : armorStandSpecial) {
 			int offset = Integer.valueOf(cases.substring(cases.lastIndexOf(":") + 1));
 			switch (cases.substring(0, cases.indexOf(":")).toLowerCase()) {
@@ -421,36 +433,36 @@ public class HoloMobHealth extends JavaPlugin {
 			ArmorstandDisplay.entityMetadataPacketListener();
 		}
 		
-		useDamageIndicator = plugin.getConfig().getBoolean("DamageIndicator.Enabled");
-		damageIndicatorVisibleRange = plugin.getConfig().getInt("DamageIndicator.VisibleRange");
-		damageIndicatorTimeout = plugin.getConfig().getInt("DamageIndicator.Timeout");
-		damageIndicatorPlayerTriggered = plugin.getConfig().getBoolean("DamageIndicator.OnlyPlayerTriggered");
-		damageIndicatorDamageEnabled = plugin.getConfig().getBoolean("DamageIndicator.Damage.Enabled");
-		damageIndicatorDamageAnimation = plugin.getConfig().getBoolean("DamageIndicator.Damage.Animation");
-		damageIndicatorDamageText = DisplayTextCacher.cacheDecimalFormat(ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("DamageIndicator.Damage.HoloText")));
-		damageIndicatorDamageY = plugin.getConfig().getDouble("DamageIndicator.Damage.Y-Offset");
-		damageIndicatorDamageMinimum = plugin.getConfig().getDouble("DamageIndicator.Damage.Minimum");
-		damageIndicatorRegenEnabled = plugin.getConfig().getBoolean("DamageIndicator.Regen.Enabled");
-		damageIndicatorRegenAnimation = plugin.getConfig().getBoolean("DamageIndicator.Regen.Animation");
-		damageIndicatorRegenText = DisplayTextCacher.cacheDecimalFormat(ChatColorUtils.translateAlternateColorCodes('&', plugin.getConfig().getString("DamageIndicator.Regen.HoloText")));
-		damageIndicatorRegenY = plugin.getConfig().getDouble("DamageIndicator.Regen.Y-Offset");
-		damageIndicatorRegenMinimum = plugin.getConfig().getDouble("DamageIndicator.Regen.Minimum");
+		useDamageIndicator = config.getConfiguration().getBoolean("DamageIndicator.Enabled");
+		damageIndicatorVisibleRange = config.getConfiguration().getInt("DamageIndicator.VisibleRange");
+		damageIndicatorTimeout = config.getConfiguration().getInt("DamageIndicator.Timeout");
+		damageIndicatorPlayerTriggered = config.getConfiguration().getBoolean("DamageIndicator.OnlyPlayerTriggered");
+		damageIndicatorDamageEnabled = config.getConfiguration().getBoolean("DamageIndicator.Damage.Enabled");
+		damageIndicatorDamageAnimation = config.getConfiguration().getBoolean("DamageIndicator.Damage.Animation");
+		damageIndicatorDamageText = DisplayTextCacher.cacheDecimalFormat(ChatColorUtils.translateAlternateColorCodes('&', config.getConfiguration().getString("DamageIndicator.Damage.HoloText")));
+		damageIndicatorDamageY = config.getConfiguration().getDouble("DamageIndicator.Damage.Y-Offset");
+		damageIndicatorDamageMinimum = config.getConfiguration().getDouble("DamageIndicator.Damage.Minimum");
+		damageIndicatorRegenEnabled = config.getConfiguration().getBoolean("DamageIndicator.Regen.Enabled");
+		damageIndicatorRegenAnimation = config.getConfiguration().getBoolean("DamageIndicator.Regen.Animation");
+		damageIndicatorRegenText = DisplayTextCacher.cacheDecimalFormat(ChatColorUtils.translateAlternateColorCodes('&', config.getConfiguration().getString("DamageIndicator.Regen.HoloText")));
+		damageIndicatorRegenY = config.getConfiguration().getDouble("DamageIndicator.Regen.Y-Offset");
+		damageIndicatorRegenMinimum = config.getConfiguration().getDouble("DamageIndicator.Regen.Minimum");
 		
-		showCitizens = plugin.getConfig().getBoolean("Hooks.Citizens.ShowNPCMobHealth");		
-		showMythicMobs = plugin.getConfig().getBoolean("Hooks.MythicMobs.ShowMythicMobsHealth");
-		showShopkeepers = plugin.getConfig().getBoolean("Hooks.Shopkeepers.ShowShopkeepersHealth");
-		showMyPet = plugin.getConfig().getBoolean("Hooks.MyPet.ShowMyPetHealth");
+		showCitizens = config.getConfiguration().getBoolean("Hooks.Citizens.ShowNPCMobHealth");		
+		showMythicMobs = config.getConfiguration().getBoolean("Hooks.MythicMobs.ShowMythicMobsHealth");
+		showShopkeepers = config.getConfiguration().getBoolean("Hooks.Shopkeepers.ShowShopkeepersHealth");
+		showMyPet = config.getConfiguration().getBoolean("Hooks.MyPet.ShowMyPetHealth");
 		
-		updaterEnabled = plugin.getConfig().getBoolean("Updater.Enable");
+		updaterEnabled = config.getConfiguration().getBoolean("Updater.Enable");
 		
-		language = plugin.getConfig().getString("Options.Language");
+		language = config.getConfiguration().getString("Options.Language");
 		
 		CustomPlaceholderScripts.clearScripts();
 		CustomPlaceholderScripts.loadScriptsFromFolder(new File(plugin.getDataFolder(), "placeholder_scripts"));
 		
-		boolean silentClassNotFound = plugin.getConfig().getBoolean("CustomPlaceholderScript.SilentClassNotFound");
-		for (String key : plugin.getConfig().getConfigurationSection("CustomPlaceholderScript.AdditionClasses").getValues(false).keySet()) {
-			String classPath = plugin.getConfig().getString("CustomPlaceholderScript.AdditionClasses." + key);
+		boolean silentClassNotFound = config.getConfiguration().getBoolean("CustomPlaceholderScript.SilentClassNotFound");
+		for (String key : config.getConfiguration().getConfigurationSection("CustomPlaceholderScript.AdditionClasses").getValues(false).keySet()) {
+			String classPath = config.getConfiguration().getString("CustomPlaceholderScript.AdditionClasses." + key);
 			try {
 				Class<?> clazz = Class.forName(classPath);
 				HoloMobHealthAPI.registerClassToCustomPlaceholderScript(key, clazz);

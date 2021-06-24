@@ -21,7 +21,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.simpleyaml.configuration.comments.CommentType;
 import org.simpleyaml.configuration.file.FileConfiguration;
 
 import com.comphenix.protocol.PacketType;
@@ -183,7 +182,7 @@ public class HoloMobHealth extends JavaPlugin {
         if (!getDataFolder().exists()) {
         	getDataFolder().mkdirs();
         }
-        Config.loadConfig(CONFIG_ID, new File(getDataFolder(), "config.yml"), getClass().getClassLoader().getResourceAsStream("config.yml"), getClass().getClassLoader().getResourceAsStream("config.yml"), CommentType.BLOCK);
+        Config.loadConfig(CONFIG_ID, new File(getDataFolder(), "config.yml"), getClass().getClassLoader().getResourceAsStream("config.yml"), getClass().getClassLoader().getResourceAsStream("config.yml"), true);
         
         try {
 			JarUtils.copyFolderFromJar("placeholder_scripts", getDataFolder(), CopyOption.COPY_IF_NOT_EXIST);

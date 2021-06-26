@@ -112,10 +112,13 @@ public class ArmorstandDisplay implements Listener {
 	public void onVehicleMove(VehicleMoveEvent event) {
 		if (event.getFrom().distanceSquared(event.getTo()) > 0) {
 			Entity vehicle = event.getVehicle();
-			int range = HoloMobHealth.getUpdateRange(vehicle.getWorld());
-			List<Player> nearby = vehicle.getNearbyEntities(range, range, range).stream().filter(each -> each instanceof Player).map(each -> (Player) each).collect(Collectors.toList());
-			for (Entity passenger : EntityUtils.getPassenger(vehicle)) {
-				Bukkit.getScheduler().runTask(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(nearby, passenger));
+			List<Entity> passengers = EntityUtils.getPassenger(vehicle);
+			if (!passengers.isEmpty()) {
+				int range = HoloMobHealth.getUpdateRange(vehicle.getWorld());
+				List<Player> nearby = vehicle.getNearbyEntities(range, range, range).stream().filter(each -> each instanceof Player).map(each -> (Player) each).collect(Collectors.toList());
+				for (Entity passenger : passengers) {
+					Bukkit.getScheduler().runTask(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(nearby, passenger));
+				}
 			}
 		}
 	}

@@ -106,7 +106,7 @@ Options:
   #Note that it is a bit more performance heavy
   #Y-Offset is measured in Steps, accept only integers, experiment with the numbers to find one that is suitable for you
   #Name match is in Regex, be careful with special meta characters
-  #Restart to see changes
+  #YOU MUST RESTART TO SEE CHANGES
   MultiLine: 
     Enable: false
     MasterYOffset: 0

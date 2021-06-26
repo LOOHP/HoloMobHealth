@@ -5,12 +5,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -23,8 +20,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPortalEvent;
+import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.potion.PotionEffectType;
-import org.spigotmc.event.entity.EntityMountEvent;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
@@ -45,6 +42,7 @@ import com.loohp.holomobhealth.utils.ChatColorUtils;
 import com.loohp.holomobhealth.utils.CitizensUtils;
 import com.loohp.holomobhealth.utils.CustomNameUtils;
 import com.loohp.holomobhealth.utils.EntityTypeUtils;
+import com.loohp.holomobhealth.utils.EntityUtils;
 import com.loohp.holomobhealth.utils.MCVersion;
 import com.loohp.holomobhealth.utils.MyPetUtils;
 import com.loohp.holomobhealth.utils.MythicMobsUtils;
@@ -63,8 +61,6 @@ public class ArmorstandDisplay implements Listener {
 	
 	private static Map<UUID, MultilineStands> mapping = new HashMap<>();
 	private static Map<Player, UUID> focusingEntities = new HashMap<>();
-	
-	private static Set<Entity> requiresTicking = new HashSet<>();
 	
 	public static void run() {
 		Bukkit.getScheduler().runTaskTimer(HoloMobHealth.plugin, () -> {
@@ -110,30 +106,18 @@ public class ArmorstandDisplay implements Listener {
 				}, current);
 			}
 		}, 0, 5);
-		
-		Bukkit.getScheduler().runTaskTimer(HoloMobHealth.plugin, () -> {
-			Iterator<Entity> itr = requiresTicking.iterator();
-			while (itr.hasNext()) {
-				Entity entity = itr.next();
-				if (entity.getVehicle() == null) {
-					itr.remove();
-				}
-				MultilineStands multi = mapping.get(entity.getUniqueId());
-				if (multi == null) {
-					continue;
-				}
-				multi.setLocation(entity.getLocation());
-				multi.getStands().forEach(each -> ArmorStandPacket.updateArmorStandLocation(entity, each));
-			}
-		}, 0, 1);
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void onMount(EntityMountEvent event) {
-		if (event.isCancelled()) {
-			return;
+	public void onVehicleMove(VehicleMoveEvent event) {
+		if (event.getFrom().distanceSquared(event.getTo()) > 0) {
+			Entity vehicle = event.getVehicle();
+			int range = HoloMobHealth.getUpdateRange(vehicle.getWorld());
+			List<Player> nearby = vehicle.getNearbyEntities(range, range, range).stream().filter(each -> each instanceof Player).map(each -> (Player) each).collect(Collectors.toList());
+			for (Entity passenger : EntityUtils.getPassenger(vehicle)) {
+				Bukkit.getScheduler().runTask(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(nearby, passenger));
+			}
 		}
-		requiresTicking.add(event.getEntity());
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)

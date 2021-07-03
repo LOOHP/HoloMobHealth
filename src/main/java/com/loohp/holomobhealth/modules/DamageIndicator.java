@@ -43,6 +43,7 @@ import com.loohp.holomobhealth.utils.MythicMobsUtils;
 import com.loohp.holomobhealth.utils.NMSUtils;
 import com.loohp.holomobhealth.utils.ParsePlaceholders;
 import com.loohp.holomobhealth.utils.ShopkeepersUtils;
+import com.loohp.holomobhealth.utils.WorldGuardUtils;
 
 import net.md_5.bungee.chat.ComponentSerializer;
 
@@ -301,6 +302,11 @@ public class DamageIndicator implements Listener {
 	
 	public void damage(LivingEntity entity, double damage) {
 		Location location = entity.getLocation();
+		if (HoloMobHealth.worldGuardHook) {
+			if (!WorldGuardUtils.checkStateFlag(location, null, WorldGuardUtils.DAMAGE_INDICATOR_FLAG)) {
+				return;
+			}
+		}
 		double height = NMSUtils.getEntityHeight(entity);
 		double width = NMSUtils.getEntityWidth(entity);
 		
@@ -330,6 +336,11 @@ public class DamageIndicator implements Listener {
 	
 	public void regen(LivingEntity entity, double damage) {
 		Location location = entity.getLocation();
+		if (HoloMobHealth.worldGuardHook) {
+			if (!WorldGuardUtils.checkStateFlag(location, null, WorldGuardUtils.REGEN_INDICATOR_FLAG)) {
+				return;
+			}
+		}
 		double height = NMSUtils.getEntityHeight(entity);
 		double width = NMSUtils.getEntityWidth(entity);
 		

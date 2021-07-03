@@ -50,6 +50,7 @@ import com.loohp.holomobhealth.utils.JarUtils.CopyOption;
 import com.loohp.holomobhealth.utils.LanguageUtils;
 import com.loohp.holomobhealth.utils.LegacyPlaceholdersConverter;
 import com.loohp.holomobhealth.utils.MCVersion;
+import com.loohp.holomobhealth.utils.WorldGuardUtils;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -142,6 +143,8 @@ public class HoloMobHealth extends JavaPlugin {
 	
 	public static boolean ultimateStackerHook = false;
 	public static boolean roseStackerHook = false;
+	
+	public static boolean worldGuardHook = false;
 	
 	public static boolean armorStandMode = false;
 	public static int armorStandYOffset = 0;
@@ -243,6 +246,15 @@ public class HoloMobHealth extends JavaPlugin {
 	    if (Bukkit.getServer().getPluginManager().getPlugin("RoseStacker") != null) {
 	    	Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into RoseStacker!");
 	    	roseStackerHook = true;
+		}
+	    
+	    if (Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") != null) {
+	    	String version = getServer().getPluginManager().getPlugin("WorldGuard").getDescription().getVersion();
+			if (version.startsWith("7.")) {
+		    	WorldGuardUtils.registerFlag();
+		    	Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into WorldGuard! (v7)");
+		    	worldGuardHook = true;
+			}
 		}
 		
 		try {

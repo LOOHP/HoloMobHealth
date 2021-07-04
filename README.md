@@ -37,8 +37,9 @@ Replace `VERSION` with the version number.
 
 ## Soft Dependencies
 
-- [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)
 - [MythicMobs](https://mythicmobs.net/index.php)
 - [Citizens](https://www.spigotmc.org/resources/citizens.13811/)
 - [Shopkeepers](https://dev.bukkit.org/projects/shopkeepers)
 - [MyPet](https://wiki.mypet-plugin.de/)
+- [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)
+- [WorldGuard](https://www.enginehub.org/worldguard/)

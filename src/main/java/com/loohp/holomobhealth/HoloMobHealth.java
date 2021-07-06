@@ -160,6 +160,18 @@ public class HoloMobHealth extends JavaPlugin {
 	public static String language = "en_us";
 	
 	@Override
+	public void onLoad() {
+		if (Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") != null) {
+	    	String version = getServer().getPluginManager().getPlugin("WorldGuard").getDescription().getVersion();
+			if (version.startsWith("7.")) {
+				getServer().getLogger().info("[HoloMobHealth] Registering WorldGuard State Flags...");
+		    	WorldGuardUtils.registerFlag();
+		    	worldGuardHook = true;
+			}
+		}
+	}
+	
+	@Override
 	public void onEnable() {	
 		plugin = this;
 		
@@ -248,13 +260,8 @@ public class HoloMobHealth extends JavaPlugin {
 	    	roseStackerHook = true;
 		}
 	    
-	    if (Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") != null) {
-	    	String version = getServer().getPluginManager().getPlugin("WorldGuard").getDescription().getVersion();
-			if (version.startsWith("7.")) {
-		    	WorldGuardUtils.registerFlag();
-		    	Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into WorldGuard! (v7)");
-		    	worldGuardHook = true;
-			}
+	    if (worldGuardHook) {
+		    Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into WorldGuard! (v7)");
 		}
 		
 		try {

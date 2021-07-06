@@ -303,7 +303,7 @@ public class DamageIndicator implements Listener {
 	public void damage(LivingEntity entity, double damage) {
 		Location location = entity.getLocation();
 		if (HoloMobHealth.worldGuardHook) {
-			if (!WorldGuardUtils.checkStateFlag(location, null, WorldGuardUtils.DAMAGE_INDICATOR_FLAG)) {
+			if (!WorldGuardUtils.checkStateFlag(location, null, WorldGuardUtils.getDamageIndicatorFlag())) {
 				return;
 			}
 		}
@@ -337,7 +337,7 @@ public class DamageIndicator implements Listener {
 	public void regen(LivingEntity entity, double damage) {
 		Location location = entity.getLocation();
 		if (HoloMobHealth.worldGuardHook) {
-			if (!WorldGuardUtils.checkStateFlag(location, null, WorldGuardUtils.REGEN_INDICATOR_FLAG)) {
+			if (!WorldGuardUtils.checkStateFlag(location, null, WorldGuardUtils.getRegenIndicatorFlag())) {
 				return;
 			}
 		}

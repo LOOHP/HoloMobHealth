@@ -12,7 +12,6 @@ softdepend:
   - PlaceholderAPI
   - RoseStacker
   - UltimateStacker
-loadbefore:
   - WorldGuard
 depend: [ProtocolLib]
 prefix: HoloMobHealth

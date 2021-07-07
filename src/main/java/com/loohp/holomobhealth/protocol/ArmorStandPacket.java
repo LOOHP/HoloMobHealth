@@ -38,6 +38,7 @@ import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.holders.HoloMobArmorStand;
 import com.loohp.holomobhealth.utils.LanguageUtils;
 import com.loohp.holomobhealth.utils.MCVersion;
+import com.loohp.holomobhealth.utils.PacketUtils;
 
 import net.md_5.bungee.chat.ComponentSerializer;
 
@@ -324,17 +325,14 @@ public class ArmorStandPacket implements Listener {
 				}
 			}
 			
-			PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
-			if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_17)) {
-				packet1.getIntegers().write(0, entity.getEntityId());
-			} else {
-				packet1.getIntegerArrays().write(0, new int[]{entity.getEntityId()});
-			}
+			PacketContainer[] packets = PacketUtils.createEntityDestoryPacket(entity.getEntityId());
 			
 			Bukkit.getScheduler().runTask(plugin, () -> {
 				try {
 					for (Player player : playersInRange) {
-						protocolManager.sendServerPacket(player, packet1);
+						for (PacketContainer packet : packets) {
+							protocolManager.sendServerPacket(player, packet);
+						}
 					}
 				} catch (InvocationTargetException e) {
 					e.printStackTrace();

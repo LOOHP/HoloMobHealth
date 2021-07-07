@@ -23,7 +23,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.simpleyaml.configuration.file.FileConfiguration;
 
-import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
@@ -50,6 +49,7 @@ import com.loohp.holomobhealth.utils.JarUtils.CopyOption;
 import com.loohp.holomobhealth.utils.LanguageUtils;
 import com.loohp.holomobhealth.utils.LegacyPlaceholdersConverter;
 import com.loohp.holomobhealth.utils.MCVersion;
+import com.loohp.holomobhealth.utils.PacketUtils;
 import com.loohp.holomobhealth.utils.WorldGuardUtils;
 
 import net.md_5.bungee.api.ChatColor;
@@ -327,31 +327,17 @@ public class HoloMobHealth extends JavaPlugin {
 		if (!Bukkit.getOnlinePlayers().isEmpty()) {
 			if (armorStandMode) {
 				getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "[HoloMobHealth] Plugin reload detected, attempting to despawn all visual entities. If anything went wrong, please restart! (Reloads are always not recommended)");
-				if (version.isNewerOrEqualTo(MCVersion.V1_17)) {
-					for (HoloMobArmorStand entity : ArmorStandPacket.active) {
-						PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
-						packet1.getIntegers().write(0, entity.getEntityId());
-						
-						try {
-							for (Player player : Bukkit.getOnlinePlayers()) {
-								protocolManager.sendServerPacket(player, packet1);
-							}
-						} catch (InvocationTargetException e) {
-							e.printStackTrace();
+				int [] entityIdArray = ArmorStandPacket.active.stream().mapToInt(each -> each.getEntityId()).toArray();
+				PacketContainer[] packets = PacketUtils.createEntityDestoryPacket(entityIdArray);
+				
+				try {
+					for (Player player : Bukkit.getOnlinePlayers()) {
+						for (PacketContainer packet : packets) {
+							protocolManager.sendServerPacket(player, packet);
 						}
 					}
-				} else {
-					PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
-					int [] entityIdArray = ArmorStandPacket.active.stream().mapToInt(each -> each.getEntityId()).toArray();
-					packet1.getIntegerArrays().write(0, entityIdArray);
-					
-					try {
-						for (Player player : Bukkit.getOnlinePlayers()) {
-							protocolManager.sendServerPacket(player, packet1);
-						}
-					} catch (InvocationTargetException e) {
-						e.printStackTrace();
-					}
+				} catch (InvocationTargetException e) {
+					e.printStackTrace();
 				}
 			}
 		}

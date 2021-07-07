@@ -41,6 +41,7 @@ import com.loohp.holomobhealth.utils.LanguageUtils;
 import com.loohp.holomobhealth.utils.MyPetUtils;
 import com.loohp.holomobhealth.utils.MythicMobsUtils;
 import com.loohp.holomobhealth.utils.NMSUtils;
+import com.loohp.holomobhealth.utils.PacketUtils;
 import com.loohp.holomobhealth.utils.ParsePlaceholders;
 import com.loohp.holomobhealth.utils.ShopkeepersUtils;
 import com.loohp.holomobhealth.utils.WorldGuardUtils;
@@ -489,19 +490,16 @@ public class DamageIndicator implements Listener {
 						});
 					} else if (tick >= HoloMobHealth.damageIndicatorTimeout) {
 						this.cancel();
-						PacketContainer packet3 = HoloMobHealth.protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
-						if (metaversion >= 4) {
-							packet3.getIntegers().write(0, entityId);
-						} else {
-							packet3.getIntegerArrays().write(0, new int[] {entityId});	
-						}
+						PacketContainer[] packets = PacketUtils.createEntityDestoryPacket(entityId);
 			        	Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {
 				        	for (Player player : players) {
-				            	try {
-				            		 HoloMobHealth.protocolManager.sendServerPacket(player, packet3);
-				     			} catch (InvocationTargetException e) {
-				     				e.printStackTrace();
-				     			}
+				        		for (PacketContainer packet : packets) {
+				        			try {
+					            		 HoloMobHealth.protocolManager.sendServerPacket(player, packet);
+					     			} catch (InvocationTargetException e) {
+					     				e.printStackTrace();
+					     			}
+				        		}				       
 				            }
 			        	}, 3);
 					}

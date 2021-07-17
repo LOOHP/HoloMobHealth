@@ -41,7 +41,9 @@ public class NMSUtils {
 			nmsEntityClass = getNMSClass("net.minecraft.server.%s.Entity", "net.minecraft.world.entity.Entity");
 			nmsWorldServerClass = getNMSClass("net.minecraft.server.%s.WorldServer", "net.minecraft.server.level.WorldServer");
 			craftWorldGetHandleMethod = craftWorldClass.getMethod("getHandle");
-			nmsWorldServerGetEntityByIDMethod = nmsWorldServerClass.getMethod("getEntity", int.class);
+			try {
+				nmsWorldServerGetEntityByIDMethod = nmsWorldServerClass.getMethod("getEntity", int.class);
+			} catch (NoSuchMethodException e) {}
 			nmsWorldServerGetEntityByUUIDMethod = nmsWorldServerClass.getMethod("getEntity", UUID.class);
 			nmsEntityGetBukkitEntityMethod = nmsEntityClass.getMethod("getBukkitEntity");
 			nmsEntityGetUniqueIDMethod = nmsEntityClass.getMethod("getUniqueID");		

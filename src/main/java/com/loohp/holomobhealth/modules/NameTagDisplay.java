@@ -228,8 +228,7 @@ public class NameTagDisplay {
 					watcher.setObject(object, LanguageUtils.convert(components[0], HoloMobHealth.language).toLegacyText());
 				} else {
 					Optional<?> opt = Optional.of(WrappedChatComponent.fromJson(json).getHandle());
-					watcher.setObject(
-							new WrappedDataWatcherObject(2, Registry.getChatComponentSerializer(true)), opt);
+					watcher.setObject(new WrappedDataWatcherObject(2, Registry.getChatComponentSerializer(true)), opt);
 				}
 			} else {
 				if (HoloMobHealth.version.isOld()) {
@@ -240,8 +239,7 @@ public class NameTagDisplay {
 					watcher.setObject(object, "");
 				} else {
 					Optional<?> opt = Optional.empty();
-					watcher.setObject(
-							new WrappedDataWatcherObject(2, Registry.getChatComponentSerializer(true)), opt);
+					watcher.setObject(new WrappedDataWatcherObject(2, Registry.getChatComponentSerializer(true)), opt);
 				}
 			}
 

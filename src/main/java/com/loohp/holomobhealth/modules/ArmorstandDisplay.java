@@ -46,12 +46,12 @@ import com.loohp.holomobhealth.utils.EntityUtils;
 import com.loohp.holomobhealth.utils.MCVersion;
 import com.loohp.holomobhealth.utils.MyPetUtils;
 import com.loohp.holomobhealth.utils.MythicMobsUtils;
-import com.loohp.holomobhealth.utils.NBTUtils;
 import com.loohp.holomobhealth.utils.NMSUtils;
 import com.loohp.holomobhealth.utils.ParsePlaceholders;
 import com.loohp.holomobhealth.utils.RayTrace;
 import com.loohp.holomobhealth.utils.ShopkeepersUtils;
 
+import io.github.bananapuncher714.nbteditor.NBTEditor;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
@@ -229,7 +229,7 @@ public class ArmorstandDisplay implements Listener {
 									return;
 								}
 								Entity entity = data.getEntity();
-								String name = NBTUtils.getString(entity, "CustomName");
+								String name = NBTEditor.getString(entity, "CustomName");
 								boolean visible = entity.isCustomNameVisible();
 								EntityMetadata.sendMetadataPacket(entity, name, visible, Arrays.asList(player), true);
 								multi.getStands().forEach(each -> ArmorStandPacket.removeArmorStand(HoloMobHealth.playersEnabled, each, true, false));

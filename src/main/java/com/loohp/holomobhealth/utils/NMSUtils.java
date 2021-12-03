@@ -43,20 +43,38 @@ public class NMSUtils {
 			craftWorldGetHandleMethod = craftWorldClass.getMethod("getHandle");
 			try {
 				nmsWorldServerGetEntityByIDMethod = nmsWorldServerClass.getMethod("getEntity", int.class);
-			} catch (NoSuchMethodException e) {}
-			nmsWorldServerGetEntityByUUIDMethod = nmsWorldServerClass.getMethod("getEntity", UUID.class);
+			} catch (NoSuchMethodException e) {
+				nmsWorldServerGetEntityByIDMethod = nmsWorldServerClass.getMethod("a", int.class);
+			}
+			try {
+				nmsWorldServerGetEntityByUUIDMethod = nmsWorldServerClass.getMethod("getEntity", UUID.class);
+			} catch (NoSuchMethodException e) {
+				nmsWorldServerGetEntityByUUIDMethod = nmsWorldServerClass.getMethod("a", UUID.class);
+			}
 			nmsEntityGetBukkitEntityMethod = nmsEntityClass.getMethod("getBukkitEntity");
-			nmsEntityGetUniqueIDMethod = nmsEntityClass.getMethod("getUniqueID");		
-			nmsEntityGetBoundingBox = nmsEntityClass.getMethod("getBoundingBox");
+			try {
+				nmsEntityGetUniqueIDMethod = nmsEntityClass.getMethod("getUniqueID");
+			} catch (NoSuchMethodException e) {
+				nmsEntityGetUniqueIDMethod = nmsEntityClass.getMethod("cm");
+			}
+			try {
+				nmsEntityGetBoundingBox = nmsEntityClass.getMethod("getBoundingBox");
+			} catch (NoSuchMethodException e) {
+				nmsEntityGetBoundingBox = nmsEntityClass.getMethod("cw");
+			}
 			nmsEntityGetHandle = craftEntityClass.getMethod("getHandle");
 			nmsAxisAlignedBBClass = getNMSClass("net.minecraft.server.%s.AxisAlignedBB", "net.minecraft.world.phys.AxisAlignedBB");
 			nmsAxisAlignedBBFields = nmsAxisAlignedBBClass.getFields();
 			if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_17)) {
-				nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("G");
-				nmsEntityManagerGetEntityGetterMethod = nmsWorldEntityManagerField.getType().getMethod("d");
+				if (HoloMobHealth.version.equals(MCVersion.V1_17)) {
+					nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("G");
+				} else {
+					nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("P");
+				}
+				nmsEntityManagerGetEntityGetterMethod = nmsWorldEntityManagerField.getType().getMethod("d");//
 				nmsLevelEntityGetterClass = Class.forName("net.minecraft.world.level.entity.LevelEntityGetterAdapter");
-				nmsLevelEntityGetterGetEntityByIDMethod = nmsLevelEntityGetterClass.getMethod("a", int.class);
-				nmsLevelEntityGetterGetEntityByUUIDMethod = nmsLevelEntityGetterClass.getMethod("a", UUID.class);
+				nmsLevelEntityGetterGetEntityByIDMethod = nmsLevelEntityGetterClass.getMethod("a", int.class);//
+				nmsLevelEntityGetterGetEntityByUUIDMethod = nmsLevelEntityGetterClass.getMethod("a", UUID.class);//
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

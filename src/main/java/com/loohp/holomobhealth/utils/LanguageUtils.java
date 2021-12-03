@@ -309,7 +309,11 @@ public class LanguageUtils {
 				return "%s's Head";
 			}
 			Map<String, String> mapping = translations.get(language);
-			return mapping == null ? new TranslatableComponent(translationKey).toPlainText() : mapping.getOrDefault(translationKey, translationKey);
+			if (language.equals("en_us")) {
+				return mapping.getOrDefault(translationKey, translationKey);
+			} else {
+				return mapping == null ? getTranslation(translationKey, "en_us") : mapping.getOrDefault(translationKey, getTranslation(translationKey, "en_us"));
+			}
 		} catch (Exception e) {
 			return translationKey;
 		}

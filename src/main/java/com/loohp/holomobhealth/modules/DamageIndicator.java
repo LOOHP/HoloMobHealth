@@ -72,6 +72,7 @@ public class DamageIndicator implements Listener {
 		}
 		
 		switch (HoloMobHealth.version) {
+		case V1_18:
 		case V1_17:
 			metaversion = 4;
 			break;
@@ -103,7 +104,7 @@ public class DamageIndicator implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onEntityDamage(EntityDamageEvent event) {
 		if (HoloMobHealth.useDamageIndicator && HoloMobHealth.damageIndicatorDamageEnabled && !HoloMobHealth.damageIndicatorPlayerTriggered) {
 			if (event.getCause().equals(DamageCause.SUICIDE) || event.getFinalDamage() > Integer.MAX_VALUE) {

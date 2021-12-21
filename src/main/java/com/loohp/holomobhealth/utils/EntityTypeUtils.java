@@ -9,24 +9,24 @@ import org.bukkit.entity.LivingEntity;
 
 public class EntityTypeUtils {
 	
-	private static Set<EntityType> MobTypesSet = new HashSet<EntityType>();
+	private static Set<EntityType> mobTypesSet = new HashSet<EntityType>();
 	
 	static {
-		MobTypesSet.clear();
+		mobTypesSet.clear();
     	for (EntityType each : EntityType.values()) {
     		if (each.equals(EntityType.PLAYER) || each.equals(EntityType.ARMOR_STAND) || each.equals(EntityType.UNKNOWN)) {
     			continue;
     		}
     		Set<Class<?>> clazzList = ClassUtils.getAllExtendedOrImplementedTypesRecursively(each.getEntityClass());
     		if (clazzList.contains(LivingEntity.class)) {
-    			MobTypesSet.add(each);
+    			mobTypesSet.add(each);
     		}
     	}
-    	MobTypesSet.add(EntityType.UNKNOWN);
+    	mobTypesSet.add(EntityType.UNKNOWN);
 	}
     
     public static Set<EntityType> getMobsTypesSet() {
-    	return Collections.unmodifiableSet(MobTypesSet);
+    	return Collections.unmodifiableSet(mobTypesSet);
     }
 	
 }

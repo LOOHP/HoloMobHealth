@@ -6,6 +6,8 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 
+import com.loohp.holomobhealth.utils.EntityUtils;
+
 public class HoloMobArmorStand {
 	
 	private int id;
@@ -14,7 +16,7 @@ public class HoloMobArmorStand {
 	private Location location;
 	
 	public HoloMobArmorStand(Location location, EntityType type) {
-		this.id = (int) (Math.random() * Integer.MAX_VALUE);
+		this.id = EntityUtils.getNextEntityId();
 		this.uuid = UUID.randomUUID();
 		this.location = location.clone();
 		this.type = type;

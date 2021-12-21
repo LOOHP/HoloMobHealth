@@ -37,6 +37,7 @@ import com.loohp.holomobhealth.utils.ChatColorUtils;
 import com.loohp.holomobhealth.utils.CitizensUtils;
 import com.loohp.holomobhealth.utils.CustomNameUtils;
 import com.loohp.holomobhealth.utils.EntityTypeUtils;
+import com.loohp.holomobhealth.utils.EntityUtils;
 import com.loohp.holomobhealth.utils.LanguageUtils;
 import com.loohp.holomobhealth.utils.MyPetUtils;
 import com.loohp.holomobhealth.utils.MythicMobsUtils;
@@ -51,8 +52,6 @@ import net.md_5.bungee.chat.ComponentSerializer;
 public class DamageIndicator implements Listener {
 	
 	private static final Random RANDOM = new Random();
-	public static final int ID_OFFSET = 1000000;
-	public static final int ID_BOUND = Integer.MAX_VALUE - ID_OFFSET;
 	
 	private Vector vectorZero = new Vector(0, 0, 0);
 	private int metaversion;
@@ -366,7 +365,7 @@ public class DamageIndicator implements Listener {
 	
 	public void playIndicator(String entityNameJson, Location location, Vector velocity, boolean gravity, double fallHeight) {
 		Bukkit.getScheduler().runTaskAsynchronously(HoloMobHealth.plugin, () -> {
-			int entityId = RANDOM.nextInt(ID_BOUND) + ID_OFFSET;
+			int entityId = EntityUtils.getNextEntityId();
 			UUID uuid = UUID.randomUUID();
 			Location originalLocation = location.clone();
 			

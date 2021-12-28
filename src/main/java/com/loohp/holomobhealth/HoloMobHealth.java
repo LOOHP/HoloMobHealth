@@ -22,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.simpleyaml.configuration.file.FileConfiguration;
+import org.simpleyaml.exceptions.InvalidConfigurationException;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
@@ -197,7 +198,13 @@ public class HoloMobHealth extends JavaPlugin {
         if (!getDataFolder().exists()) {
         	getDataFolder().mkdirs();
         }
-        Config.loadConfig(CONFIG_ID, new File(getDataFolder(), "config.yml"), getClass().getClassLoader().getResourceAsStream("config.yml"), getClass().getClassLoader().getResourceAsStream("config.yml"), true);
+        try {
+			Config.loadConfig(CONFIG_ID, new File(getDataFolder(), "config.yml"), getClass().getClassLoader().getResourceAsStream("config.yml"), getClass().getClassLoader().getResourceAsStream("config.yml"), true);
+		} catch (IOException | InvalidConfigurationException e) {
+			e.printStackTrace();
+			getServer().getPluginManager().disablePlugin(this);
+			return;
+		}
         
         try {
 			JarUtils.copyFolderFromJar("placeholder_scripts", getDataFolder(), CopyOption.COPY_IF_NOT_EXIST);

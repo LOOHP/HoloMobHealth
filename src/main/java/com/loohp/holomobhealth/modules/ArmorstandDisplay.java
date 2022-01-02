@@ -198,28 +198,29 @@ public class ArmorstandDisplay implements Listener {
 									multi.getStands().forEach(each -> ArmorStandPacket.removeArmorStand(HoloMobHealth.playersEnabled, each, true, false));
 									multi.remove();
 									return;
-								}
-								MultilineStands multi = mapping.get(entity.getUniqueId());
-								if (multi == null) {
-									multi = new MultilineStands(entity);
-									mapping.put(entity.getUniqueId(), multi);
-									List<HoloMobArmorStand> stands = new ArrayList<>(multi.getStands());
-									Collections.reverse(stands);
-									for (HoloMobArmorStand stand : stands) {
-										ArmorStandPacket.sendArmorStandSpawn(HoloMobHealth.playersEnabled, stand, "", HoloMobHealth.alwaysShow);
+								} else if (entity.isValid()) {
+									MultilineStands multi = mapping.get(entity.getUniqueId());
+									if (multi == null) {
+										multi = new MultilineStands(entity);
+										mapping.put(entity.getUniqueId(), multi);
+										List<HoloMobArmorStand> stands = new ArrayList<>(multi.getStands());
+										Collections.reverse(stands);
+										for (HoloMobArmorStand stand : stands) {
+											ArmorStandPacket.sendArmorStandSpawn(HoloMobHealth.playersEnabled, stand, "", HoloMobHealth.alwaysShow);
+										}
+									} else {
+										List<Player> players = new ArrayList<>();
+										players.add(player);
+										for (HoloMobArmorStand stand : multi.getStands()) {				
+											ArmorStandPacket.sendArmorStandSpawnIfNotAlready(players, stand, "", HoloMobHealth.alwaysShow);
+										}
 									}
-								} else {
-									List<Player> players = new ArrayList<>();
-									players.add(player);
-									for (HoloMobArmorStand stand : multi.getStands()) {				
-										ArmorStandPacket.sendArmorStandSpawnIfNotAlready(players, stand, "", HoloMobHealth.alwaysShow);
+									UUID focusing = focusingEntities.getOrDefault(player, EMPTY_UUID);
+									multi.setLocation(entity.getLocation());
+									for (int i = 0; i < data.getJson().size(); i++) {
+										String display = data.getJson().get(i);
+										ArmorStandPacket.updateArmorStand(entity, multi.getStand(i), display, HoloMobHealth.alwaysShow || focusing.equals(entityUUID));
 									}
-								}
-								UUID focusing = focusingEntities.getOrDefault(player, EMPTY_UUID);
-								multi.setLocation(entity.getLocation());
-								for (int i = 0; i < data.getJson().size(); i++) {
-									String display = data.getJson().get(i);
-									ArmorStandPacket.updateArmorStand(entity, multi.getStand(i), display, HoloMobHealth.alwaysShow || focusing.equals(entityUUID));
 								}
 							}
 						} else {

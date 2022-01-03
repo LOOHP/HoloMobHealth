@@ -365,7 +365,7 @@ public class DamageIndicator implements Listener {
 	
 	public void playIndicator(String entityNameJson, Location location, Vector velocity, boolean gravity, double fallHeight) {
 		Bukkit.getScheduler().runTaskAsynchronously(HoloMobHealth.plugin, () -> {
-			int entityId = EntityUtils.getNextEntityId();
+			int entityId = EntityUtils.getNextEntityId().join();
 			UUID uuid = UUID.randomUUID();
 			Location originalLocation = location.clone();
 			
@@ -387,7 +387,7 @@ public class DamageIndicator implements Listener {
 			
 			PacketContainer packet2 = HoloMobHealth.protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
 			packet2.getIntegers().write(0, entityId);	
-	        WrappedDataWatcher watcher = new WrappedDataWatcher();
+			WrappedDataWatcher watcher = new WrappedDataWatcher();
 			
 			byte bitmask = 0x20;
 			watcher.setObject(new WrappedDataWatcherObject(0, byteSerializer), bitmask);
@@ -395,26 +395,26 @@ public class DamageIndicator implements Listener {
 			String json = (entityNameJson == null || entityNameJson.equals("")) ? null : entityNameJson;
 			
 			if (json != null) {
-		    	if (HoloMobHealth.version.isOld()) {
+				if (HoloMobHealth.version.isOld()) {
 			    	watcher.setObject(2, LanguageUtils.convert(ComponentSerializer.parse(json)[0], HoloMobHealth.language).toLegacyText());
-		    	} else if (HoloMobHealth.version.isLegacy()) {
+				} else if (HoloMobHealth.version.isLegacy()) {
 			    	WrappedDataWatcherObject object = new WrappedDataWatcherObject(2, stringSerializer);
 			    	watcher.setObject(object, LanguageUtils.convert(ComponentSerializer.parse(json)[0], HoloMobHealth.language).toLegacyText());
 			    } else {
 			    	Optional<?> opt = Optional.of(WrappedChatComponent.fromJson(json).getHandle());
 			    	watcher.setObject(new WrappedDataWatcherObject(2, optChatSerializer), opt);
 			    }
-		    } else {
-		    	if (HoloMobHealth.version.isOld()) {
-		    		watcher.setObject(2, "");
-		    	} else if (HoloMobHealth.version.isLegacy()) {
+			} else {
+				if (HoloMobHealth.version.isOld()) {
+					watcher.setObject(2, "");
+				} else if (HoloMobHealth.version.isLegacy()) {
 			    	WrappedDataWatcherObject object = new WrappedDataWatcherObject(2, stringSerializer);
 			    	watcher.setObject(object, "");
 			    } else {
 			    	Optional<?> opt = Optional.empty();
 			    	watcher.setObject(new WrappedDataWatcherObject(2, optChatSerializer), opt);
 			    }
-		    }
+			}
 			
 			watcher.setObject(new WrappedDataWatcherObject(3, booleanSerializer), true);
 			watcher.setObject(new WrappedDataWatcherObject(4, booleanSerializer), true);
@@ -438,28 +438,28 @@ public class DamageIndicator implements Listener {
 				break;
 			}
 			
-	        packet2.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects());
-	        
-	        int range = HoloMobHealth.damageIndicatorVisibleRange;
-	        List<Player> players = location.getWorld().getPlayers().stream().filter(each -> {
-	        	Location loc = each.getLocation();
-	        	return loc.getWorld().equals(location.getWorld()) && loc.distance(location) <= range * range && HoloMobHealth.playersEnabled.contains(each);
-	        }).collect(Collectors.toList());
-	        Bukkit.getScheduler().runTask(HoloMobHealth.plugin, () -> {
-		        for (Player player : players) {
-		        	try {
-		        		 HoloMobHealth.protocolManager.sendServerPacket(player, packet1);
-		        		 HoloMobHealth.protocolManager.sendServerPacket(player, packet2);
-		 			} catch (InvocationTargetException e) {
-		 				e.printStackTrace();
-		 			}
-		        }
-	        });
-	        
-	        Vector downwardAccel = new Vector(0, -0.05, 0);
-	        
-	        new BukkitRunnable() {
-	        	int tick = 0;
+			packet2.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects());
+			
+			int range = HoloMobHealth.damageIndicatorVisibleRange;
+			List<Player> players = location.getWorld().getPlayers().stream().filter(each -> {
+				Location loc = each.getLocation();
+				return loc.getWorld().equals(location.getWorld()) && loc.distance(location) <= range * range && HoloMobHealth.playersEnabled.contains(each);
+			}).collect(Collectors.toList());
+			Bukkit.getScheduler().runTask(HoloMobHealth.plugin, () -> {
+			    for (Player player : players) {
+			    	try {
+			    		 HoloMobHealth.protocolManager.sendServerPacket(player, packet1);
+			    		 HoloMobHealth.protocolManager.sendServerPacket(player, packet2);
+					} catch (InvocationTargetException e) {
+						e.printStackTrace();
+					}
+			    }
+			});
+			
+			Vector downwardAccel = new Vector(0, -0.05, 0);
+			
+			new BukkitRunnable() {
+				int tick = 0;
 				@Override
 				public void run() {
 					tick++;

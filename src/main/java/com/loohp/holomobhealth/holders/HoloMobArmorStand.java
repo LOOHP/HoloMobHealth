@@ -16,7 +16,7 @@ public class HoloMobArmorStand {
 	private Location location;
 	
 	public HoloMobArmorStand(Location location, EntityType type) {
-		this.id = EntityUtils.getNextEntityId();
+		this.id = EntityUtils.getNextEntityId().join();
 		this.uuid = UUID.randomUUID();
 		this.location = location.clone();
 		this.type = type;

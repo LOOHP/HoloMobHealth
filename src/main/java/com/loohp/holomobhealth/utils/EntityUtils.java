@@ -65,8 +65,6 @@ public class EntityUtils {
 				} else {
 					return Bukkit.getScheduler().callSyncMethod(HoloMobHealth.plugin, () -> getNextEntityId().get());
 				}
-			} else {
-				System.out.println(entityCountObject.getClass());
 			}
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			e.printStackTrace();

@@ -365,7 +365,13 @@ public class DamageIndicator implements Listener {
 	
 	public void playIndicator(String entityNameJson, Location location, Vector velocity, boolean gravity, double fallHeight) {
 		Bukkit.getScheduler().runTaskAsynchronously(HoloMobHealth.plugin, () -> {
-			int entityId = EntityUtils.getNextEntityId().join();
+			int entityId;
+			try {
+				entityId = EntityUtils.getNextEntityId().get();
+			} catch (Exception e) {
+				e.printStackTrace();
+				return;
+			}
 			UUID uuid = UUID.randomUUID();
 			Location originalLocation = location.clone();
 			

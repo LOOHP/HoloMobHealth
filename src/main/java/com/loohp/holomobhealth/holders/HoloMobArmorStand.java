@@ -1,6 +1,8 @@
 package com.loohp.holomobhealth.holders;
 
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -15,8 +17,11 @@ public class HoloMobArmorStand {
 	private EntityType type;
 	private Location location;
 	
+	private transient Future<Integer> entityIdFuture;
+	
 	public HoloMobArmorStand(Location location, EntityType type) {
-		this.id = EntityUtils.getNextEntityId().join();
+		this.entityIdFuture = EntityUtils.getNextEntityId();
+		this.id = Integer.MIN_VALUE;
 		this.uuid = UUID.randomUUID();
 		this.location = location.clone();
 		this.type = type;
@@ -57,8 +62,16 @@ public class HoloMobArmorStand {
 		return uuid;
 	}
 	
-	public int getEntityId() {
-		return id;
+	public final int getEntityId() {
+		if (id != Integer.MIN_VALUE) {
+			return id;
+		}
+		try {
+			return id = entityIdFuture.get();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			return -1;
+		}
 	}
 
 }

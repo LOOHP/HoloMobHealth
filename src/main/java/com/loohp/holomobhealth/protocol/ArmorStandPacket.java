@@ -40,7 +40,9 @@ import com.loohp.holomobhealth.utils.LanguageUtils;
 import com.loohp.holomobhealth.utils.MCVersion;
 import com.loohp.holomobhealth.utils.PacketUtils;
 
-import net.md_5.bungee.chat.ComponentSerializer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public class ArmorStandPacket implements Listener {
 
@@ -78,8 +80,8 @@ public class ArmorStandPacket implements Listener {
 								continue;
 							}
 							
-							sendArmorStandSpawn(playerList, entity, "", false);
-							updateArmorStand(playerList, entity, "", false);
+							sendArmorStandSpawn(playerList, entity, Component.empty(), false);
+							updateArmorStand(playerList, entity, Component.empty(), false);
 						}
 					}
 				} catch (ConcurrentModificationException ignore) {}
@@ -87,7 +89,7 @@ public class ArmorStandPacket implements Listener {
 		}, 0, 20);
 	}
 	
-	public static void sendArmorStandSpawnIfNotAlready(Collection<? extends Player> players, HoloMobArmorStand entity, String json, boolean visible) {
+	public static void sendArmorStandSpawnIfNotAlready(Collection<? extends Player> players, HoloMobArmorStand entity, Component component, boolean visible) {
 		if (players.isEmpty()) {
 			return;
 		}
@@ -98,10 +100,10 @@ public class ArmorStandPacket implements Listener {
 				playersNotAlready.add(player);
 			}
 		}
-		sendArmorStandSpawn(playersNotAlready, entity, json, visible);
+		sendArmorStandSpawn(playersNotAlready, entity, component, visible);
 	}
 	
-	public static void sendArmorStandSpawn(Collection<? extends Player> players, HoloMobArmorStand entity, String json, boolean visible) {
+	public static void sendArmorStandSpawn(Collection<? extends Player> players, HoloMobArmorStand entity, Component component, boolean visible) {
 		if (players.isEmpty()) {
 			return;
 		}
@@ -162,7 +164,7 @@ public class ArmorStandPacket implements Listener {
 		
 		PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
 		packet2.getIntegers().write(0, entity.getEntityId());	
-        WrappedDataWatcher wpw = buildWarppedDataWatcher(entity, json, visible);
+        WrappedDataWatcher wpw = buildWarppedDataWatcher(entity, component, visible);
         packet2.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
         
     	try {
@@ -175,7 +177,7 @@ public class ArmorStandPacket implements Listener {
 		}
 	}
 	
-	public static void updateArmorStand(Collection<? extends Player> players, HoloMobArmorStand entity, String json, boolean visible) {
+	public static void updateArmorStand(Collection<? extends Player> players, HoloMobArmorStand entity, Component component, boolean visible) {
 		if (players.isEmpty()) {
 			return;
 		}
@@ -185,7 +187,7 @@ public class ArmorStandPacket implements Listener {
 			List<Player> playersInRange = players.stream().filter(each -> (each.getWorld().equals(world)) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.getUpdateRange(world) * HoloMobHealth.getUpdateRange(world)))).collect(Collectors.toList());
 			PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
 			packet1.getIntegers().write(0, entity.getEntityId());	
-	        WrappedDataWatcher wpw = buildWarppedDataWatcher(entity, json, visible);
+	        WrappedDataWatcher wpw = buildWarppedDataWatcher(entity, component, visible);
 	        packet1.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
 	        
 	        PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);
@@ -209,14 +211,14 @@ public class ArmorStandPacket implements Listener {
 		});
 	}
 	
-	public static void updateArmorStand(Entity host, HoloMobArmorStand entity, String json, boolean visible) {
+	public static void updateArmorStand(Entity host, HoloMobArmorStand entity, Component component, boolean visible) {
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 			World world = entity.getWorld();
 			List<Player> playersInRange = Bukkit.getOnlinePlayers().stream().filter(each -> (each.getWorld().equals(world)) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.getUpdateRange(world) * HoloMobHealth.getUpdateRange(world)))).collect(Collectors.toList());
 
 			PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
 			packet1.getIntegers().write(0, entity.getEntityId());	
-		    WrappedDataWatcher wpw = buildWarppedDataWatcher(entity, json, visible);
+		    WrappedDataWatcher wpw = buildWarppedDataWatcher(entity, component, visible);
 		    packet1.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
 		    
 		    PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);
@@ -342,8 +344,7 @@ public class ArmorStandPacket implements Listener {
 		});
 	}
 	
-	private static WrappedDataWatcher buildWarppedDataWatcher(HoloMobArmorStand entity, String entityNameJson, boolean visible) {
-		String json = (entityNameJson == null || entityNameJson.equals("")) ? null : (ComponentSerializer.parse(entityNameJson)[0].toPlainText().equals("") ? null : entityNameJson);
+	private static WrappedDataWatcher buildWarppedDataWatcher(HoloMobArmorStand entity, Component entityNameComponent, boolean visible) {
 		WrappedDataWatcher watcher = new WrappedDataWatcher(); 
 	    
 		if (entity.getType().equals(EntityType.ARMOR_STAND)) {
@@ -354,15 +355,15 @@ public class ArmorStandPacket implements Listener {
 				watcher.setObject(new WrappedDataWatcherObject(0, Registry.get(Byte.class)), bitmask);
 			}
 			
-			if (json != null) {
+			if (entityNameComponent != null && !entityNameComponent.equals(Component.empty())) {
 		    	if (HoloMobHealth.version.isOld()) {
-			    	watcher.setObject(2, LanguageUtils.convert(ComponentSerializer.parse(json)[0], HoloMobHealth.language).toLegacyText());
+			    	watcher.setObject(2, LegacyComponentSerializer.legacySection().serialize(LanguageUtils.convert(entityNameComponent, HoloMobHealth.language)));
 		    	} else if (HoloMobHealth.version.isLegacy()) {
 			    	Serializer serializer = Registry.get(String.class);
 			    	WrappedDataWatcherObject object = new WrappedDataWatcherObject(2, serializer);
-			    	watcher.setObject(object, LanguageUtils.convert(ComponentSerializer.parse(json)[0], HoloMobHealth.language).toLegacyText());
+			    	watcher.setObject(object, LegacyComponentSerializer.legacySection().serialize(LanguageUtils.convert(entityNameComponent, HoloMobHealth.language)));
 			    } else {
-			    	Optional<?> opt = Optional.of(WrappedChatComponent.fromJson(json).getHandle());
+			    	Optional<?> opt = Optional.of(WrappedChatComponent.fromJson(GsonComponentSerializer.gson().serialize(entityNameComponent)).getHandle());
 			    	watcher.setObject(new WrappedDataWatcherObject(2, Registry.getChatComponentSerializer(true)), opt);
 			    }
 		    } else {
@@ -382,7 +383,7 @@ public class ArmorStandPacket implements Listener {
 		    	watcher.setObject(3, (byte) (visible ? 1 : 0));
 		    	watcher.setObject(5, (byte) 1);
 		    } else {
-		    	watcher.setObject(new WrappedDataWatcherObject(3, Registry.get(Boolean.class)), json != null ? ((ComponentSerializer.parse(json)[0].toPlainText().equals("")) ? false : visible) : false);
+		    	watcher.setObject(new WrappedDataWatcherObject(3, Registry.get(Boolean.class)), entityNameComponent != null ? ((entityNameComponent.equals(Component.empty())) ? false : visible) : false);
 		    	watcher.setObject(new WrappedDataWatcherObject(5, Registry.get(Boolean.class)), true);
 		    }
 		    

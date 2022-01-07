@@ -1,8 +1,5 @@
 package com.loohp.holomobhealth.utils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map.Entry;
 
 import org.bukkit.attribute.Attribute;
@@ -15,24 +12,22 @@ import com.loohp.holomobhealth.registries.DisplayTextCacher;
 import com.loohp.holomobhealth.registries.DisplayTextCacher.HealthFormatData;
 
 import me.clip.placeholderapi.PlaceholderAPI;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.TranslatableComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public class ParsePlaceholders {
 	
-	public static String parse(LivingEntity entity, String text, double healthchange) {
+	public static Component parse(LivingEntity entity, String text, double healthchange) {
 		return parse(null, entity, text, healthchange);
 	}
 	
-	public static String parse(Player player, LivingEntity entity, String text) {
+	public static Component parse(Player player, LivingEntity entity, String text) {
 		return parse(player, entity, text, 0);
 	}
 	
 	@SuppressWarnings("deprecation")
-	public static String parse(Player player, LivingEntity entity, String text, double healthchange) {
+	public static Component parse(Player player, LivingEntity entity, String text, double healthchange) {
 		double health = entity.getHealth();
 		double maxhealth = 0.0;
 		try {
@@ -110,52 +105,20 @@ public class ParsePlaceholders {
 		
 		text = ChatColorUtils.translateAlternateColorCodes('&', text);
 		
-		List<String> sections = new ArrayList<String>();
-		sections.addAll(Arrays.asList(text.split("(?<=})|(?![^{])")));
-		
 		String rawName = CustomNameUtils.getMobCustomName(entity);
-		BaseComponent customName = rawName != null ? ChatComponentUtils.join(TextComponent.fromLegacyText(ChatColor.RESET + rawName)) : null;
+		Component customName = rawName == null ? Component.empty() : LegacyComponentSerializer.legacySection().deserialize(rawName);
 		
-		List<BaseComponent> baselist = new ArrayList<>();
-		String lastColor = "";
-		for (String section : sections) {
-			if (section.equals("{Mob_Type}")) {
-				TranslatableComponent textcomp = new TranslatableComponent(LanguageUtils.getTranslationKey(entity));
-				textcomp = (TranslatableComponent) ChatColorUtils.applyColor(textcomp, lastColor);
-				baselist.add(textcomp);
-			} else if (section.equals("{Mob_Name}")) {
-				if (customName != null) {
-					baselist.add(customName);
-				} else {
-					TextComponent textcomp = new TextComponent("");
-					baselist.add(textcomp);
-				}
-			} else if (section.equals("{Mob_Type_Or_Name}")) {
-				if (customName != null) {
-					baselist.add(customName);
-				} else {
-					TranslatableComponent textcomp = new TranslatableComponent(LanguageUtils.getTranslationKey(entity));
-					textcomp = (TranslatableComponent) ChatColorUtils.applyColor(textcomp, lastColor);
-					baselist.add(textcomp);
-				}
-			} else {
-				baselist.addAll(Arrays.asList(TextComponent.fromLegacyText(section)));
-			}
-			lastColor = ChatColorUtils.getLastColors(section);
-		}
-		
-		BaseComponent product = new TextComponent("");
-		for (int i = 0; i < baselist.size(); i++) {
-			BaseComponent each = baselist.get(i);
-			product.addExtra(each);
-		}
+		Component displayComponent = LegacyComponentSerializer.legacySection().deserialize(text);
 		
 		if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_16)) {
-			product = ChatComponentUtils.cleanUpLegacyText(ChatComponentUtils.translatePluginFontFormatting(product));
+			displayComponent = ComponentFont.parseFont(displayComponent);
 		}
 		
-		//Bukkit.getConsoleSender().sendMessage(ComponentSerializer.toString(product));
-		return ComponentSerializer.toString(product);
+		displayComponent = displayComponent.replaceText(TextReplacementConfig.builder().matchLiteral("{Mob_Type}").replacement(Component.translatable(LanguageUtils.getTranslationKey(entity))).build());
+		displayComponent = displayComponent.replaceText(TextReplacementConfig.builder().matchLiteral("{Mob_Name}").replacement(customName).build());
+		displayComponent = displayComponent.replaceText(TextReplacementConfig.builder().matchLiteral("{Mob_Type_Or_Name}").replacement(customName.equals(Component.empty()) ? Component.translatable(LanguageUtils.getTranslationKey(entity)) : customName).build());
+		
+		return displayComponent;
 	}
 
 }

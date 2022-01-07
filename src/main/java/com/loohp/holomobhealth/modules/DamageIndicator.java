@@ -47,7 +47,9 @@ import com.loohp.holomobhealth.utils.ParsePlaceholders;
 import com.loohp.holomobhealth.utils.ShopkeepersUtils;
 import com.loohp.holomobhealth.utils.WorldGuardUtils;
 
-import net.md_5.bungee.chat.ComponentSerializer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public class DamageIndicator implements Listener {
 	
@@ -331,8 +333,8 @@ public class DamageIndicator implements Listener {
 			velocity = vectorZero;
 		}
 		
-		String json = ParsePlaceholders.parse(entity, HoloMobHealth.damageIndicatorDamageText, damage);
-		playIndicator(json, indicator, velocity, true, height);
+		Component component = ParsePlaceholders.parse(entity, HoloMobHealth.damageIndicatorDamageText, damage);
+		playIndicator(component, indicator, velocity, true, height);
 	}
 	
 	public void regen(LivingEntity entity, double damage) {
@@ -359,11 +361,11 @@ public class DamageIndicator implements Listener {
 		
 		Vector velocity = HoloMobHealth.damageIndicatorRegenAnimation ? new Vector(0, 0.2, 0) : vectorZero;
 		
-		String json = ParsePlaceholders.parse(entity, HoloMobHealth.damageIndicatorRegenText, damage);
-		playIndicator(json, location, velocity, false, height);
+		Component component = ParsePlaceholders.parse(entity, HoloMobHealth.damageIndicatorRegenText, damage);
+		playIndicator(component, location, velocity, false, height);
 	}
 	
-	public void playIndicator(String entityNameJson, Location location, Vector velocity, boolean gravity, double fallHeight) {
+	public void playIndicator(Component entityNameComponent, Location location, Vector velocity, boolean gravity, double fallHeight) {
 		Bukkit.getScheduler().runTaskAsynchronously(HoloMobHealth.plugin, () -> {
 			int entityId;
 			try {
@@ -398,16 +400,14 @@ public class DamageIndicator implements Listener {
 			byte bitmask = 0x20;
 			watcher.setObject(new WrappedDataWatcherObject(0, byteSerializer), bitmask);
 			
-			String json = (entityNameJson == null || entityNameJson.equals("")) ? null : entityNameJson;
-			
-			if (json != null) {
+			if (entityNameComponent != null && !entityNameComponent.equals(Component.empty())) {
 				if (HoloMobHealth.version.isOld()) {
-			    	watcher.setObject(2, LanguageUtils.convert(ComponentSerializer.parse(json)[0], HoloMobHealth.language).toLegacyText());
+			    	watcher.setObject(2, LegacyComponentSerializer.legacySection().serialize(LanguageUtils.convert(entityNameComponent, HoloMobHealth.language)));
 				} else if (HoloMobHealth.version.isLegacy()) {
 			    	WrappedDataWatcherObject object = new WrappedDataWatcherObject(2, stringSerializer);
-			    	watcher.setObject(object, LanguageUtils.convert(ComponentSerializer.parse(json)[0], HoloMobHealth.language).toLegacyText());
+			    	watcher.setObject(object, LegacyComponentSerializer.legacySection().serialize(LanguageUtils.convert(entityNameComponent, HoloMobHealth.language)));
 			    } else {
-			    	Optional<?> opt = Optional.of(WrappedChatComponent.fromJson(json).getHandle());
+			    	Optional<?> opt = Optional.of(WrappedChatComponent.fromJson(GsonComponentSerializer.gson().serialize(entityNameComponent)).getHandle());
 			    	watcher.setObject(new WrappedDataWatcherObject(2, optChatSerializer), opt);
 			    }
 			} else {

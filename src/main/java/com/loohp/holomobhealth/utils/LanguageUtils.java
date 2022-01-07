@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -30,10 +31,10 @@ import org.json.simple.parser.JSONParser;
 
 import com.loohp.holomobhealth.HoloMobHealth;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
+import net.kyori.adventure.text.TranslatableComponent;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.TranslatableComponent;
 
 public class LanguageUtils {
 	
@@ -326,40 +327,21 @@ public class LanguageUtils {
 		}
 	}
 	
-	public static BaseComponent[] convert(BaseComponent[] baseComponent, String language) {
-		for (int i = 0; i < baseComponent.length; i++) {
-			baseComponent[i] = convert(baseComponent[i], language);
+	public static Component convert(Component component, String language) {
+		component = ComponentFlattening.flatten(component);
+		List<Component> children = new ArrayList<>(component.children());
+		for (int i = 0; i < children.size(); i++) {
+			Component current = children.get(i);
+			if (current instanceof TranslatableComponent) {
+				TranslatableComponent trans = (TranslatableComponent) current;
+				Component translated = Component.text(getTranslation(trans.key(), language)).style(trans.style());
+				for (Component arg : trans.args()) {
+					translated = translated.replaceText(TextReplacementConfig.builder().matchLiteral("%s").replacement(convert(arg, language)).once().build());
+				}
+				children.set(i, translated);
+			}
 		}
-		return baseComponent;
-	}
-	
-	public static BaseComponent convert(BaseComponent baseComponent, String language) {
-		if (baseComponent instanceof TranslatableComponent) {
-			TranslatableComponent transComponent = (TranslatableComponent) baseComponent;
-			String translated = getTranslation(transComponent.getTranslate(), language);
-			if (transComponent.getWith() != null) {
-				for (BaseComponent with : transComponent.getWith()) {
-					translated = translated.replaceFirst("%s", convert(with, language).toLegacyText());
-				}
-			}
-			baseComponent = new TextComponent(translated);
-			CustomStringUtils.copyFormatting(baseComponent, transComponent);
-			if (transComponent.getExtra() != null) {
-				for (BaseComponent extra : transComponent.getExtra()) {
-					baseComponent.addExtra(convert(extra, language));
-				}
-			}
-			return baseComponent;
-		} else {
-			List<BaseComponent> extras = baseComponent.getExtra();
-			if (extras != null) {
-				for (int i = 0; i < extras.size(); i++) {
-					extras.set(i, convert(extras.get(i), language));
-				}
-				baseComponent.setExtra(extras);
-			}
-			return baseComponent;
-		}
+		return ComponentCompacting.optimize(component.children(children));
 	}
 
 }

@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -53,11 +54,10 @@ import com.loohp.holomobhealth.utils.MCVersion;
 import com.loohp.holomobhealth.utils.PacketUtils;
 import com.loohp.holomobhealth.utils.WorldGuardUtils;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.HoverEvent.Action;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
+import net.md_5.bungee.chat.ComponentSerializer;
 
 public class HoloMobHealth extends JavaPlugin {
 	
@@ -154,8 +154,6 @@ public class HoloMobHealth extends JavaPlugin {
 	public static HashMap<String, Integer> specialNameOffset = new HashMap<String, Integer>();
 	
 	public static boolean rangeEnabled = false;
-	
-	public static boolean legacyChatAPI = false;
 	
 	public static boolean updaterEnabled = true;
 	public static String language = "en_us";
@@ -269,16 +267,6 @@ public class HoloMobHealth extends JavaPlugin {
 	    
 	    if (worldGuardHook) {
 		    Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into WorldGuard! (v7)");
-		}
-		
-		try {
-			TextComponent test = new TextComponent("Legacy Bungeecord Chat API Test");
-			test.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, new Text("Test Hover Text")));
-			test.getHoverEvent().getContents();
-			legacyChatAPI = false;
-		} catch (Throwable e) {
-			legacyChatAPI = true;
-			Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[HoloMobHealth] Legacy Bungeecord Chat API detected, using legacy methods...");
 		}
 		
 		if (rangeEnabled) {
@@ -496,6 +484,14 @@ public class HoloMobHealth extends JavaPlugin {
 			return Math.min(world.getViewDistance() * 16 / 2, 80);
 		} else {
 			return Math.min(Bukkit.getViewDistance() * 16 / 2, 80);
+		}
+	}
+	
+	public static void sendMessage(CommandSender sender, Component component) {
+		if (version.isLegacyRGB()) {
+			sender.spigot().sendMessage(ComponentSerializer.parse(GsonComponentSerializer.colorDownsamplingGson().serialize(component)));
+		} else {
+			sender.spigot().sendMessage(ComponentSerializer.parse(GsonComponentSerializer.gson().serialize(component)));
 		}
 	}
 	

@@ -21,7 +21,9 @@ import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.utils.EntityTypeUtils;
 import com.loohp.holomobhealth.utils.LanguageUtils;
 
-import net.md_5.bungee.chat.ComponentSerializer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public class EntityMetadata {
 	
@@ -64,8 +66,7 @@ public class EntityMetadata {
 		});
 	}
 	
-	public static void sendMetadataPacket(Entity entity, String entityNameJson, boolean visible, List<Player> players, boolean quiet) {
-		String json = (entityNameJson == null || entityNameJson.equals("")) ? null : entityNameJson;
+	public static void sendMetadataPacket(Entity entity, Component entityNameComponent, boolean visible, List<Player> players, boolean quiet) {
 		Bukkit.getScheduler().runTask(HoloMobHealth.plugin, () -> {
 
 			PacketContainer packet = HoloMobHealth.protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
@@ -73,15 +74,15 @@ public class EntityMetadata {
 			packet.getIntegers().write(0, entity.getEntityId()); //Set packet's entity id
 		    WrappedDataWatcher watcher = new WrappedDataWatcher(); //Create data watcher, the Entity Metadata packet requires this
 		    
-		    if (json != null) {
+		    if (entityNameComponent != null && !entityNameComponent.equals(Component.empty())) {
 		    	if (HoloMobHealth.version.isOld()) {
-			    	watcher.setObject(2, LanguageUtils.convert(ComponentSerializer.parse(json)[0], HoloMobHealth.language).toLegacyText());
+			    	watcher.setObject(2, LegacyComponentSerializer.legacySection().serialize(LanguageUtils.convert(entityNameComponent, HoloMobHealth.language)));
 		    	} else if (HoloMobHealth.version.isLegacy()) {
 			    	Serializer serializer = Registry.get(String.class);
 			    	WrappedDataWatcherObject object = new WrappedDataWatcherObject(2, serializer);
-			    	watcher.setObject(object, LanguageUtils.convert(ComponentSerializer.parse(json)[0], HoloMobHealth.language).toLegacyText());
+			    	watcher.setObject(object, LegacyComponentSerializer.legacySection().serialize(LanguageUtils.convert(entityNameComponent, HoloMobHealth.language)));
 			    } else {
-			    	Optional<?> opt = Optional.of(WrappedChatComponent.fromJson(json).getHandle());
+			    	Optional<?> opt = Optional.of(WrappedChatComponent.fromJson(GsonComponentSerializer.gson().serialize(entityNameComponent)).getHandle());
 			    	watcher.setObject(new WrappedDataWatcherObject(2, Registry.getChatComponentSerializer(true)), opt);
 			    }
 		    } else {

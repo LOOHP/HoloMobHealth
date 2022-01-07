@@ -52,8 +52,8 @@ import com.loohp.holomobhealth.utils.RayTrace;
 import com.loohp.holomobhealth.utils.ShopkeepersUtils;
 
 import io.github.bananapuncher714.nbteditor.NBTEditor;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public class ArmorstandDisplay implements Listener {
 	
@@ -188,7 +188,7 @@ public class ArmorstandDisplay implements Listener {
 							
 							if (EntityTypeUtils.getMobsTypesSet().contains(entity.getType())) { 
 								if (entity.getPassenger() != null || isInvisible(entity) || (!HoloMobHealth.applyToNamed && customName != null) || (HoloMobHealth.useAlterHealth && !HoloMobHealth.idleUse && !HoloMobHealth.altShowHealth.containsKey(entity.getUniqueId())) || (HoloMobHealth.rangeEnabled && !RangeModule.isEntityInRangeOfPlayer(player, entity))) {
-									String name = customName != null && !customName.equals("") ? ComponentSerializer.toString(new TextComponent(customName)) : "";
+									Component name = customName != null && !customName.equals("") ? LegacyComponentSerializer.legacySection().deserialize(customName) : Component.empty();
 									boolean visible = entity.isCustomNameVisible();
 									EntityMetadata.sendMetadataPacket(entity, name, visible, Arrays.asList(player), true);
 									MultilineStands multi = mapping.remove(entity.getUniqueId());
@@ -206,19 +206,19 @@ public class ArmorstandDisplay implements Listener {
 										List<HoloMobArmorStand> stands = new ArrayList<>(multi.getStands());
 										Collections.reverse(stands);
 										for (HoloMobArmorStand stand : stands) {
-											ArmorStandPacket.sendArmorStandSpawn(HoloMobHealth.playersEnabled, stand, "", HoloMobHealth.alwaysShow);
+											ArmorStandPacket.sendArmorStandSpawn(HoloMobHealth.playersEnabled, stand, Component.empty(), HoloMobHealth.alwaysShow);
 										}
 									} else {
 										List<Player> players = new ArrayList<>();
 										players.add(player);
 										for (HoloMobArmorStand stand : multi.getStands()) {				
-											ArmorStandPacket.sendArmorStandSpawnIfNotAlready(players, stand, "", HoloMobHealth.alwaysShow);
+											ArmorStandPacket.sendArmorStandSpawnIfNotAlready(players, stand, Component.empty(), HoloMobHealth.alwaysShow);
 										}
 									}
 									UUID focusing = focusingEntities.getOrDefault(player, EMPTY_UUID);
 									multi.setLocation(entity.getLocation());
-									for (int i = 0; i < data.getJson().size(); i++) {
-										String display = data.getJson().get(i);
+									for (int i = 0; i < data.getComponents().size(); i++) {
+										Component display = data.getComponents().get(i);
 										ArmorStandPacket.updateArmorStand(entity, multi.getStand(i), display, HoloMobHealth.alwaysShow || focusing.equals(entityUUID));
 									}
 								}
@@ -230,7 +230,8 @@ public class ArmorstandDisplay implements Listener {
 									return;
 								}
 								Entity entity = data.getEntity();
-								String name = NBTEditor.getString(entity, "CustomName");
+								String rawName = NBTEditor.getString(entity, "CustomName");
+								Component name = rawName != null && !rawName.equals("") ? LegacyComponentSerializer.legacySection().deserialize(rawName) : Component.empty();
 								boolean visible = entity.isCustomNameVisible();
 								EntityMetadata.sendMetadataPacket(entity, name, visible, Arrays.asList(player), true);
 								multi.getStands().forEach(each -> ArmorStandPacket.removeArmorStand(HoloMobHealth.playersEnabled, each, true, false));
@@ -444,11 +445,11 @@ public class ArmorstandDisplay implements Listener {
 			List<WrappedWatchableObject> data = packet.getWatchableCollectionModifier().read(0);
 			WrappedDataWatcher watcher = new WrappedDataWatcher(data);
 			
-			List<String> json;
+			List<Component> components;
 			if (useIdle) {
-				json = HoloMobHealth.idleDisplayText.stream().map(each -> ParsePlaceholders.parse(player, (LivingEntity) entity, each)).collect(Collectors.toList());
+				components = HoloMobHealth.idleDisplayText.stream().map(each -> ParsePlaceholders.parse(player, (LivingEntity) entity, each)).collect(Collectors.toList());
 			} else {
-				json = HoloMobHealth.displayText.stream().map(each -> ParsePlaceholders.parse(player, (LivingEntity) entity, each)).collect(Collectors.toList());
+				components = HoloMobHealth.displayText.stream().map(each -> ParsePlaceholders.parse(player, (LivingEntity) entity, each)).collect(Collectors.toList());
 			}
 
 			if (HoloMobHealth.version.isOld()) {
@@ -468,7 +469,7 @@ public class ArmorstandDisplay implements Listener {
 				watcher.setObject(new WrappedDataWatcherObject(3, Registry.get(Boolean.class)), false);
 			}
 			
-			ArmorStandDisplayData newData = new ArmorStandDisplayData(watcher, json, customName, entity);
+			ArmorStandDisplayData newData = new ArmorStandDisplayData(watcher, components, customName, entity);
 			
 			//cache.put(entityUUID, newData);
 			//Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> cache.remove(entityUUID), 1);
@@ -488,14 +489,14 @@ public class ArmorstandDisplay implements Listener {
 	private static class ArmorStandDisplayData {
 		
 		private WrappedDataWatcher watcher;
-		private List<String> json;
+		private List<Component> components;
 		private String customName;
 		private boolean use;
 		private Entity entity;
 		
-		public ArmorStandDisplayData(WrappedDataWatcher watcher, List<String> json, String customName, Entity entity) {
+		public ArmorStandDisplayData(WrappedDataWatcher watcher, List<Component> components, String customName, Entity entity) {
 			this.watcher = watcher;
-			this.json = json;
+			this.components = components;
 			this.customName = customName;
 			this.use = true;
 			this.entity = entity;
@@ -509,8 +510,8 @@ public class ArmorstandDisplay implements Listener {
 			return watcher;
 		}
 
-		public List<String> getJson() {
-			return json;
+		public List<Component> getComponents() {
+			return components;
 		}
 
 		public String getCustomName() {

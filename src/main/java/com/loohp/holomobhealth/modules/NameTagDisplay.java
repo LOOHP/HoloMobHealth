@@ -35,8 +35,9 @@ import com.loohp.holomobhealth.utils.NMSUtils;
 import com.loohp.holomobhealth.utils.ParsePlaceholders;
 import com.loohp.holomobhealth.utils.ShopkeepersUtils;
 
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public class NameTagDisplay {
 	
@@ -215,19 +216,18 @@ public class NameTagDisplay {
 			List<WrappedWatchableObject> data = packet.getWatchableCollectionModifier().read(0);
 			WrappedDataWatcher watcher = new WrappedDataWatcher(data);
 			
-			String json = ParsePlaceholders.parse(player, (LivingEntity) entity, useIdle ? HoloMobHealth.idleDisplayText.get(0) : HoloMobHealth.displayText.get(0));
-			BaseComponent[] components = json == null ? null : ComponentSerializer.parse(json);
+			Component component = ParsePlaceholders.parse(player, (LivingEntity) entity, useIdle ? HoloMobHealth.idleDisplayText.get(0) : HoloMobHealth.displayText.get(0));
 			boolean visible = HoloMobHealth.alwaysShow;
 
-			if (json != null && components != null && components.length > 0) {
+			if (component != null && !component.equals(Component.empty())) {
 				if (HoloMobHealth.version.isOld()) {
-					watcher.setObject(2, LanguageUtils.convert(components[0], HoloMobHealth.language).toLegacyText());
+					watcher.setObject(2, LegacyComponentSerializer.legacySection().serialize(LanguageUtils.convert(component, HoloMobHealth.language)));
 				} else if (HoloMobHealth.version.isLegacy()) {
 					Serializer serializer = Registry.get(String.class);
 					WrappedDataWatcherObject object = new WrappedDataWatcherObject(2, serializer);
-					watcher.setObject(object, LanguageUtils.convert(components[0], HoloMobHealth.language).toLegacyText());
+					watcher.setObject(object, LegacyComponentSerializer.legacySection().serialize(LanguageUtils.convert(component, HoloMobHealth.language)));
 				} else {
-					Optional<?> opt = Optional.of(WrappedChatComponent.fromJson(json).getHandle());
+					Optional<?> opt = Optional.of(WrappedChatComponent.fromJson(GsonComponentSerializer.gson().serialize(component)).getHandle());
 					watcher.setObject(new WrappedDataWatcherObject(2, Registry.getChatComponentSerializer(true)), opt);
 				}
 			} else {

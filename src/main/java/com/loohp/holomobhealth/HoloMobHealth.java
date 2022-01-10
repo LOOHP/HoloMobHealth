@@ -40,6 +40,7 @@ import com.loohp.holomobhealth.modules.ArmorstandDisplay;
 import com.loohp.holomobhealth.modules.DamageIndicator;
 import com.loohp.holomobhealth.modules.NameTagDisplay;
 import com.loohp.holomobhealth.modules.RangeModule;
+import com.loohp.holomobhealth.placeholderapi.Placeholders;
 import com.loohp.holomobhealth.protocol.ArmorStandPacket;
 import com.loohp.holomobhealth.registries.CustomPlaceholderScripts;
 import com.loohp.holomobhealth.registries.DisplayTextCacher;
@@ -281,6 +282,10 @@ public class HoloMobHealth extends JavaPlugin {
 		}
 		
 		ArmorstandDisplay.run();
+		
+		if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+			new Placeholders().register();
+		}
 	    
 	    getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "[HoloMobHealth] HoloMobHealth has been Enabled!");
 	    

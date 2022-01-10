@@ -333,11 +333,11 @@ public class DamageIndicator implements Listener {
 			velocity = vectorZero;
 		}
 		
-		Component component = ParsePlaceholders.parse(entity, HoloMobHealth.damageIndicatorDamageText, damage);
+		Component component = ParsePlaceholders.parse(entity, HoloMobHealth.damageIndicatorDamageText, -damage);
 		playIndicator(component, indicator, velocity, true, height);
 	}
 	
-	public void regen(LivingEntity entity, double damage) {
+	public void regen(LivingEntity entity, double gain) {
 		Location location = entity.getLocation();
 		if (HoloMobHealth.worldGuardHook) {
 			if (!WorldGuardUtils.checkStateFlag(location, null, WorldGuardUtils.getRegenIndicatorFlag())) {
@@ -361,7 +361,7 @@ public class DamageIndicator implements Listener {
 		
 		Vector velocity = HoloMobHealth.damageIndicatorRegenAnimation ? new Vector(0, 0.2, 0) : vectorZero;
 		
-		Component component = ParsePlaceholders.parse(entity, HoloMobHealth.damageIndicatorRegenText, damage);
+		Component component = ParsePlaceholders.parse(entity, HoloMobHealth.damageIndicatorRegenText, gain);
 		playIndicator(component, location, velocity, false, height);
 	}
 	

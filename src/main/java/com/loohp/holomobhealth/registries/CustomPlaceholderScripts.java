@@ -89,11 +89,12 @@ public class CustomPlaceholderScripts {
 		scripts.clear();
 	}
 	
-	public static String evaluate(String text, Double health, Double maxhealth, String customname, String mobtype, LivingEntity entity, String placeholder, ScriptEngine engine, String script) {
+	public static String evaluate(String text, Double health, Double maxhealth, Double healthchange, String customname, String mobtype, LivingEntity entity, String placeholder, ScriptEngine engine, String script) {
         try {
             engine.put("DisplayText", text);
             engine.put("Health", health);
             engine.put("MaxHealth", maxhealth);
+            engine.put("HealthChange", healthchange);
             engine.put("CustomName", customname);
             engine.put("MobType", mobtype);
             engine.put("LivingEntity", entity);
@@ -112,7 +113,7 @@ public class CustomPlaceholderScripts {
     }
 	
 	@SuppressWarnings("deprecation")
-	public static String runScripts(String text, LivingEntity entity) throws Exception {
+	public static String runScripts(String text, LivingEntity entity, double healthchange) throws Exception {
 		double health = entity.getHealth();
 		double maxhealth = 0.0;
 		if (!HoloMobHealth.version.isLegacy()) {
@@ -127,7 +128,7 @@ public class CustomPlaceholderScripts {
 			String placeholder = entry.getKey();
 			if (text.contains(placeholder)) {
 				JavaScriptPlaceholder script = entry.getValue();
-				String replaceText = evaluate(text, health, maxhealth, customname, mobtype, entity, placeholder, script.getEngine(), script.getScript());
+				String replaceText = evaluate(text, health, maxhealth, healthchange, customname, mobtype, entity, placeholder, script.getEngine(), script.getScript());
 				text = text.replace(placeholder, replaceText);
 			}
 		}

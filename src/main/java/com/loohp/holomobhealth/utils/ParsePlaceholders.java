@@ -54,7 +54,7 @@ public class ParsePlaceholders {
 				text = text.replace(entry.getKey(), String.valueOf(data.getFormatter().format(percentage)));
 				break;
 			case INDICATOR:
-				text = text.replace(entry.getKey(), String.valueOf(data.getFormatter().format(healthchange)));
+				text = text.replace(entry.getKey(), String.valueOf(data.getFormatter().format(Math.abs(healthchange))));
 				break;
 			}
 		}
@@ -92,7 +92,7 @@ public class ParsePlaceholders {
 		}
 		
 		try {
-			text = CustomPlaceholderScripts.runScripts(text, entity);
+			text = CustomPlaceholderScripts.runScripts(text, entity, healthchange);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.text.WordUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -244,32 +245,40 @@ public class LanguageUtils {
 	}
     
     public static String getTranslationKey(Entity entity) {
-    	try {
-			if (HoloMobHealth.version.isLegacy()) {
-				return getLegacyTranslationKey(entity);
-			} else {
-				return getModernTranslationKey(entity);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
+		String result = getTranslationKeyOrNull(entity);
+		return result == null ? WordUtils.capitalizeFully(entity.getType().name().toLowerCase().replace("_", " ")) : result;
+    }
+    
+    public static String getTranslationKeyOrNull(Entity entity) {
+    	if (HoloMobHealth.version.isLegacy()) {
+			return getLegacyTranslationKey(entity);
+		} else {
+			return getModernTranslationKey(entity);
 		}
     }
     
-    private static String getLegacyTranslationKey(Entity entity) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-    	String str = getEntityKeyMethod.invoke(null, getNmsEntityMethod.invoke(craftEntityClass.cast(entity))).toString();
-    	if (str == null) {
-    		return "";
-    	} else {
-    		EntityType type = entity.getType();
-    		if (type.equals(EntityType.VILLAGER)) {
-    			Villager villager = (Villager) entity;
-    			str += "." + villager.getProfession().toString().toLowerCase();
-    		} else {
-    			str += ".name";
-    		}
-    		return "entity." + str;
-    	}
+    private static String getLegacyTranslationKey(Entity entity) {
+    	try {
+	    	Object nmsEntityObject = getNmsEntityMethod.invoke(craftEntityClass.cast(entity));
+	    	String str = getEntityKeyMethod.invoke(null, nmsEntityObject).toString();
+	    	if (str == null) {
+	    		return null;
+	    	} else {
+	    		EntityType type = entity.getType();
+	    		if (type.equals(EntityType.VILLAGER)) {
+	    			Villager villager = (Villager) entity;
+	    			str += "." + villager.getProfession().toString().toLowerCase();
+	    		} else {
+	    			str += ".name";
+	    		}
+	    		return "entity." + str;
+	    	}
+    	} catch (NullPointerException e) {
+    		//do nothing
+    	} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			e.printStackTrace();
+		}
+    	return null;
     }
 	
 	private static String getModernTranslationKey(Entity entity) {	

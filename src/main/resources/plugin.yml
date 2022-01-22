@@ -4,7 +4,7 @@ version: ${project.version}
 api-version: 1.13
 main: com.loohp.holomobhealth.HoloMobHealth
 description: Show Mob Health with packets
-softdepend: 
+softdepend:
   - MythicMobs
   - Citizens
   - Shopkeepers

@@ -17,7 +17,7 @@ Display:
   #{Mob_Name}
   #{Mob_Type_Or_Name}
   #
-  #These placeholders can be further configurated
+  #These placeholders can be furthered configured
   #{DynamicColor}
   #{ScaledSymbols}
   #
@@ -25,7 +25,7 @@ Display:
   #For example "VerticalStripedSymbols" will be {VerticalStripedSymbols}
   #
   #Only one line is allowed (Unless you enabled ***EXPERIMENTAL*** multi-line)
-  Text: 
+  Text:
     - "&b{Mob_Type_Or_Name}: {DynamicColor}{Health_0.0}&f/{MaxHealth_0.0}"
     - "If Multiline is enabled, you will see this line"
 
@@ -57,12 +57,12 @@ Options:
   NumberRounding: UP
   #Health always visible when in range or only visible when the player is looking at the mob
   AlwaysShow: true
-  #Whether or not named mobs should so had their name replaced to show health
+  #Whether named mobs should so had their name replaced to show health
   #The name is not actually replaced on the server side, only client side
   #Does not work well with AlwaysShow set to false
   ApplyToNamed: true
   #Do not use plugin in these worlds
-  DisabledWorlds: 
+  DisabledWorlds:
     - disabled_world
   #Do not apply health to these mob types
   #https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html
@@ -74,11 +74,11 @@ Options:
   #Do not apply health to mob with these name
   #The name only has to contain these strings EXCLUDING color codes AND case
   #Color codes are ignored
-  DisabledMobNamesContains: 
+  DisabledMobNamesContains:
     - PhantomShield
   #Settings for an alternate way of showing health
   DynamicHealthDisplay:
-    #Whether or not HoloMobHealth should only apply health display when the mob is taking damage
+    #Whether HoloMobHealth should only apply health display when the mob is taking damage
     Use: false
     #How long should health be shown after the mob has been attack (in seconds)
     Timeout: 3
@@ -86,10 +86,10 @@ Options:
     OnlyPlayerTrigger: false
 
     IdleDisplay:
-      #Whether to display an alternative foramt when a mob is not taking damage
+      #Whether to display an alternative format when a mob is not taking damage
       Use: false
       #Placeholders are the same as the main display
-      Text: 
+      Text:
         - "&b{Mob_Type_Or_Name}"
         - "If Multiline is enabled, you will see this line"
   #Settings for the range detection module
@@ -105,12 +105,12 @@ Options:
   #Doesn't do anything on Minecraft 1.13+
   Language: en_us
 
-  #Enable EXPERIEMENTAL multi-line mob name tag
+  #Enable EXPERIMENTAL multi-line mob name tag
   #Note that it is a bit more performance heavy
   #Y-Offset is measured in Steps, accept only integers, experiment with the numbers to find one that is suitable for you
   #Name match is in Regex, be careful with special meta characters
   #YOU MUST RESTART TO SEE CHANGES
-  MultiLine: 
+  MultiLine:
     Enable: false
     MasterYOffset: 0
     Special:
@@ -128,8 +128,8 @@ DamageIndicator:
   #In ticks -> 20 ticks = 1 second
   Timeout: 40
 
-  Damage: 
-    #Should the damage indicator be enabled for health losts
+  Damage:
+    #Should the damage indicator be enabled for health lost
     Enabled: true
     #Play the indicator animation
     Animation: true

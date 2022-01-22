@@ -1,7 +1,8 @@
 package com.loohp.holomobhealth.listeners;
 
-import java.util.UUID;
-
+import com.loohp.holomobhealth.HoloMobHealth;
+import com.loohp.holomobhealth.database.Database;
+import com.loohp.holomobhealth.protocol.EntityMetadata;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -15,101 +16,99 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import com.loohp.holomobhealth.HoloMobHealth;
-import com.loohp.holomobhealth.database.Database;
-import com.loohp.holomobhealth.protocol.EntityMetadata;
+import java.util.UUID;
 
 public class Events implements Listener {
-	
-	@EventHandler
-	public void onJoin(PlayerJoinEvent event) {
-		Player player = event.getPlayer();
-		Bukkit.getScheduler().runTaskAsynchronously(HoloMobHealth.plugin, () -> {
-			if (!Database.playerExists(player)) {
-				Database.createPlayer(player);
-			}
-			Database.loadPlayer(player);
-		});
-	}
-	
-	@EventHandler
-	public void onLeave(PlayerQuitEvent event) {
-		Player player = event.getPlayer();
-		HoloMobHealth.playersEnabled.remove(player);
-	}
-	
-	@EventHandler
-	public void onCreatureSpawn(CreatureSpawnEvent event) {
-		Entity entity = event.getEntity();
-		Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(entity.getWorld().getPlayers(), entity), 5);
-	}
-	
-	@EventHandler
-	public void onAttack(EntityDamageEvent event) {	
-		if (!HoloMobHealth.useAlterHealth) {
-			return;
-		}
-		
-		if (HoloMobHealth.disabledWorlds.contains(event.getEntity().getWorld().getName())) {
-			return;
-		}
-		
-		if (HoloMobHealth.altOnlyPlayer) {
-			return;
-		}
-		
-		Entity entity = event.getEntity();
-		UUID uuid = entity.getUniqueId();
-		HoloMobHealth.altShowHealth.put(uuid, System.currentTimeMillis() + HoloMobHealth.altHealthDisplayTime * 1000);
-		EntityMetadata.updateEntity(entity.getWorld().getPlayers(), entity);
-		Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {
-			Long timeout = HoloMobHealth.altShowHealth.get(uuid);
-			if (timeout != null && System.currentTimeMillis() > timeout) {
-				HoloMobHealth.altShowHealth.remove(uuid);
-				EntityMetadata.updateEntity(entity.getWorld().getPlayers(), entity);
-			}
-		}, HoloMobHealth.altHealthDisplayTime * 20 + 5);
-	}
-	
-	@EventHandler
-	public void onPlayerAttack(EntityDamageByEntityEvent event) {
-		if (!HoloMobHealth.useAlterHealth) {
-			return;
-		}
-		
-		if (HoloMobHealth.disabledWorlds.contains(event.getEntity().getWorld().getName())) {
-			return;
-		}
-		
-		if (!HoloMobHealth.altOnlyPlayer) {
-			return;
-		}
-		
-		if (!event.getDamager().getType().equals(EntityType.PLAYER)) {
-			if (event.getDamager() instanceof Projectile) {
-				Projectile projectile = (Projectile) event.getDamager();
-				if (projectile.getShooter() == null) {
-					return;
-				} else {
-					if (!(projectile.getShooter() instanceof Player)) {
-						return;
-					}
-				}
-			} else {
-				return;
-			}
-		}
-		
-		Entity entity = event.getEntity();
-		UUID uuid = entity.getUniqueId();		
-		HoloMobHealth.altShowHealth.put(uuid, System.currentTimeMillis() + HoloMobHealth.altHealthDisplayTime * 1000);
-		EntityMetadata.updateEntity(entity.getWorld().getPlayers(), entity);
-		Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {
-			Long timeout = HoloMobHealth.altShowHealth.get(uuid);
-			if (timeout != null && System.currentTimeMillis() > timeout) {
-				HoloMobHealth.altShowHealth.remove(uuid);
-				EntityMetadata.updateEntity(entity.getWorld().getPlayers(), entity);
-			}
-		}, HoloMobHealth.altHealthDisplayTime * 20 + 5);
-	}
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        Bukkit.getScheduler().runTaskAsynchronously(HoloMobHealth.plugin, () -> {
+            if (!Database.playerExists(player)) {
+                Database.createPlayer(player);
+            }
+            Database.loadPlayer(player);
+        });
+    }
+
+    @EventHandler
+    public void onLeave(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        HoloMobHealth.playersEnabled.remove(player);
+    }
+
+    @EventHandler
+    public void onCreatureSpawn(CreatureSpawnEvent event) {
+        Entity entity = event.getEntity();
+        Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(entity.getWorld().getPlayers(), entity), 5);
+    }
+
+    @EventHandler
+    public void onAttack(EntityDamageEvent event) {
+        if (!HoloMobHealth.useAlterHealth) {
+            return;
+        }
+
+        if (HoloMobHealth.disabledWorlds.contains(event.getEntity().getWorld().getName())) {
+            return;
+        }
+
+        if (HoloMobHealth.altOnlyPlayer) {
+            return;
+        }
+
+        Entity entity = event.getEntity();
+        UUID uuid = entity.getUniqueId();
+        HoloMobHealth.altShowHealth.put(uuid, System.currentTimeMillis() + HoloMobHealth.altHealthDisplayTime * 1000);
+        EntityMetadata.updateEntity(entity.getWorld().getPlayers(), entity);
+        Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {
+            Long timeout = HoloMobHealth.altShowHealth.get(uuid);
+            if (timeout != null && System.currentTimeMillis() > timeout) {
+                HoloMobHealth.altShowHealth.remove(uuid);
+                EntityMetadata.updateEntity(entity.getWorld().getPlayers(), entity);
+            }
+        }, HoloMobHealth.altHealthDisplayTime * 20 + 5);
+    }
+
+    @EventHandler
+    public void onPlayerAttack(EntityDamageByEntityEvent event) {
+        if (!HoloMobHealth.useAlterHealth) {
+            return;
+        }
+
+        if (HoloMobHealth.disabledWorlds.contains(event.getEntity().getWorld().getName())) {
+            return;
+        }
+
+        if (!HoloMobHealth.altOnlyPlayer) {
+            return;
+        }
+
+        if (!event.getDamager().getType().equals(EntityType.PLAYER)) {
+            if (event.getDamager() instanceof Projectile) {
+                Projectile projectile = (Projectile) event.getDamager();
+                if (projectile.getShooter() == null) {
+                    return;
+                } else {
+                    if (!(projectile.getShooter() instanceof Player)) {
+                        return;
+                    }
+                }
+            } else {
+                return;
+            }
+        }
+
+        Entity entity = event.getEntity();
+        UUID uuid = entity.getUniqueId();
+        HoloMobHealth.altShowHealth.put(uuid, System.currentTimeMillis() + HoloMobHealth.altHealthDisplayTime * 1000);
+        EntityMetadata.updateEntity(entity.getWorld().getPlayers(), entity);
+        Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {
+            Long timeout = HoloMobHealth.altShowHealth.get(uuid);
+            if (timeout != null && System.currentTimeMillis() > timeout) {
+                HoloMobHealth.altShowHealth.remove(uuid);
+                EntityMetadata.updateEntity(entity.getWorld().getPlayers(), entity);
+            }
+        }, HoloMobHealth.altHealthDisplayTime * 20 + 5);
+    }
 }

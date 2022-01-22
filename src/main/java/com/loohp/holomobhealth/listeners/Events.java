@@ -111,4 +111,5 @@ public class Events implements Listener {
             }
         }, HoloMobHealth.altHealthDisplayTime * 20 + 5);
     }
+
 }

@@ -15,16 +15,6 @@ import java.util.List;
 
 public class RayTrace {
 
-    //origin = start position
-    //direction = direction in which the raytrace will go
-    private final Vector origin;
-    private final Vector direction;
-
-    public RayTrace(Vector origin, Vector direction) {
-        this.origin = origin;
-        this.direction = direction;
-    }
-
     public static Entity getLookingEntity(LivingEntity entity, double range) {
         RayTrace ray = new RayTrace(entity.getEyeLocation().toVector(), entity.getEyeLocation().getDirection());
         List<Entity> entities = entity.getNearbyEntities(range, range, range);
@@ -55,6 +45,15 @@ public class RayTrace {
         } else {
             return !(position.getZ() < min.getZ()) && !(position.getZ() > max.getZ());
         }
+    }
+    //origin = start position
+    //direction = direction in which the raytrace will go
+    private final Vector origin;
+    private final Vector direction;
+
+    public RayTrace(Vector origin, Vector direction) {
+        this.origin = origin;
+        this.direction = direction;
     }
 
     //get a point on the raytrace at X blocks away

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 public class ClassUtils {
+
     public static Set<Class<?>> getAllExtendedOrImplementedTypesRecursively(Class<?> clazz) {
         List<Class<?>> res = new ArrayList<>();
 
@@ -37,4 +38,5 @@ public class ClassUtils {
 
         return new HashSet<Class<?>>(res);
     }
+
 }

@@ -77,12 +77,6 @@ public class DisplayTextCacher {
         PERCENTAGEHEALTH("PercentageHealth"),
         INDICATOR("Indicator");
 
-        private final String name;
-
-        HealthType(String name) {
-            this.name = name;
-        }
-
         public static HealthType fromName(String name) {
             for (HealthType type : HealthType.values()) {
                 if (type.toString().equalsIgnoreCase(name)) {
@@ -90,6 +84,11 @@ public class DisplayTextCacher {
                 }
             }
             return null;
+        }
+        private final String name;
+
+        HealthType(String name) {
+            this.name = name;
         }
 
         @Override
@@ -99,6 +98,7 @@ public class DisplayTextCacher {
     }
 
     public static class HealthFormatData {
+
         private final DecimalFormat format;
         private final HealthType type;
 
@@ -114,6 +114,7 @@ public class DisplayTextCacher {
         public HealthType getType() {
             return type;
         }
+
     }
 
 }

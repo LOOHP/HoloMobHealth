@@ -1,9 +1,9 @@
 package com.loohp.holomobhealth.utils;
 
 import com.loohp.holomobhealth.HoloMobHealth;
+import com.loohp.yamlconfiguration.YamlConfiguration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
-import org.simpleyaml.configuration.file.FileConfiguration;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,7 +14,7 @@ import java.util.Set;
 
 public class LegacyPlaceholdersConverter {
 
-    private static final Map<String, String> legacyPlaceholders = new HashMap<String, String>();
+    private static final Map<String, String> legacyPlaceholders = new HashMap<>();
 
     static {
         legacyPlaceholders.put("{Health_Rounded}", "{Health_0}");
@@ -41,7 +41,7 @@ public class LegacyPlaceholdersConverter {
     public static void convert() {
         Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[HoloMobHealth] Translating old placeholders to new placeholders...");
 
-        FileConfiguration config = HoloMobHealth.getConfiguration();
+        YamlConfiguration config = HoloMobHealth.getConfiguration();
         List<String> lines = config.getStringList("Display.Text");
 
         for (int i = 0; i < lines.size(); i++) {

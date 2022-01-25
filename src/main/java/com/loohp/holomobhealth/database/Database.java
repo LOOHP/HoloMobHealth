@@ -2,10 +2,10 @@ package com.loohp.holomobhealth.database;
 
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.protocol.EntityMetadata;
+import com.loohp.yamlconfiguration.YamlConfiguration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.simpleyaml.configuration.file.FileConfiguration;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -19,7 +19,7 @@ import java.util.UUID;
 
 public class Database {
 
-    private static final FileConfiguration config = HoloMobHealth.getConfiguration();
+    private static final YamlConfiguration config = HoloMobHealth.getConfiguration();
     private static final String table = "HoloMobHealth_USER_PERFERENCES";
     private static final Object syncdb = new Object();
     public static boolean isMYSQL = false;

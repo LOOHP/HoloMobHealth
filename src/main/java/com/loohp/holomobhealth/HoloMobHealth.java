@@ -29,6 +29,7 @@ import com.loohp.holomobhealth.utils.LegacyPlaceholdersConverter;
 import com.loohp.holomobhealth.utils.MCVersion;
 import com.loohp.holomobhealth.utils.PacketUtils;
 import com.loohp.holomobhealth.utils.WorldGuardUtils;
+import com.loohp.yamlconfiguration.YamlConfiguration;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -41,8 +42,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.simpleyaml.configuration.file.FileConfiguration;
-import org.simpleyaml.exceptions.InvalidConfigurationException;
 
 import java.io.File;
 import java.io.IOException;
@@ -158,7 +157,7 @@ public class HoloMobHealth extends JavaPlugin {
     public static boolean updaterEnabled = true;
     public static String language = "en_us";
 
-    public static FileConfiguration getConfiguration() {
+    public static YamlConfiguration getConfiguration() {
         return Config.getConfig(CONFIG_ID).getConfiguration();
     }
 
@@ -221,7 +220,7 @@ public class HoloMobHealth extends JavaPlugin {
         armorStandYOffset = config.getConfiguration().getInt("Options.MultiLine.MasterYOffset");
         List<String> armorStandSpecial = config.getConfiguration().getStringList("Options.MultiLine.Special");
         for (String cases : armorStandSpecial) {
-            int offset = Integer.valueOf(cases.substring(cases.lastIndexOf(":") + 1));
+            int offset = Integer.parseInt(cases.substring(cases.lastIndexOf(":") + 1));
             switch (cases.substring(0, cases.indexOf(":")).toLowerCase()) {
                 case "name":
                     String regex = cases.substring(cases.indexOf(":") + 1, cases.lastIndexOf(":"));
@@ -361,7 +360,7 @@ public class HoloMobHealth extends JavaPlugin {
         }
         try {
             Config.loadConfig(CONFIG_ID, new File(getDataFolder(), "config.yml"), getClass().getClassLoader().getResourceAsStream("config.yml"), getClass().getClassLoader().getResourceAsStream("config.yml"), true);
-        } catch (IOException | InvalidConfigurationException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             getServer().getPluginManager().disablePlugin(this);
             return;

@@ -5,7 +5,7 @@
 	<groupId>com.loohp</groupId>
 	<artifactId>HoloMobHealth</artifactId>
 	<name>HoloMobHealth</name>
-	<version>2.2.4.2</version>
+	<version>2.2.4.3</version>
 
 	<description>Customize how you would like to display mob health above its head!</description>
 	<url>https://github.com/LOOHP/HoloMobHealth</url>
@@ -251,7 +251,7 @@
 		<dependency>
 			<groupId>com.github.LOOHP</groupId>
 			<artifactId>Simple-YAML</artifactId>
-			<version>3de800cc0d</version>
+			<version>d68cdc3892</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -264,6 +264,7 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-text</artifactId>
 			<version>1.9</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>

@@ -54,7 +54,7 @@
 								</relocation>
 								<relocation>
 									<pattern>com.loohp.yamlconfiguration</pattern>
-									<shadedPattern>com.loohp.interactivechat.libs.com.loohp.yamlconfiguration</shadedPattern>
+									<shadedPattern>com.loohp.holomobhealth.libs.com.loohp.yamlconfiguration</shadedPattern>
 								</relocation>
 								<relocation>
 									<pattern>io.github.bananapuncher714.nbteditor</pattern>

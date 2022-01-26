@@ -227,6 +227,10 @@
 			<id>songoda-public</id>
 			<url>https://repo.songoda.com/repository/public/</url>
 		</repository>
+		<repository>
+			<id>loohp-repo</id>
+			<url>https://repo.loohpjames.com/repository</url>
+		</repository>
 	</repositories>
 
 	<dependencies>

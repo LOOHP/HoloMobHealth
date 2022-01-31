@@ -5,7 +5,7 @@
 	<groupId>com.loohp</groupId>
 	<artifactId>HoloMobHealth</artifactId>
 	<name>HoloMobHealth</name>
-	<version>2.2.4.8</version>
+	<version>2.2.4.9</version>
 
 	<description>Customize how you would like to display mob health above its head!</description>
 	<url>https://github.com/LOOHP/HoloMobHealth</url>
@@ -255,7 +255,7 @@
 		<dependency>
 			<groupId>com.loohp</groupId>
 			<artifactId>YamlConfiguration</artifactId>
-			<version>1.0.1.2</version>
+			<version>1.0.1.4</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>

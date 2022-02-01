@@ -1,18 +1,22 @@
 package com.loohp.holomobhealth.utils;
 
 import com.loohp.holomobhealth.HoloMobHealth;
+import org.bukkit.DyeColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.TropicalFish;
 import org.bukkit.entity.TropicalFish.Pattern;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class TropicalFishUtils {
 
-    private static final Map<Integer, Integer> predefined = new HashMap<>();
+    private static final Map<Integer, Integer> PREDEFINED_TROPICAL_FISH = new HashMap<>();
+
     private static Class<?> craftEntityClass;
     private static Method getNmsEntityMethod;
     private static Class<?> nmsEntityTropicalFishClass;
@@ -36,30 +40,30 @@ public class TropicalFishUtils {
             } catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
                 e.printStackTrace();
             }
-
-            predefined.put(117506305, 0);
-            predefined.put(117899265, 1);
-            predefined.put(185008129, 2);
-            predefined.put(117441793, 3);
-            predefined.put(118161664, 4);
-            predefined.put(65536, 5);
-            predefined.put(50726144, 6);
-            predefined.put(67764993, 7);
-            predefined.put(234882305, 8);
-            predefined.put(67110144, 9);
-            predefined.put(117441025, 10);
-            predefined.put(16778497, 11);
-            predefined.put(101253888, 12);
-            predefined.put(50660352, 13);
-            predefined.put(918529, 14);
-            predefined.put(235340288, 15);
-            predefined.put(918273, 16);
-            predefined.put(67108865, 17);
-            predefined.put(917504, 18);
-            predefined.put(459008, 19);
-            predefined.put(67699456, 20);
-            predefined.put(67371009, 21);
         }
+
+        PREDEFINED_TROPICAL_FISH.put(calculateTropicalFishVariant(TropicalFish.Pattern.STRIPEY, DyeColor.ORANGE, DyeColor.GRAY), 0);
+        PREDEFINED_TROPICAL_FISH.put(calculateTropicalFishVariant(TropicalFish.Pattern.FLOPPER, DyeColor.GRAY, DyeColor.GRAY), 1);
+        PREDEFINED_TROPICAL_FISH.put(calculateTropicalFishVariant(TropicalFish.Pattern.FLOPPER, DyeColor.GRAY, DyeColor.BLUE), 2);
+        PREDEFINED_TROPICAL_FISH.put(calculateTropicalFishVariant(TropicalFish.Pattern.CLAYFISH, DyeColor.WHITE, DyeColor.GRAY), 3);
+        PREDEFINED_TROPICAL_FISH.put(calculateTropicalFishVariant(TropicalFish.Pattern.SUNSTREAK, DyeColor.BLUE, DyeColor.GRAY), 4);
+        PREDEFINED_TROPICAL_FISH.put(calculateTropicalFishVariant(TropicalFish.Pattern.KOB, DyeColor.ORANGE, DyeColor.WHITE), 5);
+        PREDEFINED_TROPICAL_FISH.put(calculateTropicalFishVariant(TropicalFish.Pattern.SPOTTY, DyeColor.PINK, DyeColor.LIGHT_BLUE), 6);
+        PREDEFINED_TROPICAL_FISH.put(calculateTropicalFishVariant(TropicalFish.Pattern.BLOCKFISH, DyeColor.PURPLE, DyeColor.YELLOW), 7);
+        PREDEFINED_TROPICAL_FISH.put(calculateTropicalFishVariant(TropicalFish.Pattern.CLAYFISH, DyeColor.WHITE, DyeColor.RED), 8);
+        PREDEFINED_TROPICAL_FISH.put(calculateTropicalFishVariant(TropicalFish.Pattern.SPOTTY, DyeColor.WHITE, DyeColor.YELLOW), 9);
+        PREDEFINED_TROPICAL_FISH.put(calculateTropicalFishVariant(TropicalFish.Pattern.GLITTER, DyeColor.WHITE, DyeColor.GRAY), 10);
+        PREDEFINED_TROPICAL_FISH.put(calculateTropicalFishVariant(TropicalFish.Pattern.CLAYFISH, DyeColor.WHITE, DyeColor.ORANGE), 11);
+        PREDEFINED_TROPICAL_FISH.put(calculateTropicalFishVariant(TropicalFish.Pattern.DASHER, DyeColor.CYAN, DyeColor.PINK), 12);
+        PREDEFINED_TROPICAL_FISH.put(calculateTropicalFishVariant(TropicalFish.Pattern.BRINELY, DyeColor.LIME, DyeColor.LIGHT_BLUE), 13);
+        PREDEFINED_TROPICAL_FISH.put(calculateTropicalFishVariant(TropicalFish.Pattern.BETTY, DyeColor.RED, DyeColor.WHITE), 14);
+        PREDEFINED_TROPICAL_FISH.put(calculateTropicalFishVariant(TropicalFish.Pattern.SNOOPER, DyeColor.GRAY, DyeColor.RED), 15);
+        PREDEFINED_TROPICAL_FISH.put(calculateTropicalFishVariant(TropicalFish.Pattern.BLOCKFISH, DyeColor.RED, DyeColor.WHITE), 16);
+        PREDEFINED_TROPICAL_FISH.put(calculateTropicalFishVariant(TropicalFish.Pattern.FLOPPER, DyeColor.WHITE, DyeColor.YELLOW), 17);
+        PREDEFINED_TROPICAL_FISH.put(calculateTropicalFishVariant(TropicalFish.Pattern.KOB, DyeColor.RED, DyeColor.WHITE), 18);
+        PREDEFINED_TROPICAL_FISH.put(calculateTropicalFishVariant(TropicalFish.Pattern.SUNSTREAK, DyeColor.GRAY, DyeColor.WHITE), 19);
+        PREDEFINED_TROPICAL_FISH.put(calculateTropicalFishVariant(TropicalFish.Pattern.DASHER, DyeColor.CYAN, DyeColor.YELLOW), 20);
+        PREDEFINED_TROPICAL_FISH.put(calculateTropicalFishVariant(TropicalFish.Pattern.FLOPPER, DyeColor.YELLOW, DyeColor.YELLOW), 21);
     }
 
     public static String addTropicalFishType(Entity entity, String toAppend) {
@@ -70,13 +74,11 @@ public class TropicalFishUtils {
                 Object craftEntityObject = craftEntityClass.cast(entity);
                 Object nmsTropicalFishObject = nmsEntityTropicalFishClass.cast(getNmsEntityMethod.invoke(craftEntityObject));
                 int variance = (int) getTropicalFishVarianceMethod.invoke(nmsTropicalFishObject);
-                int prefefinedType = predefined.getOrDefault(variance, -1);
-                if (prefefinedType != -1) {
-                    path += ".predefined." + prefefinedType;
+                int predefinedType = getPredefinedType(variance);
+                if (predefinedType >= 0) {
+                    path += ".predefined." + predefinedType;
                 } else {
-                    variance = validateAndFixTropicalFishVariant(variance);
-                    Pattern pattern = (Pattern) getTropicalFishPatternMethod.invoke(null, variance);
-                    path += ".type." + pattern.toString().toLowerCase();
+                    path += ".type." + getTropicalFishTypeName(variance);
                 }
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                 e.printStackTrace();
@@ -85,24 +87,95 @@ public class TropicalFishUtils {
         return path;
     }
 
-    private static int validateAndFixTropicalFishVariant(int data) {
-        byte[] bytes = new byte[] {(byte) (data >> 24), (byte) (data >> 16), (byte) (data >> 8), (byte) data};
-        if (bytes.length != 4) {
-            return 0;
+    public static int getPredefinedType(int variance) {
+        return PREDEFINED_TROPICAL_FISH.getOrDefault(variance, -1);
+    }
+
+    public static int calculateTropicalFishVariant(Pattern bukkitPattern, DyeColor bodyColor, DyeColor patternColor) {
+        TropicalFishPattern pattern = TropicalFishPattern.fromPattern(bukkitPattern);
+        return pattern.getBase() & 255 | (pattern.getIndex() & 255) << 8 | ((int) bodyColor.getWoolData() & 255) << 16 | ((int) patternColor.getWoolData() & 255) << 24;
+    }
+
+    public static int getTropicalFishBaseColorIdx(int variance) {
+        return (variance & 16711680) >> 16;
+    }
+
+    public static int getTropicalFishPatternColorIdx(int variance) {
+        return (variance & -16777216) >> 24;
+    }
+
+    public static int getTropicalFishBaseVariant(int variance) {
+        return Math.min(variance & 255, 1);
+    }
+
+    public static int getTropicalFishPatternVariant(int variance) {
+        return Math.min((variance & '\uff00') >> 8, 5);
+    }
+
+    public static DyeColor getTropicalFishBaseColor(int variance) {
+        return DyeColor.getByWoolData((byte) getTropicalFishBaseColorIdx(variance));
+    }
+
+    public static DyeColor getTropicalFishPatternColor(int variance) {
+        return DyeColor.getByWoolData((byte) getTropicalFishPatternColorIdx(variance));
+    }
+
+    public static String getTropicalFishTypeName(int variance) {
+        int base = getTropicalFishBaseVariant(variance);
+        int index = getTropicalFishPatternVariant(variance);
+        return TropicalFishPattern.getPatternName(base, index);
+    }
+
+    public static enum TropicalFishPattern {
+
+        KOB(0, 0),
+        SUNSTREAK(0, 1),
+        SNOOPER(0, 2),
+        DASHER(0, 3),
+        BRINELY(0, 4),
+        SPOTTY(0, 5),
+        FLOPPER(1, 0),
+        STRIPEY(1, 1),
+        GLITTER(1, 2),
+        BLOCKFISH(1, 3),
+        BETTY(1, 4),
+        CLAYFISH(1, 5);
+
+        private static final TropicalFishPattern[] VALUES = values();
+
+        public static String getPatternName(int base, int index) {
+            return VALUES[index + 6 * base].getName();
         }
-        if (bytes[3] < 0 || bytes[3] > 1) {
-            bytes[3] = 1;
+
+        public static TropicalFishPattern fromPattern(Pattern pattern) {
+            for (TropicalFishPattern wrapper : VALUES) {
+                if (wrapper.name().equals(pattern.name())) {
+                    return wrapper;
+                }
+            }
+            return null;
         }
-        if (bytes[2] < 0 || bytes[2] > 5) {
-            bytes[2] = 5;
+
+        private final int base;
+        private final int index;
+
+        TropicalFishPattern(int base, int index) {
+            this.base = base;
+            this.index = index;
         }
-        if (bytes[1] < 0 || bytes[1] > 15) {
-            bytes[1] = 0;
+
+        public int getBase() {
+            return this.base;
         }
-        if (bytes[0] < 0 || bytes[0] > 15) {
-            bytes[0] = 0;
+
+        public int getIndex() {
+            return this.index;
         }
-        return ((bytes[0] & 0xFF) << 24) | ((bytes[1] & 0xFF) << 16) | ((bytes[2] & 0xFF) << 8) | (bytes[3] & 0xFF);
+
+        public String getName() {
+            return this.name().toLowerCase(Locale.ROOT);
+        }
+
     }
 
 }

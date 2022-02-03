@@ -11,6 +11,7 @@ import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.entity.Entity;
 
+import java.lang.reflect.Method;
 import java.util.Optional;
 
 public class CustomNameUtils {
@@ -22,7 +23,12 @@ public class CustomNameUtils {
                 try {
                     return optmob.get().getDisplayName();
                 } catch (Throwable e) {
-                    return optmob.get().getType().getDisplayName().toString();
+                    try {
+                        Object type = optmob.get().getType();
+                        Method method = type.getClass().getMethod("getDisplayName");
+                        return method.invoke(type).toString();
+                    } catch (Exception ignore) {
+                    }
                 }
             }
         }

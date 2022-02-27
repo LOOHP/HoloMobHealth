@@ -34,19 +34,25 @@ public class HoloMobArmorStand {
     private final UUID uuid;
     private final EntityType type;
     private final transient Future<Integer> entityIdFuture;
+    private final MultilineStands host;
     private int id;
     private Location location;
 
-    public HoloMobArmorStand(Location location, EntityType type) {
+    public HoloMobArmorStand(Location location, EntityType type, MultilineStands host) {
         this.entityIdFuture = EntityUtils.getNextEntityId();
         this.id = Integer.MIN_VALUE;
         this.uuid = UUID.randomUUID();
         this.location = location.clone();
         this.type = type;
+        this.host = host;
     }
 
     public EntityType getType() {
         return type;
+    }
+
+    public MultilineStands getHost() {
+        return host;
     }
 
     public void setRotation(float yaw, float pitch) {

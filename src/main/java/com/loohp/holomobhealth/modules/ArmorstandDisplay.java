@@ -157,7 +157,13 @@ public class ArmorstandDisplay implements Listener {
                         }
                         List<Player> players = new ArrayList<>();
                         players.add(player);
-                        multi.getStands().forEach(each -> ArmorStandPacket.removeArmorStand(players, each, false, false));
+                        Map<HoloMobArmorStand, Boolean> list = ArmorStandPacket.playerStatus.get(player);
+                        multi.getStands().forEach(each -> {
+                            ArmorStandPacket.removeArmorStand(players, each, false, false);
+                            if (list != null) {
+                                list.remove(each);
+                            }
+                        });
                         return;
                     }
 

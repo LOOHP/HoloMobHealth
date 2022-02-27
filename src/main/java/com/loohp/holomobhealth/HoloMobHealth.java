@@ -27,7 +27,6 @@ import com.loohp.holomobhealth.api.HoloMobHealthAPI;
 import com.loohp.holomobhealth.config.Config;
 import com.loohp.holomobhealth.database.Database;
 import com.loohp.holomobhealth.debug.Debug;
-import com.loohp.holomobhealth.holders.HoloMobArmorStand;
 import com.loohp.holomobhealth.listeners.Events;
 import com.loohp.holomobhealth.metrics.Charts;
 import com.loohp.holomobhealth.metrics.Metrics;
@@ -68,7 +67,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -76,7 +74,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 public class HoloMobHealth extends JavaPlugin {
 
@@ -224,10 +221,10 @@ public class HoloMobHealth extends JavaPlugin {
                 disabledMobTypes.add(EntityType.valueOf(each.toUpperCase()));
             }
         }
-        disabledMobNamesAbsolute = config.getConfiguration().getStringList("Options.DisabledMobNamesAbsolute").stream().collect(Collectors.toSet());
+        disabledMobNamesAbsolute = new HashSet<>(config.getConfiguration().getStringList("Options.DisabledMobNamesAbsolute"));
         disabledMobNamesContains = config.getConfiguration().getStringList("Options.DisabledMobNamesContains");
 
-        disabledWorlds = config.getConfiguration().getStringList("Options.DisabledWorlds").stream().collect(Collectors.toSet());
+        disabledWorlds = new HashSet<>(config.getConfiguration().getStringList("Options.DisabledWorlds"));
 
         useAlterHealth = config.getConfiguration().getBoolean("Options.DynamicHealthDisplay.Use");
         altHealthDisplayTime = config.getConfiguration().getInt("Options.DynamicHealthDisplay.Timeout");
@@ -316,11 +313,11 @@ public class HoloMobHealth extends JavaPlugin {
         if (version.isOld()) {
             return 80;
         } else if (version.isNewerOrEqualTo(MCVersion.V1_18)) {
-            return Math.min(Math.min(world.getViewDistance(), world.getSimulationDistance()), 80);
+            return Math.min(Math.min(world.getViewDistance() << 4, world.getSimulationDistance() << 4), 80);
         } else if (version.isNewerOrEqualTo(MCVersion.V1_16)) {
-            return Math.min(world.getViewDistance() * 16 / 2, 80);
+            return Math.min((world.getViewDistance() << 4) / 2, 80);
         } else {
-            return Math.min(Bukkit.getViewDistance() * 16 / 2, 80);
+            return Math.min((Bukkit.getViewDistance() << 4) / 2, 80);
         }
     }
 
@@ -482,7 +479,7 @@ public class HoloMobHealth extends JavaPlugin {
 
             if (armorStandMode) {
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    ArmorStandPacket.playerStatus.put(player, Collections.newSetFromMap(new ConcurrentHashMap<HoloMobArmorStand, Boolean>()));
+                    ArmorStandPacket.playerStatus.put(player, new ConcurrentHashMap<>());
                 }
             }
         });

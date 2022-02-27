@@ -68,7 +68,7 @@ public class MultilineStands {
         Location standloc = location.clone();
         stands = new ArrayList<>();
         for (int i = 0; i < HoloMobHealth.displayText.size(); i++) {
-            HoloMobArmorStand stand = new HoloMobArmorStand(standloc, EntityType.ARMOR_STAND);
+            HoloMobArmorStand stand = new HoloMobArmorStand(standloc, EntityType.ARMOR_STAND, this);
             stands.add(stand);
         }
         Location base = entity.getLocation().add(0, NMSUtils.getEntityHeight(entity), 0);

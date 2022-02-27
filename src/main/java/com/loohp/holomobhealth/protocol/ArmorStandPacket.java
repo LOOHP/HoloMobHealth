@@ -52,11 +52,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.ConcurrentModificationException;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,43 +67,47 @@ public class ArmorStandPacket implements Listener {
 
     private static final ProtocolManager protocolManager = HoloMobHealth.protocolManager;
     private static final Plugin plugin = HoloMobHealth.plugin;
-    public static Set<HoloMobArmorStand> active = Collections.synchronizedSet(new LinkedHashSet<>());
-    public static Map<Player, Set<HoloMobArmorStand>> playerStatus = new ConcurrentHashMap<>();
+    public static final Set<HoloMobArmorStand> active = Collections.synchronizedSet(new LinkedHashSet<>());
+    public static final Map<Player, Map<HoloMobArmorStand, Boolean>> playerStatus = new ConcurrentHashMap<>();
 
     public static void update() {
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
-                try {
-                    Set<HoloMobArmorStand> activeList = playerStatus.get(player);
-                    if (activeList == null) {
-                        continue;
-                    }
+                Map<HoloMobArmorStand, Boolean> activeList = playerStatus.get(player);
+                if (activeList == null) {
+                    continue;
+                }
 
-                    List<Player> playerList = new LinkedList<Player>();
-                    playerList.add(player);
+                List<Player> playerList = new LinkedList<>();
+                playerList.add(player);
 
-                    for (HoloMobArmorStand entity : activeList) {
-                        World world = player.getWorld();
-                        if (!entity.getWorld().equals(world) || entity.getLocation().distanceSquared(player.getLocation()) > ((HoloMobHealth.getUpdateRange(world) + 1) * (HoloMobHealth.getUpdateRange(world) + 1))) {
+                Set<Entity> entitiesUpdated = new HashSet<>();
+
+                for (Entry<HoloMobArmorStand, Boolean> entry : activeList.entrySet()) {
+                    HoloMobArmorStand entity = entry.getKey();
+                    World world = player.getWorld();
+                    int range = HoloMobHealth.getUpdateRange(world);
+                    range *= range;
+                    if (entry.getValue()) {
+                        if (!entity.getWorld().equals(world) || entity.getLocation().distanceSquared(player.getLocation()) > range + 1) {
                             removeArmorStand(playerList, entity, false, true);
+                            entry.setValue(false);
                         }
-                    }
-
-                    for (HoloMobArmorStand entity : active) {
-                        World world = player.getWorld();
-                        if (entity.getWorld().equals(player.getWorld()) && entity.getLocation().distanceSquared(player.getLocation()) <= (HoloMobHealth.getUpdateRange(world) * HoloMobHealth.getUpdateRange(world))) {
-                            if (activeList.contains(entity)) {
-                                continue;
-                            }
+                    } else {
+                        if (entity.getWorld().equals(world) && entity.getLocation().distanceSquared(player.getLocation()) <= range) {
                             if (!HoloMobHealth.playersEnabled.contains(player)) {
                                 continue;
                             }
 
                             sendArmorStandSpawn(playerList, entity, Component.empty(), false);
-                            updateArmorStand(playerList, entity, Component.empty(), false);
+                            entitiesUpdated.add(entity.getHost().getEntity());
+                            entry.setValue(true);
                         }
                     }
-                } catch (ConcurrentModificationException ignore) {
+                }
+
+                for (Entity entity : entitiesUpdated) {
+                    Bukkit.getScheduler().runTask(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(player, entity));
                 }
             }
         }, 0, 20);
@@ -114,8 +119,8 @@ public class ArmorStandPacket implements Listener {
         }
         List<Player> playersNotAlready = new ArrayList<>();
         for (Player player : players) {
-            Set<HoloMobArmorStand> list = playerStatus.get(player);
-            if (list != null && !list.contains(entity)) {
+            Map<HoloMobArmorStand, Boolean> list = playerStatus.get(player);
+            if (list != null && !list.containsKey(entity)) {
                 playersNotAlready.add(player);
             }
         }
@@ -132,9 +137,9 @@ public class ArmorStandPacket implements Listener {
         List<Player> playersInRange = new ArrayList<>();
         for (Player each : players) {
             if ((each.getWorld().equals(world)) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.getUpdateRange(world) * HoloMobHealth.getUpdateRange(world)))) {
-                Set<HoloMobArmorStand> list = playerStatus.get(each);
+                Map<HoloMobArmorStand, Boolean> list = playerStatus.get(each);
                 if (list != null) {
-                    list.add(entity);
+                    list.put(entity, true);
                     playersInRange.add(each);
                 }
             }
@@ -181,7 +186,7 @@ public class ArmorStandPacket implements Listener {
 
         PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
         packet2.getIntegers().write(0, entity.getEntityId());
-        WrappedDataWatcher wpw = buildWarppedDataWatcher(entity, component, visible);
+        WrappedDataWatcher wpw = buildWrappedDataWatcher(entity, component, visible);
         packet2.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
 
         try {
@@ -204,7 +209,7 @@ public class ArmorStandPacket implements Listener {
             List<Player> playersInRange = players.stream().filter(each -> (each.getWorld().equals(world)) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.getUpdateRange(world) * HoloMobHealth.getUpdateRange(world)))).collect(Collectors.toList());
             PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
             packet1.getIntegers().write(0, entity.getEntityId());
-            WrappedDataWatcher wpw = buildWarppedDataWatcher(entity, component, visible);
+            WrappedDataWatcher wpw = buildWrappedDataWatcher(entity, component, visible);
             packet1.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
 
             PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);
@@ -235,7 +240,7 @@ public class ArmorStandPacket implements Listener {
 
             PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
             packet1.getIntegers().write(0, entity.getEntityId());
-            WrappedDataWatcher wpw = buildWarppedDataWatcher(entity, component, visible);
+            WrappedDataWatcher wpw = buildWrappedDataWatcher(entity, component, visible);
             packet1.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
 
             PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);
@@ -326,9 +331,11 @@ public class ArmorStandPacket implements Listener {
             if (bypassFilter) {
                 playersInRange = new ArrayList<>();
                 for (Player each : players) {
-                    Set<HoloMobArmorStand> list = playerStatus.get(each);
-                    if (list != null) {
-                        list.remove(entity);
+                    if (removeFromActive) {
+                        Map<HoloMobArmorStand, Boolean> list = playerStatus.get(each);
+                        if (list != null) {
+                            list.remove(entity);
+                        }
                     }
                     playersInRange.add(each);
                 }
@@ -336,9 +343,11 @@ public class ArmorStandPacket implements Listener {
                 playersInRange = new ArrayList<>();
                 for (Player each : players) {
                     if ((each.getWorld().equals(world)) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.getUpdateRange(world) * HoloMobHealth.getUpdateRange(world)))) {
-                        Set<HoloMobArmorStand> list = playerStatus.get(each);
-                        if (list != null) {
-                            list.remove(entity);
+                        if (removeFromActive) {
+                            Map<HoloMobArmorStand, Boolean> list = playerStatus.get(each);
+                            if (list != null) {
+                                list.remove(entity);
+                            }
                         }
                         playersInRange.add(each);
                     }
@@ -361,7 +370,7 @@ public class ArmorStandPacket implements Listener {
         });
     }
 
-    private static WrappedDataWatcher buildWarppedDataWatcher(HoloMobArmorStand entity, Component entityNameComponent, boolean visible) {
+    private static WrappedDataWatcher buildWrappedDataWatcher(HoloMobArmorStand entity, Component entityNameComponent, boolean visible) {
         WrappedDataWatcher watcher = new WrappedDataWatcher();
 
         if (entity.getType().equals(EntityType.ARMOR_STAND)) {
@@ -449,12 +458,12 @@ public class ArmorStandPacket implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        playerStatus.put(event.getPlayer(), Collections.newSetFromMap(new ConcurrentHashMap<>()));
+        playerStatus.put(event.getPlayer(), new ConcurrentHashMap<>());
     }
 
     @EventHandler
     public void onWorldChange(PlayerChangedWorldEvent event) {
-        playerStatus.put(event.getPlayer(), Collections.newSetFromMap(new ConcurrentHashMap<>()));
+        playerStatus.put(event.getPlayer(), new ConcurrentHashMap<>());
     }
 
     @EventHandler

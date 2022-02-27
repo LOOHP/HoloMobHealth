@@ -89,6 +89,7 @@ Options:
       #Whether to display an alternative format when a mob is not taking damage
       Use: false
       #Placeholders are the same as the main display
+      #Need to have the same number of lines as the main display
       Text:
         - "&b{Mob_Type_Or_Name}"
         - "If Multiline is enabled, you will see this line"

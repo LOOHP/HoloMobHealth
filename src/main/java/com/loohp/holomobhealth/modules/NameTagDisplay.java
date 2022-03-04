@@ -59,8 +59,6 @@ import java.util.UUID;
 
 public class NameTagDisplay {
 
-    //private static Map<UUID, WrappedDataWatcher> cache = new HashMap<>();
-
     public static void entityMetadataPacketListener() {
         HoloMobHealth.protocolManager.addPacketListener(new PacketAdapter(HoloMobHealth.plugin, ListenerPriority.MONITOR, PacketType.Play.Server.ENTITY_METADATA) {
             @Override

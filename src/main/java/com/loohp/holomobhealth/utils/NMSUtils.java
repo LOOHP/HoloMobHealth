@@ -25,6 +25,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -60,40 +61,44 @@ public class NMSUtils {
             nmsEntityClass = getNMSClass("net.minecraft.server.%s.Entity", "net.minecraft.world.entity.Entity");
             nmsWorldServerClass = getNMSClass("net.minecraft.server.%s.WorldServer", "net.minecraft.server.level.WorldServer");
             craftWorldGetHandleMethod = craftWorldClass.getMethod("getHandle");
-            try {
-                nmsWorldServerGetEntityByIDMethod = nmsWorldServerClass.getMethod("getEntity", int.class);
-            } catch (NoSuchMethodException e) {
-                nmsWorldServerGetEntityByIDMethod = nmsWorldServerClass.getMethod("a", int.class);
-            }
-            try {
-                nmsWorldServerGetEntityByUUIDMethod = nmsWorldServerClass.getMethod("getEntity", UUID.class);
-            } catch (NoSuchMethodException e) {
-                nmsWorldServerGetEntityByUUIDMethod = nmsWorldServerClass.getMethod("a", UUID.class);
-            }
+            nmsWorldServerGetEntityByIDMethod = reflectiveLookup(Method.class, () -> {
+                return nmsWorldServerClass.getMethod("getEntity", int.class);
+            }, () -> {
+                return nmsWorldServerClass.getMethod("a", int.class);
+            });
+            nmsWorldServerGetEntityByUUIDMethod = reflectiveLookup(Method.class, () -> {
+                return nmsWorldServerClass.getMethod("getEntity", UUID.class);
+            }, () -> {
+                return nmsWorldServerClass.getMethod("a", UUID.class);
+            });
             nmsEntityGetBukkitEntityMethod = nmsEntityClass.getMethod("getBukkitEntity");
-            try {
-                nmsEntityGetUniqueIDMethod = nmsEntityClass.getMethod("getUniqueID");
-            } catch (NoSuchMethodException e) {
-                nmsEntityGetUniqueIDMethod = nmsEntityClass.getMethod("cm");
-            }
-            try {
-                nmsEntityGetBoundingBox = nmsEntityClass.getMethod("getBoundingBox");
-            } catch (NoSuchMethodException e) {
-                nmsEntityGetBoundingBox = nmsEntityClass.getMethod("cw");
-            }
+            nmsEntityGetUniqueIDMethod = reflectiveLookup(Method.class, () -> {
+                return nmsEntityClass.getMethod("getUniqueID");
+            }, () -> {
+                return nmsEntityClass.getMethod("cm");
+            });
+            nmsEntityGetBoundingBox = reflectiveLookup(Method.class, () -> {
+                return nmsEntityClass.getMethod("getBoundingBox");
+            }, () -> {
+                return nmsEntityClass.getMethod("cw");
+            }, () -> {
+                return nmsEntityClass.getMethod("cx");
+            });
             nmsEntityGetHandle = craftEntityClass.getMethod("getHandle");
             nmsAxisAlignedBBClass = getNMSClass("net.minecraft.server.%s.AxisAlignedBB", "net.minecraft.world.phys.AxisAlignedBB");
             nmsAxisAlignedBBFields = nmsAxisAlignedBBClass.getFields();
             if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_17)) {
                 if (HoloMobHealth.version.equals(MCVersion.V1_17)) {
                     nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("G");
-                } else {
+                } else if (HoloMobHealth.version.equals(MCVersion.V1_18)) {
                     nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("P");
+                } else {
+                    nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("O");
                 }
-                nmsEntityManagerGetEntityGetterMethod = nmsWorldEntityManagerField.getType().getMethod("d");//
-                nmsLevelEntityGetterClass = Class.forName("net.minecraft.world.level.entity.LevelEntityGetterAdapter");
-                nmsLevelEntityGetterGetEntityByIDMethod = nmsLevelEntityGetterClass.getMethod("a", int.class);//
-                nmsLevelEntityGetterGetEntityByUUIDMethod = nmsLevelEntityGetterClass.getMethod("a", UUID.class);//
+                nmsEntityManagerGetEntityGetterMethod = nmsWorldEntityManagerField.getType().getMethod("d");
+                nmsLevelEntityGetterClass = getNMSClass("net.minecraft.world.level.entity.LevelEntityGetterAdapter");
+                nmsLevelEntityGetterGetEntityByIDMethod = nmsLevelEntityGetterClass.getMethod("a", int.class);
+                nmsLevelEntityGetterGetEntityByUUIDMethod = nmsLevelEntityGetterClass.getMethod("a", UUID.class);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -119,8 +124,7 @@ public class NMSUtils {
             return null;
         } else if (HoloMobHealth.version.isOld()) {
             List<Entity> entities = world.getEntities();
-            for (int i = 0; i < entities.size(); i++) {
-                Entity entity = entities.get(i);
+            for (Entity entity : entities) {
                 if (entity.getEntityId() == id) {
                     return entity.getUniqueId();
                 }
@@ -228,6 +232,31 @@ public class NMSUtils {
             }
         }
         throw error;
+    }
+
+    @SafeVarargs
+    public static <T extends AccessibleObject> T reflectiveLookup(Class<T> lookupType, ReflectionLookupSupplier<T> methodLookup, ReflectionLookupSupplier<T>... methodLookups) throws ReflectiveOperationException {
+        ReflectiveOperationException error = null;
+        try {
+            return methodLookup.lookup();
+        } catch (ReflectiveOperationException e) {
+            error = e;
+        }
+        for (ReflectionLookupSupplier<T> supplier : methodLookups) {
+            try {
+                return supplier.lookup();
+            } catch (ReflectiveOperationException e) {
+                error = e;
+            }
+        }
+        throw error;
+    }
+
+    @FunctionalInterface
+    public interface ReflectionLookupSupplier<T> {
+
+        T lookup() throws ReflectiveOperationException;
+
     }
 
 }

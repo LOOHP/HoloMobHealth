@@ -28,7 +28,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.List;
 
 public class BoundingBoxUtils {
 
@@ -37,17 +36,22 @@ public class BoundingBoxUtils {
     private static Method craftEntityGetHandlerMethod;
     private static Class<?> nmsAxisAlignedBBClass;
     private static Method nmsEntityGetBoundingBoxMethod;
-    private static List<Field> nmsAxisAlignedBBFields;
+    private static Field[] nmsAxisAlignedBBFields;
 
-    private static void _init_() {
+    static {
         try {
             craftEntityClass = NMSUtils.getNMSClass("org.bukkit.craftbukkit.%s.entity.CraftEntity");
             nmsEntityClass = NMSUtils.getNMSClass("net.minecraft.server.%s.Entity", "net.minecraft.world.entity.Entity");
             craftEntityGetHandlerMethod = craftEntityClass.getMethod("getHandle");
             nmsAxisAlignedBBClass = NMSUtils.getNMSClass("net.minecraft.server.%s.AxisAlignedBB", "net.minecraft.world.phys.AxisAlignedBB");
             nmsEntityGetBoundingBoxMethod = nmsEntityClass.getMethod("getBoundingBox");
-            nmsAxisAlignedBBFields = Arrays.asList(nmsAxisAlignedBBClass.getFields());
-        } catch (ClassNotFoundException | NoSuchMethodException e) {
+            nmsEntityGetBoundingBoxMethod = NMSUtils.reflectiveLookup(Method.class, () -> {
+                return nmsEntityClass.getMethod("getBoundingBox");
+            }, () -> {
+                return nmsEntityClass.getMethod("cx");
+            });
+            nmsAxisAlignedBBFields = nmsAxisAlignedBBClass.getFields();
+        } catch (ReflectiveOperationException e) {
             e.printStackTrace();
         }
     }
@@ -57,14 +61,11 @@ public class BoundingBoxUtils {
             org.bukkit.util.BoundingBox bukkitBox = entity.getBoundingBox();
             return BoundingBox.of(bukkitBox.getMin(), bukkitBox.getMax());
         } else {
-            if (craftEntityClass == null) {
-                _init_();
-            }
             try {
                 Object craftEntityObject = craftEntityClass.cast(entity);
                 Object nmsEntityObject = craftEntityGetHandlerMethod.invoke(craftEntityObject);
                 Object axisAlignedBBObject = nmsEntityGetBoundingBoxMethod.invoke(nmsEntityObject);
-                double[] values = nmsAxisAlignedBBFields.stream().mapToDouble(field -> {
+                double[] values = Arrays.stream(nmsAxisAlignedBBFields).mapToDouble(field -> {
                     try {
                         return field.getDouble(axisAlignedBBObject);
                     } catch (IllegalArgumentException | IllegalAccessException e) {

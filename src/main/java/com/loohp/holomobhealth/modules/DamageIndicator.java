@@ -91,6 +91,7 @@ public class DamageIndicator implements Listener {
         }
 
         switch (HoloMobHealth.version) {
+            case V1_18_2:
             case V1_18:
             case V1_17:
                 metaversion = 4;

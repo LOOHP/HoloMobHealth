@@ -71,7 +71,7 @@ public class LanguageUtils {
         if (HoloMobHealth.version.isLegacy()) {
             try {
                 craftEntityClass = NMSUtils.getNMSClass("org.bukkit.craftbukkit.%s.entity.CraftEntity");
-                nmsEntityClass = NMSUtils.getNMSClass("net.minecraft.server.%s.Entity", "net.minecraft.world.entity.Entity");
+                nmsEntityClass = NMSUtils.getNMSClass("net.minecraft.server.%s.Entity");
                 nmsEntityTypesClass = NMSUtils.getNMSClass("net.minecraft.server.%s.EntityTypes");
                 getNmsEntityMethod = craftEntityClass.getMethod("getHandle");
                 getEntityKeyMethod = nmsEntityTypesClass.getMethod("b", nmsEntityClass);

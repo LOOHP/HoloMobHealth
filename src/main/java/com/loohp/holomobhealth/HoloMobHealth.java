@@ -178,6 +178,11 @@ public class HoloMobHealth extends JavaPlugin {
         return Config.getConfig(CONFIG_ID).getConfiguration();
     }
 
+    public static boolean isPluginEnabled(String name) {
+        Plugin plugin = Bukkit.getPluginManager().getPlugin(name);
+        return plugin != null && plugin.isEnabled();
+    }
+
     @SuppressWarnings("deprecation")
     public static void loadConfig() {
         Config config = Config.getConfig(CONFIG_ID);
@@ -339,7 +344,7 @@ public class HoloMobHealth extends JavaPlugin {
 
     @Override
     public void onLoad() {
-        if (Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") != null) {
+        if (isPluginEnabled("WorldGuard")) {
             String version = getServer().getPluginManager().getPlugin("WorldGuard").getDescription().getVersion();
             if (version.startsWith("7.")) {
                 getServer().getLogger().info("[HoloMobHealth] Registering WorldGuard State Flags...");
@@ -404,42 +409,42 @@ public class HoloMobHealth extends JavaPlugin {
 
         getCommand("holomobhealth").setExecutor(new Commands());
 
-        if (Bukkit.getServer().getPluginManager().getPlugin("Citizens") != null) {
+        if (isPluginEnabled("Citizens")) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into Citizens!");
             citizensHook = true;
         }
 
-        if (Bukkit.getServer().getPluginManager().getPlugin("MythicMobs") != null) {
+        if (isPluginEnabled("MythicMobs")) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into MythicMobs!");
             mythicHook = true;
         }
 
-        if (Bukkit.getServer().getPluginManager().getPlugin("Shopkeepers") != null) {
+        if (isPluginEnabled("Shopkeepers")) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into Shopkeepers!");
             shopkeepersHook = true;
         }
 
-        if (Bukkit.getServer().getPluginManager().getPlugin("MyPet") != null) {
+        if (isPluginEnabled("MyPet")) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into MyPet!");
             myPetHook = true;
         }
 
-        if (Bukkit.getServer().getPluginManager().getPlugin("UltimateStacker") != null) {
+        if (isPluginEnabled("UltimateStacker")) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into UltimateStacker!");
             ultimateStackerHook = true;
         }
 
-        if (Bukkit.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+        if (isPluginEnabled("PlaceholderAPI")) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into PlaceholderAPI!");
             placeholderAPIHook = true;
         }
 
-        if (Bukkit.getServer().getPluginManager().getPlugin("UltimateStacker") != null) {
+        if (isPluginEnabled("UltimateStacker")) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into UltimateStacker!");
             ultimateStackerHook = true;
         }
 
-        if (Bukkit.getServer().getPluginManager().getPlugin("RoseStacker") != null) {
+        if (isPluginEnabled("RoseStacker")) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into RoseStacker!");
             roseStackerHook = true;
         }
@@ -461,7 +466,7 @@ public class HoloMobHealth extends JavaPlugin {
 
         ArmorstandDisplay.run();
 
-        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+        if (isPluginEnabled("PlaceholderAPI")) {
             new Placeholders().register();
         }
 

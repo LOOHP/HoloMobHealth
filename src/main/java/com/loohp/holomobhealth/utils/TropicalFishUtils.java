@@ -50,14 +50,16 @@ public class TropicalFishUtils {
                 craftEntityClass = NMSUtils.getNMSClass("org.bukkit.craftbukkit.%s.entity.CraftEntity");
                 getNmsEntityMethod = craftEntityClass.getMethod("getHandle");
                 nmsEntityTropicalFishClass = NMSUtils.getNMSClass("net.minecraft.server.%s.EntityTropicalFish", "net.minecraft.world.entity.animal.EntityTropicalFish");
-                try {
-                    getTropicalFishVarianceMethod = nmsEntityTropicalFishClass.getMethod("getVariant");
-                } catch (Exception e) {
-                    getTropicalFishVarianceMethod = nmsEntityTropicalFishClass.getMethod("fH");
-                }
+                getTropicalFishVarianceMethod = NMSUtils.reflectiveLookup(Method.class, () -> {
+                    return nmsEntityTropicalFishClass.getMethod("getVariant");
+                }, () -> {
+                    return nmsEntityTropicalFishClass.getMethod("fH");
+                }, () -> {
+                    return nmsEntityTropicalFishClass.getMethod("fI");
+                });
                 craftTropicalFishClass = NMSUtils.getNMSClass("org.bukkit.craftbukkit.%s.entity.CraftTropicalFish");
                 getTropicalFishPatternMethod = craftTropicalFishClass.getMethod("getPattern", int.class);
-            } catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
+            } catch (SecurityException | ReflectiveOperationException e) {
                 e.printStackTrace();
             }
         }

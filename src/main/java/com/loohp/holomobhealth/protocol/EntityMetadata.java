@@ -27,6 +27,7 @@ import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.Registry;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.Serializer;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObject;
+import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.utils.EntityTypeUtils;
 import com.loohp.holomobhealth.utils.LanguageUtils;
@@ -69,7 +70,13 @@ public class EntityMetadata {
         }
         PacketContainer packet = HoloMobHealth.protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
         packet.getIntegers().write(0, entity.getEntityId());
-        packet.getWatchableCollectionModifier().write(0, WrappedDataWatcher.getEntityWatcher(entity).getWatchableObjects());
+        WrappedDataWatcher entityWatcher = WrappedDataWatcher.getEntityWatcher(entity);
+        WrappedDataWatcher watcher = new WrappedDataWatcher(entity);
+        WrappedWatchableObject watchableObject2 = entityWatcher.getWatchableObject(2);
+        watcher.setObject(watchableObject2.getWatcherObject(), watchableObject2.getValue());
+        WrappedWatchableObject watchableObject3 = entityWatcher.getWatchableObject(3);
+        watcher.setObject(watchableObject3.getWatcherObject(), watchableObject3.getValue());
+        packet.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects());
 
         Bukkit.getScheduler().runTaskAsynchronously(HoloMobHealth.plugin, () -> {
             for (Player player : players) {

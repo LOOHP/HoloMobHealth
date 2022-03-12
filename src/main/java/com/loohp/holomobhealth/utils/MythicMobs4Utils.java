@@ -20,27 +20,35 @@
 
 package com.loohp.holomobhealth.utils;
 
+import io.lumine.xikage.mythicmobs.MythicMobs;
+import io.lumine.xikage.mythicmobs.mobs.ActiveMob;
 import org.bukkit.entity.Entity;
 
-public class MythicMobsUtils {
+import java.lang.reflect.Method;
+import java.util.Optional;
 
-    private static boolean mythicMobs5;
-
-    static {
-        try {
-            Class.forName("io.lumine.mythic.bukkit.MythicBukkit");
-            mythicMobs5 = true;
-        } catch (Throwable e) {
-            mythicMobs5 = false;
-        }
-    }
+public class MythicMobs4Utils {
 
     public static boolean isMythicMob(Entity entity) {
-        return mythicMobs5 ? MythicMobs5Utils.isMythicMob(entity) : MythicMobs4Utils.isMythicMob(entity);
+        return MythicMobs.inst().getMobManager().isActiveMob(entity.getUniqueId());
     }
 
     public static String getMobCustomName(Entity entity) {
-        return mythicMobs5 ? MythicMobs5Utils.getMobCustomName(entity) : MythicMobs4Utils.getMobCustomName(entity);
+        Optional<ActiveMob> optionalActiveMob = MythicMobs.inst().getMobManager().getActiveMob(entity.getUniqueId());
+        if (optionalActiveMob.isPresent()) {
+            try {
+                ActiveMob activeMob = optionalActiveMob.get();
+                return activeMob.getEntity() == null ? "Unknown" : activeMob.getEntity().getName();
+            } catch (Throwable e1) {
+                try {
+                    Object type = optionalActiveMob.get().getType();
+                    Method method = type.getClass().getMethod("getDisplayName");
+                    return method.invoke(type).toString();
+                } catch (Exception ignore) {
+                }
+            }
+        }
+        return null;
     }
 
 }

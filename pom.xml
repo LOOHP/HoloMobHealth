@@ -25,7 +25,7 @@
 	<groupId>com.loohp</groupId>
 	<artifactId>HoloMobHealth</artifactId>
 	<name>HoloMobHealth</name>
-	<version>2.2.5.3</version>
+	<version>2.2.5.4</version>
 
 	<description>Customize how you would like to display mob health above its head!</description>
 	<url>https://github.com/LOOHP/HoloMobHealth</url>
@@ -228,10 +228,6 @@
 			<url>https://repo.rosewooddev.io/repository/public/</url>
 		</repository>
 		<repository>
-			<id>public</id>
-			<url>http://repo.songoda.com/repository/public/</url>
-		</repository>
-		<repository>
 			<id>rose-repo</id>
 			<url>https://nexus.lichtspiele.org/repository/releases/</url>
 		</repository>
@@ -373,6 +369,12 @@
 			<groupId>io.lumine.xikage</groupId>
 			<artifactId>MythicMobs</artifactId>
 			<version>4.11.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.lumine</groupId>
+			<artifactId>Mythic-Dist</artifactId>
+			<version>5.0.1</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

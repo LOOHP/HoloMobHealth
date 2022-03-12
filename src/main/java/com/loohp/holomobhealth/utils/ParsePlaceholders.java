@@ -47,18 +47,18 @@ public class ParsePlaceholders {
     @SuppressWarnings("deprecation")
     public static Component parse(Player player, LivingEntity entity, String text, double healthchange) {
         double health = entity.getHealth();
-        double maxhealth = 0.0;
+        double maxHealth = 0.0;
         try {
             if (!HoloMobHealth.version.isLegacy()) {
-                maxhealth = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+                maxHealth = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
             } else {
-                maxhealth = entity.getMaxHealth();
+                maxHealth = entity.getMaxHealth();
             }
-        } catch (Throwable e) {
+        } catch (Throwable ignored) {
         }
-        double percentage = (health / maxhealth) * 100;
+        double percentage = (health / maxHealth) * 100;
 
-        int heartScale = HoloMobHealth.dynamicScale ? (Math.ceil(maxhealth / 2) > HoloMobHealth.heartScale ? HoloMobHealth.heartScale : (int) Math.ceil(maxhealth / 2)) : HoloMobHealth.heartScale;
+        int heartScale = HoloMobHealth.dynamicScale ? (Math.ceil(maxHealth / 2) > HoloMobHealth.heartScale ? HoloMobHealth.heartScale : (int) Math.ceil(maxHealth / 2)) : HoloMobHealth.heartScale;
 
         for (Entry<String, HealthFormatData> entry : DisplayTextCacher.getDecimalFormatMapping().entrySet()) {
             HealthFormatData data = entry.getValue();
@@ -67,7 +67,7 @@ public class ParsePlaceholders {
                     text = text.replace(entry.getKey(), String.valueOf(data.getFormatter().format(health)));
                     break;
                 case MAXHEALTH:
-                    text = text.replace(entry.getKey(), String.valueOf(data.getFormatter().format(maxhealth)));
+                    text = text.replace(entry.getKey(), String.valueOf(data.getFormatter().format(maxHealth)));
                     break;
                 case PERCENTAGEHEALTH:
                     text = text.replace(entry.getKey(), String.valueOf(data.getFormatter().format(percentage)));

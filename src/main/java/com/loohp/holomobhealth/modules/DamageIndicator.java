@@ -34,6 +34,7 @@ import com.loohp.holomobhealth.utils.CustomNameUtils;
 import com.loohp.holomobhealth.utils.EntityTypeUtils;
 import com.loohp.holomobhealth.utils.EntityUtils;
 import com.loohp.holomobhealth.utils.LanguageUtils;
+import com.loohp.holomobhealth.utils.MathUtils;
 import com.loohp.holomobhealth.utils.MyPetUtils;
 import com.loohp.holomobhealth.utils.MythicMobsUtils;
 import com.loohp.holomobhealth.utils.NMSUtils;
@@ -72,9 +73,10 @@ import java.util.stream.Collectors;
 public class DamageIndicator implements Listener {
 
     private static final Random RANDOM = new Random();
+    private static final Vector VECTOR_ZERO = new Vector(0, 0, 0);
+    private static final double EPSILON = 0.001;
 
-    private final Vector vectorZero = new Vector(0, 0, 0);
-    private int metaversion;
+    private int metaVersion;
     private Serializer booleanSerializer;
     private Serializer stringSerializer;
     private Serializer byteSerializer;
@@ -94,20 +96,20 @@ public class DamageIndicator implements Listener {
             case V1_18_2:
             case V1_18:
             case V1_17:
-                metaversion = 4;
+                metaVersion = 4;
                 break;
             case V1_16_4:
             case V1_16_2:
             case V1_16:
             case V1_15:
-                metaversion = 3;
+                metaVersion = 3;
                 break;
             case V1_14:
-                metaversion = 2;
+                metaVersion = 2;
                 break;
             case V1_13_1:
             case V1_13:
-                metaversion = 1;
+                metaVersion = 1;
                 break;
             case V1_12:
             case V1_11:
@@ -117,7 +119,7 @@ public class DamageIndicator implements Listener {
             case V1_8_4:
             case V1_8_3:
             case V1_8:
-                metaversion = 0;
+                metaVersion = 0;
                 break;
             default:
                 break;
@@ -171,7 +173,10 @@ public class DamageIndicator implements Listener {
 
             double finalDamage = event.getFinalDamage();
             if (finalDamage >= HoloMobHealth.damageIndicatorDamageMinimum && entity instanceof LivingEntity && (EntityTypeUtils.getMobsTypesSet().contains(entity.getType()) || entity.getType().equals(EntityType.PLAYER))) {
-                damage((LivingEntity) entity, finalDamage);
+                LivingEntity livingEntity = (LivingEntity) entity;
+                if (MathUtils.greaterThan(livingEntity.getHealth(), 0.0, EPSILON) && !livingEntity.isDead()) {
+                    damage(livingEntity, finalDamage);
+                }
             }
         }
     }
@@ -238,7 +243,10 @@ public class DamageIndicator implements Listener {
 
             double finalDamage = event.getFinalDamage();
             if (finalDamage >= HoloMobHealth.damageIndicatorDamageMinimum && entity instanceof LivingEntity && (EntityTypeUtils.getMobsTypesSet().contains(entity.getType()) || entity.getType().equals(EntityType.PLAYER))) {
-                damage((LivingEntity) entity, finalDamage);
+                LivingEntity livingEntity = (LivingEntity) entity;
+                if (MathUtils.greaterThan(livingEntity.getHealth(), 0.0, EPSILON) && !livingEntity.isDead()) {
+                    damage(livingEntity, finalDamage);
+                }
             }
         }
     }
@@ -290,14 +298,14 @@ public class DamageIndicator implements Listener {
                 if (entity instanceof Player) {
                     LivingEntity livingentity = (LivingEntity) entity;
                     double health = livingentity.getHealth();
-                    double maxhealth = 0.0;
+                    double maxHealth;
                     if (!HoloMobHealth.version.isLegacy()) {
-                        maxhealth = livingentity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+                        maxHealth = livingentity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
                     } else {
-                        maxhealth = livingentity.getMaxHealth();
+                        maxHealth = livingentity.getMaxHealth();
                     }
 
-                    double gain = Math.min(maxhealth - health, event.getAmount());
+                    double gain = Math.min(maxHealth - health, event.getAmount());
                     if (gain >= HoloMobHealth.damageIndicatorRegenMinimum) {
                         regen(livingentity, gain);
                     }
@@ -306,14 +314,14 @@ public class DamageIndicator implements Listener {
                 if (entity instanceof LivingEntity && (EntityTypeUtils.getMobsTypesSet().contains(entity.getType()) || entity.getType().equals(EntityType.PLAYER))) {
                     LivingEntity livingentity = (LivingEntity) entity;
                     double health = livingentity.getHealth();
-                    double maxhealth = 0.0;
+                    double maxHealth;
                     if (!HoloMobHealth.version.isLegacy()) {
-                        maxhealth = livingentity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+                        maxHealth = livingentity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
                     } else {
-                        maxhealth = livingentity.getMaxHealth();
+                        maxHealth = livingentity.getMaxHealth();
                     }
 
-                    double gain = Math.min(maxhealth - health, event.getAmount());
+                    double gain = Math.min(maxHealth - health, event.getAmount());
                     if (gain >= HoloMobHealth.damageIndicatorRegenMinimum) {
                         regen(livingentity, gain);
                     }
@@ -349,7 +357,7 @@ public class DamageIndicator implements Listener {
         if (HoloMobHealth.damageIndicatorDamageAnimation) {
             velocity = indicator.toVector().subtract(location.toVector()).normalize().multiply(0.15).add(new Vector(0, 0.1, 0));
         } else {
-            velocity = vectorZero;
+            velocity = VECTOR_ZERO;
         }
 
         Component component = ParsePlaceholders.parse(entity, HoloMobHealth.damageIndicatorDamageText, -damage);
@@ -378,7 +386,7 @@ public class DamageIndicator implements Listener {
 
         location.add(x, (height / 2 + (RANDOM.nextDouble() - 1) * 0.5) + HoloMobHealth.damageIndicatorRegenY, z);
 
-        Vector velocity = HoloMobHealth.damageIndicatorRegenAnimation ? new Vector(0, 0.2, 0) : vectorZero;
+        Vector velocity = HoloMobHealth.damageIndicatorRegenAnimation ? new Vector(0, 0.2, 0) : VECTOR_ZERO;
 
         Component component = ParsePlaceholders.parse(entity, HoloMobHealth.damageIndicatorRegenText, gain);
         playIndicator(component, location, velocity, false, height);
@@ -445,21 +453,21 @@ public class DamageIndicator implements Listener {
             watcher.setObject(new WrappedDataWatcherObject(4, booleanSerializer), true);
             watcher.setObject(new WrappedDataWatcherObject(5, booleanSerializer), !gravity);
 
-            byte standbitmask = (byte) 0x01 | 0x08 | 0x10;
+            byte standBitmask = (byte) 0x01 | 0x08 | 0x10;
 
-            switch (metaversion) {
+            switch (metaVersion) {
                 case 0:
                 case 1:
-                    watcher.setObject(new WrappedDataWatcherObject(11, byteSerializer), standbitmask);
+                    watcher.setObject(new WrappedDataWatcherObject(11, byteSerializer), standBitmask);
                     break;
                 case 2:
-                    watcher.setObject(new WrappedDataWatcherObject(13, byteSerializer), standbitmask);
+                    watcher.setObject(new WrappedDataWatcherObject(13, byteSerializer), standBitmask);
                     break;
                 case 3:
-                    watcher.setObject(new WrappedDataWatcherObject(14, byteSerializer), standbitmask);
+                    watcher.setObject(new WrappedDataWatcherObject(14, byteSerializer), standBitmask);
                     break;
                 case 4:
-                    watcher.setObject(new WrappedDataWatcherObject(15, byteSerializer), standbitmask);
+                    watcher.setObject(new WrappedDataWatcherObject(15, byteSerializer), standBitmask);
                     break;
             }
 
@@ -489,7 +497,7 @@ public class DamageIndicator implements Listener {
                 @Override
                 public void run() {
                     tick++;
-                    if (!velocity.equals(vectorZero) && tick < HoloMobHealth.damageIndicatorTimeout && originalLocation.getY() - location.getY() < fallHeight) {
+                    if (!velocity.equals(VECTOR_ZERO) && tick < HoloMobHealth.damageIndicatorTimeout && originalLocation.getY() - location.getY() < fallHeight) {
                         Vector drag = velocity.clone().normalize().multiply(-0.03);
                         if (gravity) {
                             velocity.add(downwardAccel);

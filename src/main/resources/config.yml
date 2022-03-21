@@ -4,26 +4,26 @@ Display:
   #{Health_<DecimalFormat>}
   #{MaxHealth_<DecimalFormat>}
   #{PercentageHealth_<DecimalFormat>}
-  #
+  #.
   #Example of DecimalFormat:
   #{Health_0.0} = Health with 1 decimal point
   #{MaxHealth_#,##0.00} = Health formatted with commas with 2 decimal points
-  #
+  #.
   #For more info:
   #https://docs.oracle.com/javase/7/docs/api/java/text/DecimalFormat.html
-  #
+  #.
   #Supports custom mob names of supported plugins if enabled
   #{Mob_Type}
   #{Mob_Name}
   #{Mob_Type_Or_Name}
-  #
+  #.
   #These placeholders can be furthered configured
   #{DynamicColor}
   #{ScaledSymbols}
-  #
+  #.
   #Javascript placeholders can also be used
   #For example "VerticalStripedSymbols" will be {VerticalStripedSymbols}
-  #
+  #.
   #Only one line is allowed (Unless you enabled ***EXPERIMENTAL*** multi-line)
   Text:
     - "&b{Mob_Type_Or_Name}: {DynamicColor}{Health_0.0}&f/{MaxHealth_0.0}"

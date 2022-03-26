@@ -22,9 +22,7 @@ package com.loohp.holomobhealth.modules;
 
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.protocol.EntityMetadata;
-import com.loohp.holomobhealth.utils.NMSUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -52,31 +50,14 @@ public class RangeModule {
     }
 
     public static boolean isEntityInRangeOfPlayer(Player player, Entity entity) {
-        if (Bukkit.isPrimaryThread()) {
-            Location playerLocation = player.getLocation();
-            Location entityLocation = entity.getLocation();
-            if (!playerLocation.getWorld().equals(entityLocation.getWorld())) {
-                return false;
-            }
-            double diffX = Math.abs(playerLocation.getX() - entityLocation.getX());
-            double y = playerLocation.getY() - entityLocation.getY();
-            double diffY = Math.abs(y);
-            double diffZ = Math.abs(playerLocation.getZ() - entityLocation.getZ());
-            double height = NMSUtils.getEntityHeight(y > 0 ? entity : player);
-            double halfWidth = NMSUtils.getEntityWidth(entity) / 2;
-            return diffX < (distance + halfWidth) && diffZ < (distance + halfWidth) && diffY < (distance + height);
-        } else {
-            List<Entity> nearby = current.get(player);
-            return nearby != null && nearby.contains(entity);
-        }
+        List<Entity> nearby = current.get(player);
+        return nearby != null && nearby.contains(entity);
     }
 
     public static void run() {
         for (World world : Bukkit.getWorlds()) {
             if (!HoloMobHealth.disabledWorlds.contains(world.getName())) {
-                for (Player player : world.getPlayers()) {
-                    updateQueue.add(player);
-                }
+                updateQueue.addAll(world.getPlayers());
             }
         }
         playersPerTick = updateQueue.size() / rate;

@@ -36,6 +36,7 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;
@@ -70,12 +71,19 @@ public class EntityMetadata {
         }
         PacketContainer packet = HoloMobHealth.protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
         packet.getIntegers().write(0, entity.getEntityId());
-        WrappedDataWatcher entityWatcher = WrappedDataWatcher.getEntityWatcher(entity);
         WrappedDataWatcher watcher = new WrappedDataWatcher(entity);
-        WrappedWatchableObject watchableObject2 = entityWatcher.getWatchableObject(2);
-        watcher.setObject(watchableObject2.getWatcherObject(), watchableObject2.getValue());
-        WrappedWatchableObject watchableObject3 = entityWatcher.getWatchableObject(3);
-        watcher.setObject(watchableObject3.getWatcherObject(), watchableObject3.getValue());
+        WrappedDataWatcher entityWatcher = WrappedDataWatcher.getEntityWatcher(entity);
+        if (!HoloMobHealth.version.isOld()) {
+            WrappedWatchableObject watchableObject2 = entityWatcher.getWatchableObject(2);
+            watcher.setObject(watchableObject2.getWatcherObject(), watchableObject2.getValue());
+            WrappedWatchableObject watchableObject3 = entityWatcher.getWatchableObject(3);
+            watcher.setObject(watchableObject3.getWatcherObject(), watchableObject3.getValue());
+        } else if (entity instanceof LivingEntity) {
+            String watchableObject2 = entityWatcher.getString(2);
+            watcher.setObject(2, watchableObject2);
+            byte watchableObject3 = entityWatcher.getByte(3);
+            watcher.setObject(3, watchableObject3);
+        }
         packet.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects());
 
         Bukkit.getScheduler().runTaskAsynchronously(HoloMobHealth.plugin, () -> {

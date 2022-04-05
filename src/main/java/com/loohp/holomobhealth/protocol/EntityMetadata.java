@@ -63,7 +63,7 @@ public class EntityMetadata {
     }
 
     public static void updateEntity(Collection<? extends Player> players, Entity entity) {
-        if (!EntityTypeUtils.getMobsTypesSet().contains(entity.getType())) {
+        if (!EntityTypeUtils.getMobsTypesSet().contains(EntityTypeUtils.getEntityType(entity))) {
             return;
         }
         if (!entity.isValid()) {

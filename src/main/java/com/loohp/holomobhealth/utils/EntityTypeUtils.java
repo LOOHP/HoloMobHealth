@@ -20,6 +20,8 @@
 
 package com.loohp.holomobhealth.utils;
 
+import com.loohp.holomobhealth.HoloMobHealth;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
@@ -29,10 +31,9 @@ import java.util.Set;
 
 public class EntityTypeUtils {
 
-    private static final Set<EntityType> mobTypesSet = new HashSet<EntityType>();
+    private static final Set<EntityType> mobTypesSet = new HashSet<>();
 
     static {
-        mobTypesSet.clear();
         for (EntityType each : EntityType.values()) {
             if (each.equals(EntityType.PLAYER) || each.equals(EntityType.ARMOR_STAND) || each.equals(EntityType.UNKNOWN)) {
                 continue;
@@ -47,6 +48,13 @@ public class EntityTypeUtils {
 
     public static Set<EntityType> getMobsTypesSet() {
         return Collections.unmodifiableSet(mobTypesSet);
+    }
+
+    public static EntityType getEntityType(Entity entity) {
+        if (HoloMobHealth.myPetHook) {
+            return MyPetUtils.getMyPetEntityType(entity);
+        }
+        return entity.getType();
     }
 
 }

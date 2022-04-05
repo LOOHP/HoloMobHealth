@@ -168,11 +168,11 @@ public class NameTagDisplay {
 
         Entity entity = NMSUtils.getEntityFromUUID(entityUUID);
 
-        if (entity == null || !EntityTypeUtils.getMobsTypesSet().contains(entity.getType())) {
+        if (entity == null || !EntityTypeUtils.getMobsTypesSet().contains(EntityTypeUtils.getEntityType(entity))) {
             return null;
         }
 
-        if (HoloMobHealth.disabledMobTypes.contains(entity.getType())) {
+        if (HoloMobHealth.disabledMobTypes.contains(EntityTypeUtils.getEntityType(entity))) {
             return null;
         }
 

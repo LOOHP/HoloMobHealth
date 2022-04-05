@@ -266,7 +266,7 @@ public class LanguageUtils {
 
     public static String getTranslationKey(Entity entity) {
         String result = getTranslationKeyOrNull(entity);
-        return result == null ? WordUtils.capitalizeFully(entity.getType().name().toLowerCase().replace("_", " ")) : result;
+        return result == null ? WordUtils.capitalizeFully(EntityTypeUtils.getEntityType(entity).name().toLowerCase().replace("_", " ")) : result;
     }
 
     public static String getTranslationKeyOrNull(Entity entity) {
@@ -284,7 +284,7 @@ public class LanguageUtils {
             if (str == null) {
                 return null;
             } else {
-                EntityType type = entity.getType();
+                EntityType type = EntityTypeUtils.getEntityType(entity);
                 if (type.equals(EntityType.VILLAGER)) {
                     Villager villager = (Villager) entity;
                     str += "." + villager.getProfession().toString().toLowerCase();
@@ -302,7 +302,7 @@ public class LanguageUtils {
     }
 
     private static String getModernTranslationKey(Entity entity) {
-        EntityType type = entity.getType();
+        EntityType type = EntityTypeUtils.getEntityType(entity);
         String path = "";
         if (HoloMobHealth.version.equals(MCVersion.V1_13) || HoloMobHealth.version.equals(MCVersion.V1_13_1)) {
             path = "entity.minecraft." + type.name().toLowerCase();

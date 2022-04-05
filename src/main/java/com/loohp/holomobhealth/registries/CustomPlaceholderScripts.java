@@ -22,6 +22,7 @@ package com.loohp.holomobhealth.registries;
 
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.utils.CustomNameUtils;
+import com.loohp.holomobhealth.utils.EntityTypeUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang3.JavaVersion;
 import org.apache.commons.lang3.SystemUtils;
@@ -138,7 +139,7 @@ public class CustomPlaceholderScripts {
             maxhealth = entity.getMaxHealth();
         }
         String customname = CustomNameUtils.getMobCustomName(entity);
-        String mobtype = entity.getType().toString();
+        String mobtype = EntityTypeUtils.getEntityType(entity).toString();
 
         for (Entry<String, JavaScriptPlaceholder> entry : scripts.entrySet()) {
             String placeholder = entry.getKey();

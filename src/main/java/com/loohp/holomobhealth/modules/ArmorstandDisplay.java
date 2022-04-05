@@ -176,7 +176,7 @@ public class ArmorstandDisplay implements Listener {
                             Entity entity = data.getEntity();
                             String customName = data.getCustomName();
 
-                            if (EntityTypeUtils.getMobsTypesSet().contains(entity.getType())) {
+                            if (EntityTypeUtils.getMobsTypesSet().contains(EntityTypeUtils.getEntityType(entity))) {
                                 if (entity.getPassenger() != null || isInvisible(entity) || (!HoloMobHealth.applyToNamed && customName != null) || (HoloMobHealth.useAlterHealth && !HoloMobHealth.idleUse && !HoloMobHealth.altShowHealth.containsKey(entity.getUniqueId())) || (HoloMobHealth.rangeEnabled && !RangeModule.isEntityInRangeOfPlayer(player, entity))) {
                                     Component name = customName != null && !customName.equals("") ? LegacyComponentSerializer.legacySection().deserialize(customName) : Component.empty();
                                     boolean visible = entity.isCustomNameVisible();
@@ -379,11 +379,11 @@ public class ArmorstandDisplay implements Listener {
 
         Entity entity = NMSUtils.getEntityFromUUID(entityUUID);
 
-        if (entity == null || !EntityTypeUtils.getMobsTypesSet().contains(entity.getType())) {
+        if (entity == null || !EntityTypeUtils.getMobsTypesSet().contains(EntityTypeUtils.getEntityType(entity))) {
             return null;
         }
 
-        if (HoloMobHealth.disabledMobTypes.contains(entity.getType())) {
+        if (HoloMobHealth.disabledMobTypes.contains(EntityTypeUtils.getEntityType(entity))) {
             return new ArmorStandDisplayData();
         }
 

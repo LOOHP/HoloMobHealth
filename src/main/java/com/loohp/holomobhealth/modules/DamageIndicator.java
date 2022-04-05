@@ -172,7 +172,7 @@ public class DamageIndicator implements Listener {
             }
 
             double finalDamage = event.getFinalDamage();
-            if (finalDamage >= HoloMobHealth.damageIndicatorDamageMinimum && entity instanceof LivingEntity && (EntityTypeUtils.getMobsTypesSet().contains(entity.getType()) || entity.getType().equals(EntityType.PLAYER))) {
+            if (finalDamage >= HoloMobHealth.damageIndicatorDamageMinimum && entity instanceof LivingEntity && (EntityTypeUtils.getMobsTypesSet().contains(EntityTypeUtils.getEntityType(entity)) || EntityTypeUtils.getEntityType(entity).equals(EntityType.PLAYER))) {
                 LivingEntity livingEntity = (LivingEntity) entity;
                 if (MathUtils.greaterThan(livingEntity.getHealth(), 0.0, EPSILON) && !livingEntity.isDead()) {
                     damage(livingEntity, finalDamage);
@@ -242,7 +242,7 @@ public class DamageIndicator implements Listener {
             }
 
             double finalDamage = event.getFinalDamage();
-            if (finalDamage >= HoloMobHealth.damageIndicatorDamageMinimum && entity instanceof LivingEntity && (EntityTypeUtils.getMobsTypesSet().contains(entity.getType()) || entity.getType().equals(EntityType.PLAYER))) {
+            if (finalDamage >= HoloMobHealth.damageIndicatorDamageMinimum && entity instanceof LivingEntity && (EntityTypeUtils.getMobsTypesSet().contains(EntityTypeUtils.getEntityType(entity)) || EntityTypeUtils.getEntityType(entity).equals(EntityType.PLAYER))) {
                 LivingEntity livingEntity = (LivingEntity) entity;
                 if (MathUtils.greaterThan(livingEntity.getHealth(), 0.0, EPSILON) && !livingEntity.isDead()) {
                     damage(livingEntity, finalDamage);
@@ -311,7 +311,7 @@ public class DamageIndicator implements Listener {
                     }
                 }
             } else {
-                if (entity instanceof LivingEntity && (EntityTypeUtils.getMobsTypesSet().contains(entity.getType()) || entity.getType().equals(EntityType.PLAYER))) {
+                if (entity instanceof LivingEntity && (EntityTypeUtils.getMobsTypesSet().contains(EntityTypeUtils.getEntityType(entity)) || EntityTypeUtils.getEntityType(entity).equals(EntityType.PLAYER))) {
                     LivingEntity livingentity = (LivingEntity) entity;
                     double health = livingentity.getHealth();
                     double maxHealth;

@@ -94,7 +94,7 @@ public class TropicalFishUtils {
 
     public static String addTropicalFishType(Entity entity, String toAppend) {
         String path = toAppend;
-        EntityType type = entity.getType();
+        EntityType type = EntityTypeUtils.getEntityType(entity);
         if (type.equals(EntityType.TROPICAL_FISH)) {
             try {
                 Object craftEntityObject = craftEntityClass.cast(entity);

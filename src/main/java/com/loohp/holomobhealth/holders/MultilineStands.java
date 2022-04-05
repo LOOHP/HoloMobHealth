@@ -22,6 +22,7 @@ package com.loohp.holomobhealth.holders;
 
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.protocol.ArmorStandPacket;
+import com.loohp.holomobhealth.utils.EntityTypeUtils;
 import com.loohp.holomobhealth.utils.NMSUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -59,7 +60,7 @@ public class MultilineStands {
             }
         }
         for (Entry<EntityType, Integer> entry : HoloMobHealth.specialTypeOffset.entrySet()) {
-            if (entity.getType().equals(entry.getKey())) {
+            if (EntityTypeUtils.getEntityType(entity).equals(entry.getKey())) {
                 offset = offset + entry.getValue();
                 break;
             }

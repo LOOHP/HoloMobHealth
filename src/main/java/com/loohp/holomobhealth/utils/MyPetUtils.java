@@ -22,11 +22,25 @@ package com.loohp.holomobhealth.utils;
 
 import de.Keyle.MyPet.api.entity.MyPetBukkitEntity;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 
 public class MyPetUtils {
 
     public static boolean isMyPet(Entity entity) {
         return entity instanceof MyPetBukkitEntity;
+    }
+
+    public static EntityType getMyPetEntityType(Entity entity) {
+        if (isMyPet(entity)) {
+            MyPetBukkitEntity myPetEntity = (MyPetBukkitEntity) entity;
+            String typeName = myPetEntity.getPetType().getBukkitName();
+            try {
+                return EntityType.valueOf(typeName);
+            } catch (IllegalArgumentException e) {
+                return EntityType.UNKNOWN;
+            }
+        }
+        return entity.getType();
     }
 
 }

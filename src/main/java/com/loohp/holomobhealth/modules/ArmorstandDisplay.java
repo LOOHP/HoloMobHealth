@@ -47,6 +47,7 @@ import com.loohp.holomobhealth.utils.NMSUtils;
 import com.loohp.holomobhealth.utils.ParsePlaceholders;
 import com.loohp.holomobhealth.utils.RayTrace;
 import com.loohp.holomobhealth.utils.ShopkeepersUtils;
+import com.loohp.holomobhealth.utils.WorldGuardUtils;
 import io.github.bananapuncher714.nbteditor.NBTEditor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -391,6 +392,11 @@ public class ArmorstandDisplay implements Listener {
 
         if (!HoloMobHealth.disabledWorlds.contains(world.getName())) {
 
+            if (HoloMobHealth.worldGuardHook) {
+                if (!WorldGuardUtils.checkStateFlag(entity.getLocation(), player, WorldGuardUtils.getHealthDisplayFlag())) {
+                    return null;
+                }
+            }
             if (!HoloMobHealth.showCitizens && HoloMobHealth.citizensHook) {
                 if (CitizensUtils.isNPC(entity)) {
                     return null;

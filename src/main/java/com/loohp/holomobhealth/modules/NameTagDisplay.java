@@ -44,6 +44,7 @@ import com.loohp.holomobhealth.utils.MythicMobsUtils;
 import com.loohp.holomobhealth.utils.NMSUtils;
 import com.loohp.holomobhealth.utils.ParsePlaceholders;
 import com.loohp.holomobhealth.utils.ShopkeepersUtils;
+import com.loohp.holomobhealth.utils.WorldGuardUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -192,6 +193,11 @@ public class NameTagDisplay {
 
         if (!HoloMobHealth.disabledWorlds.contains(world.getName())) {
 
+            if (HoloMobHealth.worldGuardHook) {
+                if (!WorldGuardUtils.checkStateFlag(entity.getLocation(), player, WorldGuardUtils.getHealthDisplayFlag())) {
+                    return null;
+                }
+            }
             if (!HoloMobHealth.showCitizens && HoloMobHealth.citizensHook) {
                 if (CitizensUtils.isNPC(entity)) {
                     return null;

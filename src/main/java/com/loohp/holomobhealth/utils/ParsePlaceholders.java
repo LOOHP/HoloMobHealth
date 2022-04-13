@@ -36,8 +36,8 @@ import java.util.Map.Entry;
 
 public class ParsePlaceholders {
 
-    public static Component parse(LivingEntity entity, String text, double healthchange) {
-        return parse(null, entity, text, healthchange);
+    public static Component parse(LivingEntity entity, String text, double healthChange) {
+        return parse(null, entity, text, healthChange);
     }
 
     public static Component parse(Player player, LivingEntity entity, String text) {
@@ -45,7 +45,7 @@ public class ParsePlaceholders {
     }
 
     @SuppressWarnings("deprecation")
-    public static Component parse(Player player, LivingEntity entity, String text, double healthchange) {
+    public static Component parse(Player player, LivingEntity entity, String text, double healthChange) {
         double health = entity.getHealth();
         double maxHealth = 0.0;
         try {
@@ -73,7 +73,7 @@ public class ParsePlaceholders {
                     text = text.replace(entry.getKey(), String.valueOf(data.getFormatter().format(percentage)));
                     break;
                 case INDICATOR:
-                    text = text.replace(entry.getKey(), String.valueOf(data.getFormatter().format(Math.abs(healthchange))));
+                    text = text.replace(entry.getKey(), String.valueOf(data.getFormatter().format(Math.abs(healthChange))));
                     break;
             }
         }
@@ -111,7 +111,7 @@ public class ParsePlaceholders {
         }
 
         try {
-            text = CustomPlaceholderScripts.runScripts(text, entity, healthchange);
+            text = CustomPlaceholderScripts.runScripts(text, entity, healthChange);
         } catch (Exception e) {
             e.printStackTrace();
         }

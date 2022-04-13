@@ -179,8 +179,12 @@ public class HoloMobHealth extends JavaPlugin {
     }
 
     public static boolean isPluginEnabled(String name) {
+        return isPluginEnabled(name, true);
+    }
+
+    public static boolean isPluginEnabled(String name, boolean checkRunning) {
         Plugin plugin = Bukkit.getPluginManager().getPlugin(name);
-        return plugin != null && plugin.isEnabled();
+        return plugin != null && (!checkRunning || plugin.isEnabled());
     }
 
     @SuppressWarnings("deprecation")
@@ -344,7 +348,7 @@ public class HoloMobHealth extends JavaPlugin {
 
     @Override
     public void onLoad() {
-        if (isPluginEnabled("WorldGuard")) {
+        if (isPluginEnabled("WorldGuard", false)) {
             String version = getServer().getPluginManager().getPlugin("WorldGuard").getDescription().getVersion();
             if (version.startsWith("7.")) {
                 getServer().getLogger().info("[HoloMobHealth] Registering WorldGuard State Flags...");

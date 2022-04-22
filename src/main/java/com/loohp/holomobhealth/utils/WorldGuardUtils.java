@@ -83,10 +83,17 @@ public class WorldGuardUtils {
     }
 
     public static boolean checkStateFlag(Location location, Player player, StateFlag... stateFlags) {
+        return checkStateFlag(location, player, true, stateFlags);
+    }
+
+    public static boolean checkStateFlag(Location location, Player player, boolean checkBypass, StateFlag... stateFlags) {
         WorldGuardPlatform platform = WorldGuard.getInstance().getPlatform();
         LocalPlayer localPlayer = player == null ? null : WorldGuardPlugin.inst().wrapPlayer(player);
         RegionQuery query = platform.getRegionContainer().createQuery();
-        return (localPlayer != null && platform.getSessionManager().hasBypass(localPlayer, localPlayer.getWorld())) || query.testState(BukkitAdapter.adapt(location), localPlayer, stateFlags);
+        if (checkBypass && localPlayer != null && platform.getSessionManager().hasBypass(localPlayer, localPlayer.getWorld())) {
+            return true;
+        }
+        return query.testState(BukkitAdapter.adapt(location), localPlayer, stateFlags);
     }
 
 }

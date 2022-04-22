@@ -27,6 +27,7 @@ import org.bukkit.entity.Entity;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
+@SuppressWarnings("resource")
 public class MythicMobs4Utils {
 
     public static boolean isMythicMob(Entity entity) {

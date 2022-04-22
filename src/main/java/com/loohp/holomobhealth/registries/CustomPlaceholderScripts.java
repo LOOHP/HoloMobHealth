@@ -165,13 +165,7 @@ public class CustomPlaceholderScripts {
     }
 
     public static boolean containsClass(Class<?> clazz) {
-        Iterator<Entry<String, Class<?>>> itr = scriptDataTypes.entrySet().iterator();
-        while (itr.hasNext()) {
-            if (itr.next().getValue().equals(clazz)) {
-                return true;
-            }
-        }
-        return false;
+        return scriptDataTypes.containsValue(clazz);
     }
 
     public static class JavaScriptPlaceholder {

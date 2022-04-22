@@ -20,13 +20,13 @@
 
 package com.loohp.holomobhealth.utils;
 
-import io.lumine.mythic.api.skills.SkillCaster;
 import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.core.mobs.ActiveMob;
 import org.bukkit.entity.Entity;
 
 import java.util.Optional;
 
+@SuppressWarnings("resource")
 public class MythicMobs5Utils {
 
     public static boolean isMythicMob(Entity entity) {
@@ -35,7 +35,7 @@ public class MythicMobs5Utils {
 
     public static String getMobCustomName(Entity entity) {
         Optional<ActiveMob> optionalActiveMob = MythicBukkit.inst().getMobManager().getActiveMob(entity.getUniqueId());
-        return optionalActiveMob.map(SkillCaster::getName).orElse(null);
+        return optionalActiveMob.map(mob -> mob.getName()).orElse(null);
     }
 
 }

@@ -270,10 +270,14 @@ public class LanguageUtils {
     }
 
     public static String getTranslationKeyOrNull(Entity entity) {
-        if (HoloMobHealth.version.isLegacy()) {
-            return getLegacyTranslationKey(entity);
-        } else {
-            return getModernTranslationKey(entity);
+        try {
+            if (HoloMobHealth.version.isLegacy()) {
+                return getLegacyTranslationKey(entity);
+            } else {
+                return getModernTranslationKey(entity);
+            }
+        } catch (Throwable e) {
+            return null;
         }
     }
 

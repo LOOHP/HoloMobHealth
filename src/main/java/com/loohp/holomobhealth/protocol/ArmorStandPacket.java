@@ -48,7 +48,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -145,39 +144,48 @@ public class ArmorStandPacket implements Listener {
             }
         }
 
-        PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
+        PacketContainer packet1 = protocolManager.createPacket(HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_19) ? PacketType.Play.Server.SPAWN_ENTITY : PacketType.Play.Server.SPAWN_ENTITY_LIVING);
         packet1.getIntegers().write(0, entity.getEntityId());
-        switch (HoloMobHealth.version) {
-            case V1_18_2:
-            case V1_18:
-            case V1_17:
-            case V1_16_4:
-            case V1_16_2:
-                packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 1 : 66);
-                break;
-            case V1_16:
-                packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 1 : 65);
-                break;
-            case V1_15:
-                packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 1 : 60);
-                break;
-            case V1_14:
-                packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 1 : 59);
-                break;
-            case V1_13_1:
-            case V1_13:
-                packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 1 : 56);
-                break;
-            default:
-                packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 30 : 101);
-                break;
-        }
         if (packet1.getUUIDs().size() > 0) {
             packet1.getUUIDs().write(0, entity.getUniqueId());
         }
-        packet1.getIntegers().write(2, 0);
-        packet1.getIntegers().write(3, 0);
-        packet1.getIntegers().write(4, 0);
+        if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_19)) {
+            packet1.getEntityTypeModifier().write(0, entity.getType());
+            packet1.getIntegers().write(1, 0);
+            packet1.getIntegers().write(2, 0);
+            packet1.getIntegers().write(3, 0);
+        } else {
+            switch (HoloMobHealth.version) {
+                case V1_18_2:
+                case V1_18:
+                case V1_17:
+                    packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 1 : 71);
+                    break;
+                case V1_16_4:
+                case V1_16_2:
+                    packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 1 : 66);
+                    break;
+                case V1_16:
+                    packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 1 : 65);
+                    break;
+                case V1_15:
+                    packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 1 : 60);
+                    break;
+                case V1_14:
+                    packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 1 : 59);
+                    break;
+                case V1_13_1:
+                case V1_13:
+                    packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 1 : 56);
+                    break;
+                default:
+                    packet1.getIntegers().write(1, entity.getType().equals(EntityType.ARMOR_STAND) ? 30 : 101);
+                    break;
+            }
+            packet1.getIntegers().write(2, 0);
+            packet1.getIntegers().write(3, 0);
+            packet1.getIntegers().write(4, 0);
+        }
         packet1.getDoubles().write(0, entity.getLocation().getX());
         packet1.getDoubles().write(1, entity.getLocation().getY());
         packet1.getDoubles().write(2, entity.getLocation().getZ());
@@ -190,13 +198,9 @@ public class ArmorStandPacket implements Listener {
         WrappedDataWatcher wpw = buildWrappedDataWatcher(entity, component, visible);
         packet2.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
 
-        try {
-            for (Player player : playersInRange) {
-                protocolManager.sendServerPacket(player, packet1);
-                protocolManager.sendServerPacket(player, packet2);
-            }
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
+        for (Player player : playersInRange) {
+            protocolManager.sendServerPacket(player, packet1);
+            protocolManager.sendServerPacket(player, packet2);
         }
     }
 
@@ -221,16 +225,10 @@ public class ArmorStandPacket implements Listener {
             packet2.getBytes().write(0, (byte) (int) (entity.getLocation().getYaw() * 256.0F / 360.0F));
             packet2.getBytes().write(1, (byte) (int) (entity.getLocation().getPitch() * 256.0F / 360.0F));
 
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                try {
-                    for (Player player : playersInRange) {
-                        protocolManager.sendServerPacket(player, packet1);
-                        protocolManager.sendServerPacket(player, packet2);
-                    }
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-            });
+            for (Player player : playersInRange) {
+                protocolManager.sendServerPacket(player, packet1);
+                protocolManager.sendServerPacket(player, packet2);
+            }
         });
     }
 
@@ -253,13 +251,9 @@ public class ArmorStandPacket implements Listener {
             packet2.getBytes().write(1, (byte) (int) (entity.getLocation().getPitch() * 256.0F / 360.0F));
 
             Bukkit.getScheduler().runTask(plugin, () -> {
-                try {
-                    for (Player player : playersInRange) {
-                        protocolManager.sendServerPacket(player, packet1, false);
-                        protocolManager.sendServerPacket(player, packet2, false);
-                    }
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
+                for (Player player : playersInRange) {
+                    protocolManager.sendServerPacket(player, packet1, false);
+                    protocolManager.sendServerPacket(player, packet2, false);
                 }
             });
         });
@@ -282,12 +276,8 @@ public class ArmorStandPacket implements Listener {
             packet1.getBytes().write(1, (byte) (int) (entity.getLocation().getPitch() * 256.0F / 360.0F));
 
             Bukkit.getScheduler().runTask(plugin, () -> {
-                try {
-                    for (Player player : playersInRange) {
-                        protocolManager.sendServerPacket(player, packet1);
-                    }
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
+                for (Player player : playersInRange) {
+                    protocolManager.sendServerPacket(player, packet1);
                 }
             });
         });
@@ -307,12 +297,8 @@ public class ArmorStandPacket implements Listener {
             packet1.getBytes().write(1, (byte) (int) (entity.getLocation().getPitch() * 256.0F / 360.0F));
 
             Bukkit.getScheduler().runTask(plugin, () -> {
-                try {
-                    for (Player player : playersInRange) {
-                        protocolManager.sendServerPacket(player, packet1, false);
-                    }
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
+                for (Player player : playersInRange) {
+                    protocolManager.sendServerPacket(player, packet1, false);
                 }
             });
         });
@@ -355,17 +341,13 @@ public class ArmorStandPacket implements Listener {
                 }
             }
 
-            PacketContainer[] packets = PacketUtils.createEntityDestoryPacket(entity.getEntityId());
+            PacketContainer[] packets = PacketUtils.createEntityDestroyPacket(entity.getEntityId());
 
             Bukkit.getScheduler().runTask(plugin, () -> {
-                try {
-                    for (Player player : playersInRange) {
-                        for (PacketContainer packet : packets) {
-                            protocolManager.sendServerPacket(player, packet);
-                        }
+                for (Player player : playersInRange) {
+                    for (PacketContainer packet : packets) {
+                        protocolManager.sendServerPacket(player, packet);
                     }
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
                 }
             });
         });

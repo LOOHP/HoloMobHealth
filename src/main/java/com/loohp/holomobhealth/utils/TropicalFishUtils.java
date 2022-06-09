@@ -59,7 +59,17 @@ public class TropicalFishUtils {
                     }
                     return method;
                 }, () -> {
-                    return nmsEntityTropicalFishClass.getMethod("fI");
+                    Method method = nmsEntityTropicalFishClass.getMethod("fI");
+                    if (!method.getReturnType().equals(int.class)) {
+                        throw new NoSuchMethodException("Incorrect return type");
+                    }
+                    return method;
+                }, () -> {
+                    Method method = nmsEntityTropicalFishClass.getMethod("fT");
+                    if (!method.getReturnType().equals(int.class)) {
+                        throw new NoSuchMethodException("Incorrect return type");
+                    }
+                    return method;
                 });
                 craftTropicalFishClass = NMSUtils.getNMSClass("org.bukkit.craftbukkit.%s.entity.CraftTropicalFish");
                 getTropicalFishPatternMethod = craftTropicalFishClass.getMethod("getPattern", int.class);
@@ -138,10 +148,12 @@ public class TropicalFishUtils {
         return Math.min((variance & '\uff00') >> 8, 5);
     }
 
+    @SuppressWarnings("deprecation")
     public static DyeColor getTropicalFishBaseColor(int variance) {
         return DyeColor.getByWoolData((byte) getTropicalFishBaseColorIdx(variance));
     }
 
+    @SuppressWarnings("deprecation")
     public static DyeColor getTropicalFishPatternColor(int variance) {
         return DyeColor.getByWoolData((byte) getTropicalFishPatternColorIdx(variance));
     }

@@ -64,7 +64,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -515,16 +514,12 @@ public class HoloMobHealth extends JavaPlugin {
             if (armorStandMode) {
                 getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "[HoloMobHealth] Plugin reload detected, attempting to despawn all visual entities. If anything went wrong, please restart! (Reloads are always not recommended)");
                 int[] entityIdArray = ArmorStandPacket.active.stream().mapToInt(each -> each.getEntityId()).toArray();
-                PacketContainer[] packets = PacketUtils.createEntityDestoryPacket(entityIdArray);
+                PacketContainer[] packets = PacketUtils.createEntityDestroyPacket(entityIdArray);
 
-                try {
-                    for (Player player : Bukkit.getOnlinePlayers()) {
-                        for (PacketContainer packet : packets) {
-                            protocolManager.sendServerPacket(player, packet);
-                        }
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    for (PacketContainer packet : packets) {
+                        protocolManager.sendServerPacket(player, packet);
                     }
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
                 }
             }
         }

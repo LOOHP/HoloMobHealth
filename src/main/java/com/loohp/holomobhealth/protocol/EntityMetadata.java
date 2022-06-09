@@ -39,7 +39,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -138,14 +137,10 @@ public class EntityMetadata {
             }
             packet.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects());
 
-            try {
-                for (Player player : players) {
-                    if (player.hasPermission("holomobhealth.use")) {
-                        HoloMobHealth.protocolManager.sendServerPacket(player, packet, !quiet);
-                    }
+            for (Player player : players) {
+                if (player.hasPermission("holomobhealth.use")) {
+                    HoloMobHealth.protocolManager.sendServerPacket(player, packet, !quiet);
                 }
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
             }
         });
     }

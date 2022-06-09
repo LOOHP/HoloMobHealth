@@ -29,6 +29,8 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -75,25 +77,51 @@ public class NMSUtils {
             nmsEntityGetUniqueIDMethod = reflectiveLookup(Method.class, () -> {
                 return nmsEntityClass.getMethod("getUniqueID");
             }, () -> {
-                return nmsEntityClass.getMethod("cm");
+                Method method = nmsEntityClass.getMethod("cm");
+                if (!method.getReturnType().equals(UUID.class)) {
+                    throw new NoSuchMethodException("Incorrect return type");
+                }
+                return method;
+            }, () -> {
+                Method method = nmsEntityClass.getMethod("cp");
+                if (!method.getReturnType().equals(UUID.class)) {
+                    throw new NoSuchMethodException("Incorrect return type");
+                }
+                return method;
             });
+            nmsAxisAlignedBBClass = getNMSClass("net.minecraft.server.%s.AxisAlignedBB", "net.minecraft.world.phys.AxisAlignedBB");
             nmsEntityGetBoundingBox = reflectiveLookup(Method.class, () -> {
                 return nmsEntityClass.getMethod("getBoundingBox");
             }, () -> {
-                return nmsEntityClass.getMethod("cw");
+                Method method = nmsEntityClass.getMethod("cw");
+                if (!method.getReturnType().equals(nmsAxisAlignedBBClass)) {
+                    throw new NoSuchMethodException("Incorrect return type");
+                }
+                return method;
             }, () -> {
-                return nmsEntityClass.getMethod("cx");
+                Method method = nmsEntityClass.getMethod("cx");
+                if (!method.getReturnType().equals(nmsAxisAlignedBBClass)) {
+                    throw new NoSuchMethodException("Incorrect return type");
+                }
+                return method;
+            }, () -> {
+                Method method = nmsEntityClass.getMethod("cA");
+                if (!method.getReturnType().equals(nmsAxisAlignedBBClass)) {
+                    return method;
+                }
+                throw new ReflectiveOperationException();
             });
             nmsEntityGetHandle = craftEntityClass.getMethod("getHandle");
-            nmsAxisAlignedBBClass = getNMSClass("net.minecraft.server.%s.AxisAlignedBB", "net.minecraft.world.phys.AxisAlignedBB");
-            nmsAxisAlignedBBFields = nmsAxisAlignedBBClass.getFields();
+            nmsAxisAlignedBBFields = Arrays.stream(nmsAxisAlignedBBClass.getFields()).filter(each -> each.getType().equals(double.class) && !Modifier.isStatic(each.getModifiers())).toArray(Field[]::new);
             if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_17)) {
                 if (HoloMobHealth.version.equals(MCVersion.V1_17)) {
                     nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("G");
                 } else if (HoloMobHealth.version.equals(MCVersion.V1_18)) {
                     nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("P");
-                } else {
+                } else if (HoloMobHealth.version.equals(MCVersion.V1_18_2)) {
                     nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("O");
+                } else if (HoloMobHealth.version.equals(MCVersion.V1_19)) {
+                    nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("P");
                 }
                 nmsEntityManagerGetEntityGetterMethod = nmsWorldEntityManagerField.getType().getMethod("d");
                 nmsLevelEntityGetterClass = getNMSClass("net.minecraft.world.level.entity.LevelEntityGetterAdapter");

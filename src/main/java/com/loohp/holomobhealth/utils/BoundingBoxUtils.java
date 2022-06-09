@@ -44,11 +44,20 @@ public class BoundingBoxUtils {
             nmsEntityClass = NMSUtils.getNMSClass("net.minecraft.server.%s.Entity", "net.minecraft.world.entity.Entity");
             craftEntityGetHandlerMethod = craftEntityClass.getMethod("getHandle");
             nmsAxisAlignedBBClass = NMSUtils.getNMSClass("net.minecraft.server.%s.AxisAlignedBB", "net.minecraft.world.phys.AxisAlignedBB");
-            nmsEntityGetBoundingBoxMethod = nmsEntityClass.getMethod("getBoundingBox");
             nmsEntityGetBoundingBoxMethod = NMSUtils.reflectiveLookup(Method.class, () -> {
                 return nmsEntityClass.getMethod("getBoundingBox");
             }, () -> {
-                return nmsEntityClass.getMethod("cx");
+                Method method = nmsEntityClass.getMethod("cx");
+                if (!method.getReturnType().equals(nmsAxisAlignedBBClass)) {
+                    throw new ReflectiveOperationException();
+                }
+                return method;
+            }, () -> {
+                Method method = nmsEntityClass.getMethod("cA");
+                if (!method.getReturnType().equals(nmsAxisAlignedBBClass)) {
+                    return method;
+                }
+                throw new ReflectiveOperationException();
             });
             nmsAxisAlignedBBFields = nmsAxisAlignedBBClass.getFields();
         } catch (ReflectiveOperationException e) {

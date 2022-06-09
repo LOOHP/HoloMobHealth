@@ -95,38 +95,40 @@ public class NameTagDisplay {
                 }
             }
         });
-        HoloMobHealth.protocolManager.addPacketListener(new PacketAdapter(HoloMobHealth.plugin, ListenerPriority.HIGHEST, PacketType.Play.Server.SPAWN_ENTITY_LIVING) {
-            @Override
-            public void onPacketSending(PacketEvent event) {
-                try {
-                    if (!event.getPacketType().equals(PacketType.Play.Server.SPAWN_ENTITY_LIVING)) {
-                        return;
+        if (HoloMobHealth.version.isOlderThan(MCVersion.V1_19)) {
+            HoloMobHealth.protocolManager.addPacketListener(new PacketAdapter(HoloMobHealth.plugin, ListenerPriority.HIGHEST, PacketType.Play.Server.SPAWN_ENTITY_LIVING) {
+                @Override
+                public void onPacketSending(PacketEvent event) {
+                    try {
+                        if (!event.getPacketType().equals(PacketType.Play.Server.SPAWN_ENTITY_LIVING)) {
+                            return;
+                        }
+
+                        PacketContainer packet = event.getPacket();
+
+                        Player player = event.getPlayer();
+
+                        World world = player.getWorld();
+                        int entityId = packet.getIntegers().read(0);
+
+                        UUID entityUUID = NMSUtils.getEntityUUIDFromID(world, entityId);
+
+                        if (entityUUID == null) {
+                            return;
+                        }
+
+                        Entity entity = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(entityUUID) : Bukkit.getEntity(entityUUID);
+
+                        if (entity == null) {
+                            return;
+                        }
+
+                        Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(player, entity), 5);
+                    } catch (UnsupportedOperationException e) {
                     }
-
-                    PacketContainer packet = event.getPacket();
-
-                    Player player = event.getPlayer();
-
-                    World world = player.getWorld();
-                    int entityId = packet.getIntegers().read(0);
-
-                    UUID entityUUID = NMSUtils.getEntityUUIDFromID(world, entityId);
-
-                    if (entityUUID == null) {
-                        return;
-                    }
-
-                    Entity entity = HoloMobHealth.version.isLegacy() && !HoloMobHealth.version.equals(MCVersion.V1_12) ? NMSUtils.getEntityFromUUID(entityUUID) : Bukkit.getEntity(entityUUID);
-
-                    if (entity == null) {
-                        return;
-                    }
-
-                    Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(player, entity), 5);
-                } catch (UnsupportedOperationException e) {
                 }
-            }
-        });
+            });
+        }
         HoloMobHealth.protocolManager.addPacketListener(new PacketAdapter(HoloMobHealth.plugin, ListenerPriority.HIGHEST, PacketType.Play.Server.SPAWN_ENTITY) {
             @Override
             public void onPacketSending(PacketEvent event) {

@@ -29,24 +29,24 @@ import java.lang.reflect.InvocationTargetException;
 
 public class PacketUtils {
 
-    private static Constructor<?> entityDestoryIntListConstructor;
+    private static Constructor<?> entityDestroyIntListConstructor;
 
     static {
         try {
             try {
                 Class<?> entityDestroyClass = NMSUtils.getNMSClass("net.minecraft.server.%s.PacketPlayOutEntityDestroy", "net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy");
-                entityDestoryIntListConstructor = entityDestroyClass.getConstructor(int[].class);
+                entityDestroyIntListConstructor = entityDestroyClass.getConstructor(int[].class);
             } catch (NoSuchMethodException e) {
-                entityDestoryIntListConstructor = null;
+                entityDestroyIntListConstructor = null;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static PacketContainer[] createEntityDestoryPacket(int... entityIds) {
+    public static PacketContainer[] createEntityDestroyPacket(int... entityIds) {
         if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_17)) {
-            if (entityDestoryIntListConstructor == null) {
+            if (entityDestroyIntListConstructor == null) {
                 PacketContainer[] packets = new PacketContainer[entityIds.length];
                 for (int i = 0; i < entityIds.length; i++) {
                     PacketContainer packet = HoloMobHealth.protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
@@ -56,7 +56,7 @@ public class PacketUtils {
                 return packets;
             } else {
                 try {
-                    return new PacketContainer[] {PacketContainer.fromPacket(entityDestoryIntListConstructor.newInstance(entityIds))};
+                    return new PacketContainer[] {PacketContainer.fromPacket(entityDestroyIntListConstructor.newInstance(entityIds))};
                 } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                     e.printStackTrace();
                     return new PacketContainer[0];

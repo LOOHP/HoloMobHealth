@@ -84,6 +84,10 @@
 									<pattern>net.kyori</pattern>
 									<shadedPattern>com.loohp.holomobhealth.libs.net.kyori</shadedPattern>
 								</relocation>
+								<relocation>
+									<pattern>org.openjdk.nashorn</pattern>
+									<shadedPattern>com.loohp.holomobhealth.libs.org.openjdk.nashorn</shadedPattern>
+								</relocation>
 							</relocations>
 						</configuration>
 					</execution>

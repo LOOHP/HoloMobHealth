@@ -107,9 +107,9 @@ public class NMSUtils {
             }, () -> {
                 Method method = nmsEntityClass.getMethod("cA");
                 if (!method.getReturnType().equals(nmsAxisAlignedBBClass)) {
-                    return method;
+                    throw new NoSuchMethodException("Incorrect return type");
                 }
-                throw new ReflectiveOperationException();
+                return method;
             });
             nmsEntityGetHandle = craftEntityClass.getMethod("getHandle");
             nmsAxisAlignedBBFields = Arrays.stream(nmsAxisAlignedBBClass.getFields()).filter(each -> each.getType().equals(double.class) && !Modifier.isStatic(each.getModifiers())).toArray(Field[]::new);

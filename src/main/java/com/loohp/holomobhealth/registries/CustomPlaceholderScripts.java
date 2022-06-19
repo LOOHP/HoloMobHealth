@@ -43,10 +43,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class CustomPlaceholderScripts {
 
+    public static final String PLACEHOLDER_FUNCTION = "placeholder";
+    public static final Pattern PATTERN = Pattern.compile("//.*|/\\*[\\S\\s]*?\\*/|%([^%]+)%");
     private static final Map<String, JavaScriptPlaceholder> scripts = new ConcurrentHashMap<>();
     private static final Map<String, Class<?>> scriptDataTypes = new ConcurrentHashMap<>();
     private static ScriptEngineFactory scriptEngineFactory;

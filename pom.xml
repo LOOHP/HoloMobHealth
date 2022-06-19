@@ -25,7 +25,7 @@
 	<groupId>com.loohp</groupId>
 	<artifactId>HoloMobHealth</artifactId>
 	<name>HoloMobHealth</name>
-	<version>2.3.1.0</version>
+	<version>2.3.0.0</version>
 
 	<description>Customize how you would like to display mob health above its head!</description>
 	<url>https://github.com/LOOHP/HoloMobHealth</url>
@@ -327,7 +327,7 @@
 		<dependency>
 			<groupId>org.openjdk.nashorn</groupId>
 			<artifactId>nashorn-core</artifactId>
-			<version>15.4</version>
+			<version>15.3</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -409,12 +409,6 @@
 			<artifactId>rosestacker</artifactId>
 			<version>1.2.2</version>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>me.lucko</groupId>
-			<artifactId>jar-relocator</artifactId>
-			<version>1.5</version>
-			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 </project>

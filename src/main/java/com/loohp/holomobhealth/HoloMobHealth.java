@@ -27,8 +27,6 @@ import com.loohp.holomobhealth.api.HoloMobHealthAPI;
 import com.loohp.holomobhealth.config.Config;
 import com.loohp.holomobhealth.database.Database;
 import com.loohp.holomobhealth.debug.Debug;
-import com.loohp.holomobhealth.libs.LibraryDownloadManager;
-import com.loohp.holomobhealth.libs.LibraryLoader;
 import com.loohp.holomobhealth.listeners.Events;
 import com.loohp.holomobhealth.metrics.Charts;
 import com.loohp.holomobhealth.metrics.Metrics;
@@ -365,32 +363,6 @@ public class HoloMobHealth extends JavaPlugin {
 
         exactMinecraftVersion = Bukkit.getVersion().substring(Bukkit.getVersion().indexOf("(") + 5, Bukkit.getVersion().indexOf(")"));
         version = MCVersion.fromPackageName(getServer().getClass().getPackage().getName());
-
-        File libs = new File(getDataFolder(), "libs");
-        new LibraryDownloadManager(libs).downloadLibraries((result, jarName) -> {
-            if (result) {
-                Bukkit.getConsoleSender().sendMessage("[HoloMobHealth] Downloaded library \"" + jarName + "\"");
-            } else {
-                Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[HoloMobHealth] Unable to download library \"" + jarName + "\"");
-            }
-        });
-        LibraryLoader.loadLibraries(libs, (file, e) -> {
-            String jarName = file.getName();
-            if (e == null) {
-                Bukkit.getConsoleSender().sendMessage("[HoloMobHealth] Remapped library \"" + jarName + "\"");
-            } else {
-                Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[HoloMobHealth] Unable to remap library \"" + jarName + "\"");
-                e.printStackTrace();
-            }
-        }, (file, e) -> {
-            String jarName = file.getName();
-            if (e == null) {
-                Bukkit.getConsoleSender().sendMessage("[HoloMobHealth] Loaded library \"" + jarName + "\"");
-            } else {
-                Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[HoloMobHealth] Unable to load library \"" + jarName + "\"");
-                e.printStackTrace();
-            }
-        });
 
         getServer().getPluginManager().registerEvents(new Debug(), this);
         if (version.isNewerOrEqualTo(MCVersion.V1_11)) {

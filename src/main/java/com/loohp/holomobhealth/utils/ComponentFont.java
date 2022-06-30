@@ -80,7 +80,7 @@ public class ComponentFont {
         }
         String section = content.substring(start);
         component = component.append(Component.text(section).style(style));
-        component = ComponentFlattening.flatten(ComponentCompacting.optimize(component));
+        component = ComponentFlattening.flatten(component);
 
         List<Component> children = new ArrayList<>(component.children());
         for (int i = 0; i < children.size(); i++) {
@@ -100,7 +100,7 @@ public class ComponentFont {
             }
         }
 
-        return ComponentCompacting.optimize(component.children(children));
+        return component.children(children);
     }
 
 }

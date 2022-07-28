@@ -70,6 +70,12 @@ public class TropicalFishUtils {
                         throw new NoSuchMethodException("Incorrect return type");
                     }
                     return method;
+                }, () -> {
+                    Method method = nmsEntityTropicalFishClass.getMethod("fS");
+                    if (!method.getReturnType().equals(int.class)) {
+                        throw new NoSuchMethodException("Incorrect return type");
+                    }
+                    return method;
                 });
                 craftTropicalFishClass = NMSUtils.getNMSClass("org.bukkit.craftbukkit.%s.entity.CraftTropicalFish");
                 getTropicalFishPatternMethod = craftTropicalFishClass.getMethod("getPattern", int.class);

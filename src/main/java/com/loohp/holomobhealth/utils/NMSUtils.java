@@ -53,6 +53,9 @@ public class NMSUtils {
     private static Field nmsWorldEntityManagerField;
     private static Method nmsEntityManagerGetEntityGetterMethod;
     private static Class<?> nmsLevelEntityGetterClass;
+
+    private static Method nmsGetEntityLookUpMethod;
+
     private static Method nmsLevelEntityGetterGetEntityByIDMethod;
     private static Method nmsLevelEntityGetterGetEntityByUUIDMethod;
 
@@ -126,19 +129,25 @@ public class NMSUtils {
             nmsEntityGetHandle = craftEntityClass.getMethod("getHandle");
             nmsAxisAlignedBBFields = Arrays.stream(nmsAxisAlignedBBClass.getFields()).filter(each -> each.getType().equals(double.class) && !Modifier.isStatic(each.getModifiers())).toArray(Field[]::new);
             if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_17)) {
-                if (HoloMobHealth.version.equals(MCVersion.V1_17)) {
-                    nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("G");
-                } else if (HoloMobHealth.version.equals(MCVersion.V1_18)) {
-                    nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("P");
-                } else if (HoloMobHealth.version.equals(MCVersion.V1_18_2)) {
-                    nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("O");
-                } else if (HoloMobHealth.version.equals(MCVersion.V1_19)) {
-                    nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("P");
+                try {
+                    nmsGetEntityLookUpMethod = nmsWorldServerClass.getMethod("getEntityLookup");
+                    nmsLevelEntityGetterGetEntityByIDMethod = nmsGetEntityLookUpMethod.getReturnType().getMethod("get", int.class);
+                    nmsLevelEntityGetterGetEntityByUUIDMethod = nmsGetEntityLookUpMethod.getReturnType().getMethod("get", UUID.class);
+                } catch (NoSuchMethodException e) {
+                    if (HoloMobHealth.version.equals(MCVersion.V1_17)) {
+                        nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("G");
+                    } else if (HoloMobHealth.version.equals(MCVersion.V1_18)) {
+                        nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("P");
+                    } else if (HoloMobHealth.version.equals(MCVersion.V1_18_2)) {
+                        nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("O");
+                    } else if (HoloMobHealth.version.equals(MCVersion.V1_19)) {
+                        nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("P");
+                    }
+                    nmsEntityManagerGetEntityGetterMethod = nmsWorldEntityManagerField.getType().getMethod("d");
+                    nmsLevelEntityGetterClass = getNMSClass("net.minecraft.world.level.entity.LevelEntityGetterAdapter");
+                    nmsLevelEntityGetterGetEntityByIDMethod = nmsLevelEntityGetterClass.getMethod("a", int.class);
+                    nmsLevelEntityGetterGetEntityByUUIDMethod = nmsLevelEntityGetterClass.getMethod("a", UUID.class);
                 }
-                nmsEntityManagerGetEntityGetterMethod = nmsWorldEntityManagerField.getType().getMethod("d");
-                nmsLevelEntityGetterClass = getNMSClass("net.minecraft.world.level.entity.LevelEntityGetterAdapter");
-                nmsLevelEntityGetterGetEntityByIDMethod = nmsLevelEntityGetterClass.getMethod("a", int.class);
-                nmsLevelEntityGetterGetEntityByUUIDMethod = nmsLevelEntityGetterClass.getMethod("a", UUID.class);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -150,10 +159,16 @@ public class NMSUtils {
             try {
                 Object craftWorldObject = craftWorldClass.cast(world);
                 Object nmsWorldServerObject = craftWorldGetHandleMethod.invoke(craftWorldObject);
-                nmsWorldEntityManagerField.setAccessible(true);
-                Object nmsEntityManagerObject = nmsWorldEntityManagerField.get(nmsWorldServerObject);
-                Object nmsLevelEntityGetterObject = nmsEntityManagerGetEntityGetterMethod.invoke(nmsEntityManagerObject);
-                Object nmsEntityObject = nmsLevelEntityGetterGetEntityByIDMethod.invoke(nmsLevelEntityGetterObject, id);
+                Object nmsEntityObject;
+                if (nmsGetEntityLookUpMethod == null) {
+                    nmsWorldEntityManagerField.setAccessible(true);
+                    Object nmsEntityManagerObject = nmsWorldEntityManagerField.get(nmsWorldServerObject);
+                    Object nmsLevelEntityGetterObject = nmsEntityManagerGetEntityGetterMethod.invoke(nmsEntityManagerObject);
+                    nmsEntityObject = nmsLevelEntityGetterGetEntityByIDMethod.invoke(nmsLevelEntityGetterObject, id);
+                } else {
+                    Object nmsEntityLookup = nmsGetEntityLookUpMethod.invoke(nmsWorldServerObject);
+                    nmsEntityObject = nmsLevelEntityGetterGetEntityByIDMethod.invoke(nmsEntityLookup, id);
+                }
                 if (nmsEntityObject == null) {
                     return null;
                 }
@@ -193,10 +208,16 @@ public class NMSUtils {
                 try {
                     Object craftWorldObject = craftWorldClass.cast(world);
                     Object nmsWorldServerObject = craftWorldGetHandleMethod.invoke(craftWorldObject);
-                    nmsWorldEntityManagerField.setAccessible(true);
-                    Object nmsEntityManagerObject = nmsWorldEntityManagerField.get(nmsWorldServerObject);
-                    Object nmsLevelEntityGetterObject = nmsEntityManagerGetEntityGetterMethod.invoke(nmsEntityManagerObject);
-                    Object nmsEntityObject = nmsLevelEntityGetterGetEntityByUUIDMethod.invoke(nmsLevelEntityGetterObject, uuid);
+                    Object nmsEntityObject;
+                    if (nmsGetEntityLookUpMethod == null) {
+                        nmsWorldEntityManagerField.setAccessible(true);
+                        Object nmsEntityManagerObject = nmsWorldEntityManagerField.get(nmsWorldServerObject);
+                        Object nmsLevelEntityGetterObject = nmsEntityManagerGetEntityGetterMethod.invoke(nmsEntityManagerObject);
+                        nmsEntityObject = nmsLevelEntityGetterGetEntityByUUIDMethod.invoke(nmsLevelEntityGetterObject, uuid);
+                    } else {
+                        Object nmsEntityLookup = nmsGetEntityLookUpMethod.invoke(nmsWorldServerObject);
+                        nmsEntityObject = nmsLevelEntityGetterGetEntityByUUIDMethod.invoke(nmsEntityLookup, uuid);
+                    }
                     if (nmsEntityObject == null) {
                         continue;
                     }

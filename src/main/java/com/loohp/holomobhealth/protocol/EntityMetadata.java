@@ -29,6 +29,7 @@ import com.comphenix.protocol.wrappers.WrappedDataWatcher.Serializer;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObject;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.loohp.holomobhealth.HoloMobHealth;
+import com.loohp.holomobhealth.utils.DataWatcherUtils;
 import com.loohp.holomobhealth.utils.EntityTypeUtils;
 import com.loohp.holomobhealth.utils.LanguageUtils;
 import net.kyori.adventure.text.Component;
@@ -83,7 +84,7 @@ public class EntityMetadata {
             byte watchableObject3 = entityWatcher.getByte(3);
             watcher.setObject(3, watchableObject3);
         }
-        packet.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects());
+        DataWatcherUtils.writeMetadataPacket(packet, watcher);
 
         Bukkit.getScheduler().runTaskAsynchronously(HoloMobHealth.plugin, () -> {
             for (Player player : players) {
@@ -135,7 +136,7 @@ public class EntityMetadata {
             } else {
                 watcher.setObject(new WrappedDataWatcherObject(3, Registry.get(Boolean.class)), visible);
             }
-            packet.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects());
+            DataWatcherUtils.writeMetadataPacket(packet, watcher);
 
             for (Player player : players) {
                 if (player.hasPermission("holomobhealth.use")) {

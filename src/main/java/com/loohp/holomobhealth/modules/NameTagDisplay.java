@@ -30,12 +30,12 @@ import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.Registry;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.Serializer;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObject;
-import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.protocol.EntityMetadata;
 import com.loohp.holomobhealth.utils.ChatColorUtils;
 import com.loohp.holomobhealth.utils.CitizensUtils;
 import com.loohp.holomobhealth.utils.CustomNameUtils;
+import com.loohp.holomobhealth.utils.DataWatcherUtils;
 import com.loohp.holomobhealth.utils.EntityTypeUtils;
 import com.loohp.holomobhealth.utils.LanguageUtils;
 import com.loohp.holomobhealth.utils.MCVersion;
@@ -54,7 +54,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -88,7 +87,7 @@ public class NameTagDisplay {
                     if (watcher != null) {
                         boolean readOnly = event.isReadOnly();
                         event.setReadOnly(true);
-                        packet.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects());
+                        DataWatcherUtils.writeMetadataPacket(packet, watcher);
                         event.setReadOnly(readOnly);
                     }
                 } catch (UnsupportedOperationException e) {
@@ -240,8 +239,7 @@ public class NameTagDisplay {
                 }
             }
 
-            List<WrappedWatchableObject> data = packet.getWatchableCollectionModifier().read(0);
-            WrappedDataWatcher watcher = new WrappedDataWatcher(data);
+            WrappedDataWatcher watcher = DataWatcherUtils.fromMetadataPacket(packet);
 
             Component component = ParsePlaceholders.parse(player, (LivingEntity) entity, useIdle ? HoloMobHealth.idleDisplayText.get(0) : HoloMobHealth.displayText.get(0));
             boolean visible = HoloMobHealth.alwaysShow;

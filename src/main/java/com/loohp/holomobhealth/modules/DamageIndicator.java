@@ -31,6 +31,7 @@ import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.utils.ChatColorUtils;
 import com.loohp.holomobhealth.utils.CitizensUtils;
 import com.loohp.holomobhealth.utils.CustomNameUtils;
+import com.loohp.holomobhealth.utils.DataWatcherUtils;
 import com.loohp.holomobhealth.utils.EntityTypeUtils;
 import com.loohp.holomobhealth.utils.EntityUtils;
 import com.loohp.holomobhealth.utils.LanguageUtils;
@@ -93,6 +94,7 @@ public class DamageIndicator implements Listener {
         }
 
         switch (HoloMobHealth.version) {
+            case V1_19_3:
             case V1_19:
             case V1_18_2:
             case V1_18:
@@ -479,7 +481,7 @@ public class DamageIndicator implements Listener {
                     break;
             }
 
-            packet2.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects());
+            DataWatcherUtils.writeMetadataPacket(packet2, watcher);
 
             int range = HoloMobHealth.damageIndicatorVisibleRange;
             List<Player> players = location.getWorld().getPlayers().stream().filter(each -> {

@@ -29,7 +29,6 @@ import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.Registry;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.Serializer;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObject;
-import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.holders.HoloMobArmorStand;
 import com.loohp.holomobhealth.holders.MultilineStands;
@@ -38,6 +37,7 @@ import com.loohp.holomobhealth.protocol.EntityMetadata;
 import com.loohp.holomobhealth.utils.ChatColorUtils;
 import com.loohp.holomobhealth.utils.CitizensUtils;
 import com.loohp.holomobhealth.utils.CustomNameUtils;
+import com.loohp.holomobhealth.utils.DataWatcherUtils;
 import com.loohp.holomobhealth.utils.EntityTypeUtils;
 import com.loohp.holomobhealth.utils.EntityUtils;
 import com.loohp.holomobhealth.utils.MCVersion;
@@ -64,7 +64,6 @@ import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -172,7 +171,7 @@ public class ArmorstandDisplay implements Listener {
 
                     if (data != null) {
                         if (data.use()) {
-                            packet.getWatchableCollectionModifier().write(0, data.getWatcher().getWatchableObjects());
+                            DataWatcherUtils.writeMetadataPacket(packet, data.getWatcher());
 
                             Entity entity = data.getEntity();
                             String customName = data.getCustomName();
@@ -446,8 +445,7 @@ public class ArmorstandDisplay implements Listener {
                 }
             }
 
-            List<WrappedWatchableObject> data = packet.getWatchableCollectionModifier().read(0);
-            WrappedDataWatcher watcher = new WrappedDataWatcher(data);
+            WrappedDataWatcher watcher = DataWatcherUtils.fromMetadataPacket(packet);
 
             List<Component> components;
             if (useIdle) {

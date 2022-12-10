@@ -30,6 +30,7 @@ import com.comphenix.protocol.wrappers.WrappedDataWatcher.Serializer;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObject;
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.holders.HoloMobArmorStand;
+import com.loohp.holomobhealth.utils.DataWatcherUtils;
 import com.loohp.holomobhealth.utils.LanguageUtils;
 import com.loohp.holomobhealth.utils.MCVersion;
 import com.loohp.holomobhealth.utils.PacketUtils;
@@ -196,7 +197,7 @@ public class ArmorStandPacket implements Listener {
         PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
         packet2.getIntegers().write(0, entity.getEntityId());
         WrappedDataWatcher wpw = buildWrappedDataWatcher(entity, component, visible);
-        packet2.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
+        DataWatcherUtils.writeMetadataPacket(packet2, wpw);
 
         for (Player player : playersInRange) {
             protocolManager.sendServerPacket(player, packet1);
@@ -215,7 +216,7 @@ public class ArmorStandPacket implements Listener {
             PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
             packet1.getIntegers().write(0, entity.getEntityId());
             WrappedDataWatcher wpw = buildWrappedDataWatcher(entity, component, visible);
-            packet1.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
+            DataWatcherUtils.writeMetadataPacket(packet1, wpw);
 
             PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);
             packet2.getIntegers().write(0, entity.getEntityId());
@@ -240,7 +241,7 @@ public class ArmorStandPacket implements Listener {
             PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
             packet1.getIntegers().write(0, entity.getEntityId());
             WrappedDataWatcher wpw = buildWrappedDataWatcher(entity, component, visible);
-            packet1.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
+            DataWatcherUtils.writeMetadataPacket(packet1, wpw);
 
             PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);
             packet2.getIntegers().write(0, entity.getEntityId());

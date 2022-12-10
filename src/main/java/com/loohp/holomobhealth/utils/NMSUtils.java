@@ -97,6 +97,12 @@ public class NMSUtils {
                     throw new NoSuchMethodException("Incorrect return type");
                 }
                 return method;
+            }, () -> {
+                Method method = nmsEntityClass.getMethod("cs");
+                if (!method.getReturnType().equals(UUID.class)) {
+                    throw new NoSuchMethodException("Incorrect return type");
+                }
+                return method;
             });
             nmsAxisAlignedBBClass = getNMSClass("net.minecraft.server.%s.AxisAlignedBB", "net.minecraft.world.phys.AxisAlignedBB");
             nmsEntityGetBoundingBox = reflectiveLookup(Method.class, () -> {
@@ -121,6 +127,12 @@ public class NMSUtils {
                 return method;
             }, () -> {
                 Method method = nmsEntityClass.getMethod("cz");
+                if (!method.getReturnType().equals(nmsAxisAlignedBBClass)) {
+                    throw new NoSuchMethodException("Incorrect return type");
+                }
+                return method;
+            }, () -> {
+                Method method = nmsEntityClass.getMethod("cD");
                 if (!method.getReturnType().equals(nmsAxisAlignedBBClass)) {
                     throw new NoSuchMethodException("Incorrect return type");
                 }

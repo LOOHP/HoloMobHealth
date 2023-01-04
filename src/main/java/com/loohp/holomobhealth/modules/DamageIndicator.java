@@ -488,12 +488,11 @@ public class DamageIndicator implements Listener {
                 Location loc = each.getLocation();
                 return loc.getWorld().equals(location.getWorld()) && loc.distance(location) <= range * range && HoloMobHealth.playersEnabled.contains(each);
             }).collect(Collectors.toList());
-            Bukkit.getScheduler().runTask(HoloMobHealth.plugin, () -> {
-                for (Player player : players) {
-                    HoloMobHealth.protocolManager.sendServerPacket(player, packet1);
-                    HoloMobHealth.protocolManager.sendServerPacket(player, packet2);
-                }
-            });
+
+            for (Player player : players) {
+                HoloMobHealth.protocolManager.sendServerPacket(player, packet1);
+                HoloMobHealth.protocolManager.sendServerPacket(player, packet2);
+            }
 
             Vector downwardAccel = new Vector(0, -0.05, 0);
 
@@ -519,15 +518,13 @@ public class DamageIndicator implements Listener {
                         packet3.getBytes().write(0, (byte) 0);
                         packet3.getBytes().write(1, (byte) 0);
 
-                        Bukkit.getScheduler().runTask(HoloMobHealth.plugin, () -> {
-                            for (Player player : players) {
-                                HoloMobHealth.protocolManager.sendServerPacket(player, packet3);
-                            }
-                        });
+                        for (Player player : players) {
+                            HoloMobHealth.protocolManager.sendServerPacket(player, packet3);
+                        }
                     } else if (tick >= HoloMobHealth.damageIndicatorTimeout) {
                         this.cancel();
                         PacketContainer[] packets = PacketUtils.createEntityDestroyPacket(entityId);
-                        Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {
+                        Bukkit.getScheduler().runTaskLaterAsynchronously(HoloMobHealth.plugin, () -> {
                             for (Player player : players) {
                                 for (PacketContainer packet : packets) {
                                     HoloMobHealth.protocolManager.sendServerPacket(player, packet);

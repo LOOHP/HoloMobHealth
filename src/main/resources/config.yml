@@ -183,7 +183,7 @@ Messages:
 CustomPlaceholderScript:
   SilentClassNotFound: true
   AdditionClasses:
-    MythicMobs: "io.lumine.xikage.mythicmobs.MythicMobs"
+    MythicMobs: "io.lumine.mythic.bukkit.MythicBukkit"
 
 Database:
   #Player data storage type, MYSQL or SQLITE

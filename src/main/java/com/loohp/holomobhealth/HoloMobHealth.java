@@ -147,6 +147,7 @@ public class HoloMobHealth extends JavaPlugin {
 
     public static boolean mythicHook = false;
     public static boolean showMythicMobs = true;
+    public static boolean useMythicMobCustomNamesFirst = true;
 
     public static boolean citizensHook = false;
     public static boolean showCitizens = true;
@@ -291,6 +292,7 @@ public class HoloMobHealth extends JavaPlugin {
 
         showCitizens = config.getConfiguration().getBoolean("Hooks.Citizens.ShowNPCMobHealth");
         showMythicMobs = config.getConfiguration().getBoolean("Hooks.MythicMobs.ShowMythicMobsHealth");
+        useMythicMobCustomNamesFirst = config.getConfiguration().getBoolean("Hooks.MythicMobs.UseMythicMobCustomNamesFirst");
         showShopkeepers = config.getConfiguration().getBoolean("Hooks.Shopkeepers.ShowShopkeepersHealth");
         showMyPet = config.getConfiguration().getBoolean("Hooks.MyPet.ShowMyPetHealth");
 

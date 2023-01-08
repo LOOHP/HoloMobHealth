@@ -165,6 +165,8 @@ Hooks:
   MythicMobs:
     #Whether HoloMobHealth should show health for MythicMobs (applies to mobs only)
     ShowMythicMobsHealth: true
+    #Whether to prioritize Mythic Mob custom names over Vanilla custom names
+    UseMythicMobCustomNamesFirst: true
   Shopkeepers:
     #Whether HoloMobHealth should show health for Shopkeepers (applies to mobs only)
     ShowShopkeepersHealth: true

@@ -33,7 +33,13 @@ public class CustomNameUtils {
 
     public static String getMobCustomName(Entity entity) {
         if (HoloMobHealth.mythicHook) {
-            return MythicMobsUtils.getMobCustomName(entity);
+            String customName = MythicMobsUtils.getMobCustomName(entity);
+            String vanillaCustomName = entity.getCustomName();
+            if (HoloMobHealth.useMythicMobCustomNamesFirst) {
+                return customName == null || customName.isEmpty() ? vanillaCustomName : customName;
+            } else {
+                return vanillaCustomName == null || vanillaCustomName.isEmpty() ? customName : vanillaCustomName;
+            }
         }
         if (HoloMobHealth.citizensHook) {
             NPC npc = CitizensAPI.getNPCRegistry().getNPC(entity);

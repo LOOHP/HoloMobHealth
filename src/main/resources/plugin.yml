@@ -13,6 +13,7 @@ softdepend:
   - RoseStacker
   - UltimateStacker
   - WorldGuard
+  - ModelEngine
 depend: [ProtocolLib]
 prefix: HoloMobHealth
 

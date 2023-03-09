@@ -46,6 +46,7 @@ import com.loohp.holomobhealth.utils.JarUtils.CopyOption;
 import com.loohp.holomobhealth.utils.LanguageUtils;
 import com.loohp.holomobhealth.utils.LegacyPlaceholdersConverter;
 import com.loohp.holomobhealth.utils.MCVersion;
+import com.loohp.holomobhealth.utils.ModelEngineUtils;
 import com.loohp.holomobhealth.utils.PacketUtils;
 import com.loohp.holomobhealth.utils.WorldGuardUtils;
 import com.loohp.yamlconfiguration.YamlConfiguration;
@@ -115,10 +116,10 @@ public class HoloMobHealth extends JavaPlugin {
     public static String toggleDisplayOnMessage = "";
     public static String toggleDisplayOffMessage = "";
 
-    public static Set<EntityType> disabledMobTypes = new HashSet<EntityType>();
-    public static Set<String> disabledMobNamesAbsolute = new HashSet<String>();
-    public static List<String> disabledMobNamesContains = new ArrayList<String>();
-    public static Set<String> disabledWorlds = new HashSet<String>();
+    public static Set<EntityType> disabledMobTypes = new HashSet<>();
+    public static Set<String> disabledMobNamesAbsolute = new HashSet<>();
+    public static List<String> disabledMobNamesContains = new ArrayList<>();
+    public static Set<String> disabledWorlds = new HashSet<>();
 
     public static boolean useAlterHealth = false;
     public static int altHealthDisplayTime = 3;
@@ -126,7 +127,7 @@ public class HoloMobHealth extends JavaPlugin {
     public static Map<UUID, Long> altShowHealth = new ConcurrentHashMap<>();
 
     public static boolean idleUse = false;
-    public static List<String> idleDisplayText = new ArrayList<String>();
+    public static List<String> idleDisplayText = new ArrayList<>();
 
     public static boolean useDamageIndicator = true;
     public static boolean damageIndicatorPlayerTriggered = false;
@@ -161,13 +162,15 @@ public class HoloMobHealth extends JavaPlugin {
     public static boolean ultimateStackerHook = false;
     public static boolean roseStackerHook = false;
 
+    public static boolean modelEngineHook = false;
+
     public static boolean worldGuardHook = false;
 
     public static boolean armorStandMode = false;
     public static int armorStandYOffset = 0;
 
-    public static HashMap<EntityType, Integer> specialTypeOffset = new HashMap<EntityType, Integer>();
-    public static HashMap<String, Integer> specialNameOffset = new HashMap<String, Integer>();
+    public static HashMap<EntityType, Integer> specialTypeOffset = new HashMap<>();
+    public static HashMap<String, Integer> specialNameOffset = new HashMap<>();
 
     public static boolean rangeEnabled = false;
 
@@ -273,6 +276,9 @@ public class HoloMobHealth extends JavaPlugin {
             }
         } else {
             ArmorstandDisplay.entityMetadataPacketListener();
+            if (modelEngineHook) {
+                Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> ModelEngineUtils.updateModelEngineNametags(), 0, 10);
+            }
         }
 
         useDamageIndicator = config.getConfiguration().getBoolean("DamageIndicator.Enabled");
@@ -452,6 +458,11 @@ public class HoloMobHealth extends JavaPlugin {
         if (isPluginEnabled("RoseStacker")) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into RoseStacker!");
             roseStackerHook = true;
+        }
+
+        if (isPluginEnabled("ModelEngine", false)) {
+            Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[HoloMobHealth] Hooked into ModelEngine!");
+            modelEngineHook = true;
         }
 
         if (worldGuardHook) {

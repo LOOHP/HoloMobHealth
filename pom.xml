@@ -25,7 +25,7 @@
 	<groupId>com.loohp</groupId>
 	<artifactId>HoloMobHealth</artifactId>
 	<name>HoloMobHealth</name>
-	<version>2.3.2.4</version>
+	<version>2.3.3.0</version>
 
 	<description>Customize how you would like to display mob health above its head!</description>
 	<url>https://github.com/LOOHP/HoloMobHealth</url>
@@ -267,7 +267,7 @@
 		<dependency>
 			<groupId>io.github.bananapuncher714</groupId>
 			<artifactId>nbteditor</artifactId>
-			<version>7.18.4</version>
+			<version>7.18.5</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -297,31 +297,31 @@
 		<dependency>
 			<groupId>net.kyori</groupId>
 			<artifactId>adventure-text-serializer-gson</artifactId>
-			<version>4.11.0-SNAPSHOT</version>
+			<version>4.13.0</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.kyori</groupId>
 			<artifactId>adventure-text-serializer-legacy</artifactId>
-			<version>4.11.0-SNAPSHOT</version>
+			<version>4.13.0</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.kyori</groupId>
 			<artifactId>adventure-text-serializer-plain</artifactId>
-			<version>4.11.0-SNAPSHOT</version>
+			<version>4.13.0</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.kyori</groupId>
 			<artifactId>adventure-api</artifactId>
-			<version>4.11.0-SNAPSHOT</version>
+			<version>4.13.0</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.kyori</groupId>
 			<artifactId>adventure-nbt</artifactId>
-			<version>4.11.0-SNAPSHOT</version>
+			<version>4.13.0</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -339,13 +339,13 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.19.3-R0.1-SNAPSHOT</version>
+			<version>1.19.4-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>craftbukkit</artifactId>
-			<version>1.19.3-R0.1-SNAPSHOT</version>
+			<version>1.19.4-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

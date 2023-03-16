@@ -152,8 +152,10 @@ public class NMSUtils {
                         nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("P");
                     } else if (HoloMobHealth.version.equals(MCVersion.V1_18_2)) {
                         nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("O");
-                    } else if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_19)) {
+                    } else if (HoloMobHealth.version.equals(MCVersion.V1_19)) {
                         nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("P");
+                    } else if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_19_4)) {
+                        nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("L");
                     }
                     nmsEntityManagerGetEntityGetterMethod = nmsWorldEntityManagerField.getType().getMethod("d");
                     nmsLevelEntityGetterClass = getNMSClass("net.minecraft.world.level.entity.LevelEntityGetterAdapter");

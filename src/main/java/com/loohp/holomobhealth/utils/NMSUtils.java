@@ -103,6 +103,12 @@ public class NMSUtils {
                     throw new NoSuchMethodException("Incorrect return type");
                 }
                 return method;
+            }, () -> {
+                Method method = nmsEntityClass.getMethod("ct");
+                if (!method.getReturnType().equals(UUID.class)) {
+                    throw new NoSuchMethodException("Incorrect return type");
+                }
+                return method;
             });
             nmsAxisAlignedBBClass = getNMSClass("net.minecraft.server.%s.AxisAlignedBB", "net.minecraft.world.phys.AxisAlignedBB");
             nmsEntityGetBoundingBox = reflectiveLookup(Method.class, () -> {
@@ -137,6 +143,12 @@ public class NMSUtils {
                     throw new NoSuchMethodException("Incorrect return type");
                 }
                 return method;
+            }, () -> {
+                Method method = nmsEntityClass.getMethod("cE");
+                if (!method.getReturnType().equals(nmsAxisAlignedBBClass)) {
+                    throw new NoSuchMethodException("Incorrect return type");
+                }
+                return method;
             });
             nmsEntityGetHandle = craftEntityClass.getMethod("getHandle");
             nmsAxisAlignedBBFields = Arrays.stream(nmsAxisAlignedBBClass.getFields()).filter(each -> each.getType().equals(double.class) && !Modifier.isStatic(each.getModifiers())).toArray(Field[]::new);
@@ -146,16 +158,18 @@ public class NMSUtils {
                     nmsLevelEntityGetterGetEntityByIDMethod = nmsGetEntityLookUpMethod.getReturnType().getMethod("get", int.class);
                     nmsLevelEntityGetterGetEntityByUUIDMethod = nmsGetEntityLookUpMethod.getReturnType().getMethod("get", UUID.class);
                 } catch (NoSuchMethodException e) {
-                    if (HoloMobHealth.version.equals(MCVersion.V1_17)) {
+                    if (HoloMobHealth.version.isOlderOrEqualTo(MCVersion.V1_17)) {
                         nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("G");
-                    } else if (HoloMobHealth.version.equals(MCVersion.V1_18)) {
+                    } else if (HoloMobHealth.version.isOlderOrEqualTo(MCVersion.V1_18)) {
                         nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("P");
-                    } else if (HoloMobHealth.version.equals(MCVersion.V1_18_2)) {
+                    } else if (HoloMobHealth.version.isOlderOrEqualTo(MCVersion.V1_18_2)) {
                         nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("O");
-                    } else if (HoloMobHealth.version.equals(MCVersion.V1_19)) {
+                    } else if (HoloMobHealth.version.isOlderOrEqualTo(MCVersion.V1_19)) {
                         nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("P");
-                    } else if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_19_4)) {
+                    } else if (HoloMobHealth.version.isOlderOrEqualTo(MCVersion.V1_19_4)) {
                         nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("L");
+                    } else { //MCVersion.V1_20
+                        nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("M");
                     }
                     nmsEntityManagerGetEntityGetterMethod = nmsWorldEntityManagerField.getType().getMethod("d");
                     nmsLevelEntityGetterClass = getNMSClass("net.minecraft.world.level.entity.LevelEntityGetterAdapter");

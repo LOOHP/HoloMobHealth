@@ -93,7 +93,7 @@ public class Database {
             Class.forName("com.mysql.jdbc.Driver");
             setConnection(DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database, username, password));
 
-            if (echo == true) {
+            if (echo) {
                 Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[HoloMobHealth] MYSQL CONNECTED");
             }
         } catch (SQLException e) {

@@ -53,6 +53,12 @@ public class TropicalFishUtils {
                 getTropicalFishVarianceMethod = NMSUtils.reflectiveLookup(Method.class, () -> {
                     return nmsEntityTropicalFishClass.getMethod("getVariant");
                 }, () -> {
+                    Method method = nmsEntityTropicalFishClass.getMethod("gp");
+                    if (!method.getReturnType().equals(int.class)) {
+                        throw new NoSuchMethodException("Incorrect return type");
+                    }
+                    return method;
+                }, () -> {
                     Method method = nmsEntityTropicalFishClass.getMethod("fH");
                     if (!method.getReturnType().equals(int.class)) {
                         throw new NoSuchMethodException("Incorrect return type");

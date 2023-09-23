@@ -94,6 +94,7 @@ public class DamageIndicator implements Listener {
         }
 
         switch (HoloMobHealth.version) {
+            case V1_20_2:
             case V1_20:
             case V1_19_4:
             case V1_19_3:

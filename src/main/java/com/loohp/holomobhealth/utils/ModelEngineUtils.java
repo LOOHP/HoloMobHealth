@@ -20,22 +20,28 @@
 
 package com.loohp.holomobhealth.utils;
 
-import com.ticxo.modelengine.ModelEngine;
+import com.ticxo.modelengine.api.ModelEngineAPI;
 import com.ticxo.modelengine.api.model.ActiveModel;
 import com.ticxo.modelengine.api.model.ModeledEntity;
-import com.ticxo.modelengine.api.nms.entity.fake.NametagPoint;
+import com.ticxo.modelengine.api.model.bone.BoneBehaviorTypes;
+import com.ticxo.modelengine.api.model.bone.ModelBone;
+import com.ticxo.modelengine.api.model.bone.type.NameTag;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public class ModelEngineUtils {
 
     public static void updateModelEngineNametags() {
-        for (UUID uuid : ModelEngine.getModelTicker().getAllModeledEntityUUID()) {
-            ModeledEntity modeledEntity = ModelEngine.getModeledEntity(uuid);
+        for (UUID uuid : ModelEngineAPI.getAPI().getModelUpdater().getAllModeledEntityUUID()) {
+            ModeledEntity modeledEntity = ModelEngineAPI.getModeledEntity(uuid);
             for (ActiveModel activeModel : modeledEntity.getModels().values()) {
-                for (NametagPoint nametagPoint : activeModel.getNametagHandler().getFakeEntity().values()) {
-                    nametagPoint.setCustomNameVisible(false);
-                    nametagPoint.update();
+                for (ModelBone modelBone : activeModel.getBones().values()) {
+                    Optional<? extends NameTag> optNameTag = modelBone.getBoneBehavior(BoneBehaviorTypes.NAMETAG);
+                    if (optNameTag.isPresent()) {
+                        NameTag nameTag = optNameTag.get();
+                        nameTag.setVisible(false);
+                    }
                 }
             }
         }

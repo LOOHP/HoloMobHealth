@@ -42,7 +42,7 @@ public class DataWatcherUtils {
     public static List<WrappedDataValue> toDataValueList(WrappedDataWatcher wrappedDataWatcher) {
         List<WrappedWatchableObject> watchableObjectList = wrappedDataWatcher.getWatchableObjects();
         List<WrappedDataValue> wrappedDataValues = new ArrayList<>(watchableObjectList.size());
-        for (WrappedWatchableObject wrappedWatchableObject : wrappedDataWatcher.getWatchableObjects()) {
+        for (WrappedWatchableObject wrappedWatchableObject : wrappedDataWatcher.asMap().values()) {
             WrappedDataWatcher.WrappedDataWatcherObject wrappedDataWatcherObject = wrappedWatchableObject.getWatcherObject();
             wrappedDataValues.add(new WrappedDataValue(wrappedDataWatcherObject.getIndex(), wrappedDataWatcherObject.getSerializer(), wrappedWatchableObject.getRawValue()));
         }

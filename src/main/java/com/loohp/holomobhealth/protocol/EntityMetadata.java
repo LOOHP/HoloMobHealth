@@ -104,8 +104,8 @@ public class EntityMetadata {
 
             PacketContainer packet = HoloMobHealth.protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
 
-            packet.getIntegers().write(0, entity.getEntityId()); //Set packet's entity id
-            WrappedDataWatcher watcher = new WrappedDataWatcher(); //Create data watcher, the Entity Metadata packet requires this
+            packet.getIntegers().write(0, entity.getEntityId());
+            WrappedDataWatcher watcher = new WrappedDataWatcher();
 
             if (entityNameComponent != null && !entityNameComponent.equals(Component.empty())) {
                 if (HoloMobHealth.version.isOld()) {

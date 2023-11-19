@@ -90,25 +90,7 @@ public class ParsePlaceholders {
             text = text.replace("{DynamicColor}", symbol);
         }
         if (text.contains("{ScaledSymbols}")) {
-            StringBuilder symbol = new StringBuilder();
-            double healthpercentagescaled = percentage / 100.0 * (double) heartScale;
-            int fullhearts = (int) Math.floor(healthpercentagescaled);
-            for (int i = 0; i < fullhearts; i++) {
-                symbol.append(HoloMobHealth.healthyChar);
-            }
-            if (fullhearts < heartScale) {
-                double leftover = healthpercentagescaled - (double) fullhearts;
-                if (leftover > 0.500001) {
-                    symbol.append(HoloMobHealth.healthyChar);
-                } else if (leftover > 0.000001) {
-                    symbol.append(HoloMobHealth.halfChar);
-                } else {
-                    symbol.append(HoloMobHealth.emptyChar);
-                }
-                for (int i = fullhearts + 1; i < heartScale; i++) {
-                    symbol.append(HoloMobHealth.emptyChar);
-                }
-            }
+            String symbol = getSymbol(percentage, heartScale);
             text = text.replace("{ScaledSymbols}", symbol);
         }
 
@@ -131,7 +113,7 @@ public class ParsePlaceholders {
 
         Component displayComponent = LegacyComponentSerializer.legacySection().deserialize(text);
 
-        if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_16)) {
+        if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_16) && ComponentFont.FONT_TAG_PATTERN.matcher(text).find()) {
             displayComponent = ComponentFont.parseFont(displayComponent);
         }
 
@@ -140,6 +122,29 @@ public class ParsePlaceholders {
         displayComponent = displayComponent.replaceText(TextReplacementConfig.builder().matchLiteral("{Mob_Type_Or_Name}").replacement(customName.equals(Component.empty()) ? Component.translatable(LanguageUtils.getTranslationKey(entity)) : customName).build());
 
         return displayComponent;
+    }
+
+    private static String getSymbol(double percentage, int heartScale) {
+        StringBuilder symbol = new StringBuilder();
+        double healthpercentagescaled = percentage / 100.0 * (double) heartScale;
+        int fullhearts = (int) Math.floor(healthpercentagescaled);
+        for (int i = 0; i < fullhearts; i++) {
+            symbol.append(HoloMobHealth.healthyChar);
+        }
+        if (fullhearts < heartScale) {
+            double leftover = healthpercentagescaled - (double) fullhearts;
+            if (leftover > 0.500001) {
+                symbol.append(HoloMobHealth.healthyChar);
+            } else if (leftover > 0.000001) {
+                symbol.append(HoloMobHealth.halfChar);
+            } else {
+                symbol.append(HoloMobHealth.emptyChar);
+            }
+            for (int i = fullhearts + 1; i < heartScale; i++) {
+                symbol.append(HoloMobHealth.emptyChar);
+            }
+        }
+        return symbol.toString();
     }
 
 }

@@ -77,91 +77,9 @@ public class NMSUtils {
                 return nmsWorldServerClass.getMethod("a", UUID.class);
             });
             nmsEntityGetBukkitEntityMethod = nmsEntityClass.getMethod("getBukkitEntity");
-            nmsEntityGetUniqueIDMethod = reflectiveLookup(Method.class, () -> {
-                return nmsEntityClass.getMethod("getUniqueID");
-            }, () -> {
-                Method method = nmsEntityClass.getMethod("cm");
-                if (!method.getReturnType().equals(UUID.class)) {
-                    throw new NoSuchMethodException("Incorrect return type");
-                }
-                return method;
-            }, () -> {
-                Method method = nmsEntityClass.getMethod("cp");
-                if (!method.getReturnType().equals(UUID.class)) {
-                    throw new NoSuchMethodException("Incorrect return type");
-                }
-                return method;
-            }, () -> {
-                Method method = nmsEntityClass.getMethod("co");
-                if (!method.getReturnType().equals(UUID.class)) {
-                    throw new NoSuchMethodException("Incorrect return type");
-                }
-                return method;
-            }, () -> {
-                Method method = nmsEntityClass.getMethod("cs");
-                if (!method.getReturnType().equals(UUID.class)) {
-                    throw new NoSuchMethodException("Incorrect return type");
-                }
-                return method;
-            }, () -> {
-                Method method = nmsEntityClass.getMethod("ct");
-                if (!method.getReturnType().equals(UUID.class)) {
-                    throw new NoSuchMethodException("Incorrect return type");
-                }
-                return method;
-            }, () -> {
-                Method method = nmsEntityClass.getMethod("cv");
-                if (!method.getReturnType().equals(UUID.class)) {
-                    throw new NoSuchMethodException("Incorrect return type");
-                }
-                return method;
-            });
+            nmsEntityGetUniqueIDMethod = Arrays.stream(nmsEntityClass.getMethods()).filter(m -> m.getReturnType().equals(UUID.class)).findFirst().get();
             nmsAxisAlignedBBClass = getNMSClass("net.minecraft.server.%s.AxisAlignedBB", "net.minecraft.world.phys.AxisAlignedBB");
-            nmsEntityGetBoundingBox = reflectiveLookup(Method.class, () -> {
-                return nmsEntityClass.getMethod("getBoundingBox");
-            }, () -> {
-                Method method = nmsEntityClass.getMethod("cw");
-                if (!method.getReturnType().equals(nmsAxisAlignedBBClass)) {
-                    throw new NoSuchMethodException("Incorrect return type");
-                }
-                return method;
-            }, () -> {
-                Method method = nmsEntityClass.getMethod("cx");
-                if (!method.getReturnType().equals(nmsAxisAlignedBBClass)) {
-                    throw new NoSuchMethodException("Incorrect return type");
-                }
-                return method;
-            }, () -> {
-                Method method = nmsEntityClass.getMethod("cA");
-                if (!method.getReturnType().equals(nmsAxisAlignedBBClass)) {
-                    throw new NoSuchMethodException("Incorrect return type");
-                }
-                return method;
-            }, () -> {
-                Method method = nmsEntityClass.getMethod("cz");
-                if (!method.getReturnType().equals(nmsAxisAlignedBBClass)) {
-                    throw new NoSuchMethodException("Incorrect return type");
-                }
-                return method;
-            }, () -> {
-                Method method = nmsEntityClass.getMethod("cD");
-                if (!method.getReturnType().equals(nmsAxisAlignedBBClass)) {
-                    throw new NoSuchMethodException("Incorrect return type");
-                }
-                return method;
-            }, () -> {
-                Method method = nmsEntityClass.getMethod("cE");
-                if (!method.getReturnType().equals(nmsAxisAlignedBBClass)) {
-                    throw new NoSuchMethodException("Incorrect return type");
-                }
-                return method;
-            }, () -> {
-                Method method = nmsEntityClass.getMethod("cG");
-                if (!method.getReturnType().equals(nmsAxisAlignedBBClass)) {
-                    throw new NoSuchMethodException("Incorrect return type");
-                }
-                return method;
-            });
+            nmsEntityGetBoundingBox = Arrays.stream(nmsEntityClass.getMethods()).filter(m -> m.getReturnType().equals(nmsAxisAlignedBBClass)).findFirst().get();
             nmsEntityGetHandle = craftEntityClass.getMethod("getHandle");
             nmsAxisAlignedBBFields = Arrays.stream(nmsAxisAlignedBBClass.getFields()).filter(each -> each.getType().equals(double.class) && !Modifier.isStatic(each.getModifiers())).toArray(Field[]::new);
             if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_17)) {
@@ -180,7 +98,7 @@ public class NMSUtils {
                         nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("P");
                     } else if (HoloMobHealth.version.isOlderOrEqualTo(MCVersion.V1_19_4)) {
                         nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("L");
-                    } else { //MCVersion.V1_20 & V1_20_2
+                    } else { //MCVersion.V1_20 & V1_20_2 & V1_20_3
                         nmsWorldEntityManagerField = nmsWorldServerClass.getDeclaredField("M");
                     }
                     nmsEntityManagerGetEntityGetterMethod = nmsWorldEntityManagerField.getType().getMethod("d");

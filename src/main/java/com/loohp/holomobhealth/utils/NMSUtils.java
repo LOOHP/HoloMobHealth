@@ -79,7 +79,7 @@ public class NMSUtils {
             nmsEntityGetBukkitEntityMethod = nmsEntityClass.getMethod("getBukkitEntity");
             nmsEntityGetUniqueIDMethod = Arrays.stream(nmsEntityClass.getMethods()).filter(m -> m.getReturnType().equals(UUID.class)).findFirst().get();
             nmsAxisAlignedBBClass = getNMSClass("net.minecraft.server.%s.AxisAlignedBB", "net.minecraft.world.phys.AxisAlignedBB");
-            nmsEntityGetBoundingBox = Arrays.stream(nmsEntityClass.getMethods()).filter(m -> m.getReturnType().equals(nmsAxisAlignedBBClass)).findFirst().get();
+            nmsEntityGetBoundingBox = Arrays.stream(nmsEntityClass.getMethods()).filter(m -> m.getReturnType().equals(nmsAxisAlignedBBClass) && m.getParameterCount() == 0).findFirst().get();
             nmsEntityGetHandle = craftEntityClass.getMethod("getHandle");
             nmsAxisAlignedBBFields = Arrays.stream(nmsAxisAlignedBBClass.getFields()).filter(each -> each.getType().equals(double.class) && !Modifier.isStatic(each.getModifiers())).toArray(Field[]::new);
             if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_17)) {

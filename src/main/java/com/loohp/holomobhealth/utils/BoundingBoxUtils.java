@@ -40,26 +40,28 @@ public class BoundingBoxUtils {
 
     static {
         try {
-            craftEntityClass = NMSUtils.getNMSClass("org.bukkit.craftbukkit.%s.entity.CraftEntity");
-            nmsEntityClass = NMSUtils.getNMSClass("net.minecraft.server.%s.Entity", "net.minecraft.world.entity.Entity");
-            craftEntityGetHandlerMethod = craftEntityClass.getMethod("getHandle");
-            nmsAxisAlignedBBClass = NMSUtils.getNMSClass("net.minecraft.server.%s.AxisAlignedBB", "net.minecraft.world.phys.AxisAlignedBB");
-            nmsEntityGetBoundingBoxMethod = NMSUtils.reflectiveLookup(Method.class, () -> {
-                return nmsEntityClass.getMethod("getBoundingBox");
-            }, () -> {
-                Method method = nmsEntityClass.getMethod("cx");
-                if (!method.getReturnType().equals(nmsAxisAlignedBBClass)) {
-                    throw new ReflectiveOperationException();
-                }
-                return method;
-            }, () -> {
-                Method method = nmsEntityClass.getMethod("cA");
-                if (!method.getReturnType().equals(nmsAxisAlignedBBClass)) {
+            if (HoloMobHealth.version.isOlderThan(MCVersion.V1_14)) {
+                craftEntityClass = NMSUtils.getNMSClass("org.bukkit.craftbukkit.%s.entity.CraftEntity");
+                nmsEntityClass = NMSUtils.getNMSClass("net.minecraft.server.%s.Entity", "net.minecraft.world.entity.Entity");
+                craftEntityGetHandlerMethod = craftEntityClass.getMethod("getHandle");
+                nmsAxisAlignedBBClass = NMSUtils.getNMSClass("net.minecraft.server.%s.AxisAlignedBB", "net.minecraft.world.phys.AxisAlignedBB");
+                nmsEntityGetBoundingBoxMethod = NMSUtils.reflectiveLookup(Method.class, () -> {
+                    return nmsEntityClass.getMethod("getBoundingBox");
+                }, () -> {
+                    Method method = nmsEntityClass.getMethod("cx");
+                    if (!method.getReturnType().equals(nmsAxisAlignedBBClass)) {
+                        throw new ReflectiveOperationException();
+                    }
                     return method;
-                }
-                throw new ReflectiveOperationException();
-            });
-            nmsAxisAlignedBBFields = nmsAxisAlignedBBClass.getFields();
+                }, () -> {
+                    Method method = nmsEntityClass.getMethod("cA");
+                    if (!method.getReturnType().equals(nmsAxisAlignedBBClass)) {
+                        return method;
+                    }
+                    throw new ReflectiveOperationException();
+                });
+                nmsAxisAlignedBBFields = nmsAxisAlignedBBClass.getFields();
+            }
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
         }

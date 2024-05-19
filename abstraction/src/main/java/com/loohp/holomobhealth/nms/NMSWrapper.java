@@ -99,4 +99,10 @@ public abstract class NMSWrapper {
 
     public abstract PacketContainer[] createSpawnDamageIndicatorPackets(int entityId, UUID uuid, Component entityNameComponent, Location location, Vector velocity, boolean gravity);
 
+    public abstract List<?> readDataWatchersFromMetadataPacket(PacketContainer packet);
+
+    public abstract void modifyDataWatchers(List<?> dataWatchers, Component entityNameComponent, boolean visible);
+
+    public abstract PacketContainer createModifiedMetadataPacket(PacketContainer packet, List<?> dataWatchers);
+
 }

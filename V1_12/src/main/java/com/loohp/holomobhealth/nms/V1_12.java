@@ -51,6 +51,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -394,6 +395,58 @@ public class V1_12 extends NMSWrapper {
             PacketContainer packet2 = createEntityMetadataPacket(entityId, dataWatcher);
 
             return new PacketContainer[] {p(packet1), packet2};
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<DataWatcher.Item<?>> readDataWatchersFromMetadataPacket(PacketContainer packet) {
+        try {
+            PacketPlayOutEntityMetadata nmsPacket = (PacketPlayOutEntityMetadata) packet.getHandle();
+            entityMetadataPacketFields[1].setAccessible(true);
+            return (List<DataWatcher.Item<?>>) entityMetadataPacketFields[1].get(packet);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private <T> void addOrReplaceDataWatcher(List<DataWatcher.Item<?>> dataWatcher, DataWatcher.Item<T> newWatcher) {
+        for (int i = 0; i < dataWatcher.size(); i++) {
+            DataWatcher.Item<?> watcher = dataWatcher.get(i);
+            if (newWatcher.a().a() == watcher.a().a() && newWatcher.b().equals(watcher.b())) {
+                dataWatcher.set(i, newWatcher);
+                return;
+            }
+        }
+        dataWatcher.add(newWatcher);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void modifyDataWatchers(List<?> dataWatchers, Component entityNameComponent, boolean visible) {
+        try {
+            List<DataWatcher.Item<?>> dataWatcher = (List<DataWatcher.Item<?>>) dataWatchers;
+
+            dataWatcherCustomNameField.setAccessible(true);
+            dataWatcherCustomNameVisibleField.setAccessible(true);
+
+            String name = entityNameComponent == null ? "" : LegacyComponentSerializer.legacySection().serialize(entityNameComponent);
+            addOrReplaceDataWatcher(dataWatcher, new DataWatcher.Item<>((DataWatcherObject<String>) dataWatcherCustomNameField.get(null), name));
+            addOrReplaceDataWatcher(dataWatcher, new DataWatcher.Item<>((DataWatcherObject<Boolean>) dataWatcherCustomNameVisibleField.get(null), visible));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public PacketContainer createModifiedMetadataPacket(PacketContainer packet, List<?> dataWatchers) {
+        try {
+            PacketPlayOutEntityMetadata nmsPacket = (PacketPlayOutEntityMetadata) packet.getHandle();
+            entityMetadataPacketFields[0].setAccessible(true);
+            int id = entityMetadataPacketFields[0].getInt(packet);
+            return createEntityMetadataPacket(id, dataWatchers);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

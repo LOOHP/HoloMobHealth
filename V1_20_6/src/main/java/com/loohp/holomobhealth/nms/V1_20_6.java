@@ -346,4 +346,44 @@ public class V1_20_6 extends NMSWrapper {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public List<DataWatcher.c<?>> readDataWatchersFromMetadataPacket(PacketContainer packet) {
+        PacketPlayOutEntityMetadata nmsPacket = (PacketPlayOutEntityMetadata) packet.getHandle();
+        return nmsPacket.e();
+    }
+
+    private <T> void addOrReplaceDataWatcher(List<DataWatcher.c<?>> dataWatcher, DataWatcher.c<T> newWatcher) {
+        for (int i = 0; i < dataWatcher.size(); i++) {
+            DataWatcher.c<?> watcher = dataWatcher.get(i);
+            if (newWatcher.a() == watcher.a() && newWatcher.b().equals(watcher.b())) {
+                dataWatcher.set(i, newWatcher);
+                return;
+            }
+        }
+        dataWatcher.add(newWatcher);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void modifyDataWatchers(List<?> dataWatchers, Component entityNameComponent, boolean visible) {
+        try {
+            List<DataWatcher.c<?>> dataWatcher = (List<DataWatcher.c<?>>) dataWatchers;
+
+            dataWatcherCustomNameField.setAccessible(true);
+            dataWatcherCustomNameVisibleField.setAccessible(true);
+
+            Optional<IChatBaseComponent> name = entityNameComponent == null ? Optional.empty() : Optional.of(CraftChatMessage.fromJSON(GsonComponentSerializer.gson().serialize(entityNameComponent)));
+            addOrReplaceDataWatcher(dataWatcher, DataWatcher.c.a((DataWatcherObject<Optional<IChatBaseComponent>>) dataWatcherCustomNameField.get(null), name));
+            addOrReplaceDataWatcher(dataWatcher, DataWatcher.c.a((DataWatcherObject<Boolean>) dataWatcherCustomNameVisibleField.get(null), visible));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public PacketContainer createModifiedMetadataPacket(PacketContainer packet, List<?> dataWatchers) {
+        PacketPlayOutEntityMetadata nmsPacket = (PacketPlayOutEntityMetadata) packet.getHandle();
+        return createEntityMetadataPacket(nmsPacket.b(), dataWatchers);
+    }
 }

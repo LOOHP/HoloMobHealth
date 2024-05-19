@@ -25,20 +25,13 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.wrappers.WrappedChatComponent;
-import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-import com.comphenix.protocol.wrappers.WrappedDataWatcher.Registry;
-import com.comphenix.protocol.wrappers.WrappedDataWatcher.Serializer;
-import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObject;
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.nms.NMS;
 import com.loohp.holomobhealth.protocol.EntityMetadata;
 import com.loohp.holomobhealth.utils.ChatColorUtils;
 import com.loohp.holomobhealth.utils.CitizensUtils;
 import com.loohp.holomobhealth.utils.CustomNameUtils;
-import com.loohp.holomobhealth.utils.DataWatcherUtils;
 import com.loohp.holomobhealth.utils.EntityTypeUtils;
-import com.loohp.holomobhealth.utils.LanguageUtils;
 import com.loohp.holomobhealth.utils.MCVersion;
 import com.loohp.holomobhealth.utils.MyPetUtils;
 import com.loohp.holomobhealth.utils.MythicMobsUtils;
@@ -46,19 +39,18 @@ import com.loohp.holomobhealth.utils.ParsePlaceholders;
 import com.loohp.holomobhealth.utils.ShopkeepersUtils;
 import com.loohp.holomobhealth.utils.WorldGuardUtils;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 
 public class NameTagDisplay {
 
+    @SuppressWarnings("deprecation")
     public static void entityMetadataPacketListener() {
         HoloMobHealth.protocolManager.addPacketListener(new PacketAdapter(HoloMobHealth.plugin, ListenerPriority.MONITOR, PacketType.Play.Server.ENTITY_METADATA) {
             @Override
@@ -82,15 +74,15 @@ public class NameTagDisplay {
                     if (entityUUID == null) {
                         return;
                     }
-                    WrappedDataWatcher watcher = getWatcher(player, entityUUID, world, packet);
+                    List<?> watcher = getWatcher(player, entityUUID, world, packet);
 
                     if (watcher != null) {
                         boolean readOnly = event.isReadOnly();
-                        event.setReadOnly(true);
-                        DataWatcherUtils.writeMetadataPacket(packet, watcher);
+                        event.setReadOnly(false);
+                        event.setPacket(NMS.getInstance().createModifiedMetadataPacket(packet, watcher));
                         event.setReadOnly(readOnly);
                     }
-                } catch (UnsupportedOperationException e) {
+                } catch (UnsupportedOperationException ignored) {
                 }
             }
         });
@@ -123,7 +115,7 @@ public class NameTagDisplay {
                         }
 
                         Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(player, entity), 5);
-                    } catch (UnsupportedOperationException e) {
+                    } catch (UnsupportedOperationException ignored) {
                     }
                 }
             });
@@ -156,18 +148,13 @@ public class NameTagDisplay {
                     }
 
                     Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(player, entity), 5);
-                } catch (UnsupportedOperationException e) {
+                } catch (UnsupportedOperationException ignored) {
                 }
             }
         });
     }
 
-    public static WrappedDataWatcher getWatcher(Player player, UUID entityUUID, World world, PacketContainer packet) {
-        //WrappedDataWatcher cachedWatcher = cache.get(entityUUID);
-        //if (cachedWatcher != null) {
-        //	return cachedWatcher;
-        //}
-
+    public static List<?> getWatcher(Player player, UUID entityUUID, World world, PacketContainer packet) {
         Entity entity = NMS.getInstance().getEntityFromUUID(entityUUID);
 
         if (entity == null || !EntityTypeUtils.getMobsTypesSet().contains(EntityTypeUtils.getEntityType(entity))) {
@@ -239,43 +226,12 @@ public class NameTagDisplay {
                 }
             }
 
-            WrappedDataWatcher watcher = DataWatcherUtils.fromMetadataPacket(packet);
+            List<?> watcher = NMS.getInstance().readDataWatchersFromMetadataPacket(packet);
 
             Component component = ParsePlaceholders.parse(player, (LivingEntity) entity, useIdle ? HoloMobHealth.idleDisplayText.get(0) : HoloMobHealth.displayText.get(0));
             boolean visible = HoloMobHealth.alwaysShow;
 
-            if (component != null && !component.equals(Component.empty())) {
-                if (HoloMobHealth.version.isOld()) {
-                    watcher.setObject(2, LegacyComponentSerializer.legacySection().serialize(LanguageUtils.convert(component, HoloMobHealth.language)));
-                } else if (HoloMobHealth.version.isLegacy()) {
-                    Serializer serializer = Registry.get(String.class);
-                    WrappedDataWatcherObject object = new WrappedDataWatcherObject(2, serializer);
-                    watcher.setObject(object, LegacyComponentSerializer.legacySection().serialize(LanguageUtils.convert(component, HoloMobHealth.language)));
-                } else {
-                    Optional<?> opt = Optional.of(WrappedChatComponent.fromJson(GsonComponentSerializer.gson().serialize(component)).getHandle());
-                    watcher.setObject(new WrappedDataWatcherObject(2, Registry.getChatComponentSerializer(true)), opt);
-                }
-            } else {
-                if (HoloMobHealth.version.isOld()) {
-                    watcher.setObject(2, "");
-                } else if (HoloMobHealth.version.isLegacy()) {
-                    Serializer serializer = Registry.get(String.class);
-                    WrappedDataWatcherObject object = new WrappedDataWatcherObject(2, serializer);
-                    watcher.setObject(object, "");
-                } else {
-                    Optional<?> opt = Optional.empty();
-                    watcher.setObject(new WrappedDataWatcherObject(2, Registry.getChatComponentSerializer(true)), opt);
-                }
-            }
-
-            if (HoloMobHealth.version.isOld()) {
-                watcher.setObject(3, (byte) (visible ? 1 : 0));
-            } else {
-                watcher.setObject(new WrappedDataWatcherObject(3, Registry.get(Boolean.class)), visible);
-            }
-
-            //cache.put(entityUUID, watcher);
-            //Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> cache.remove(entityUUID), 1);
+            NMS.getInstance().modifyDataWatchers(watcher, component, visible);
 
             return watcher;
         }

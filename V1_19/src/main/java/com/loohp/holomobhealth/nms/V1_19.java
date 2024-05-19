@@ -339,4 +339,44 @@ public class V1_19 extends NMSWrapper {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public List<DataWatcher.Item<?>> readDataWatchersFromMetadataPacket(PacketContainer packet) {
+        PacketPlayOutEntityMetadata nmsPacket = (PacketPlayOutEntityMetadata) packet.getHandle();
+        return nmsPacket.b();
+    }
+
+    private <T> void addOrReplaceDataWatcher(List<DataWatcher.Item<?>> dataWatcher, DataWatcher.Item<T> newWatcher) {
+        for (int i = 0; i < dataWatcher.size(); i++) {
+            DataWatcher.Item<?> watcher = dataWatcher.get(i);
+            if (newWatcher.a().a() == watcher.a().a() && newWatcher.b().equals(watcher.b())) {
+                dataWatcher.set(i, newWatcher);
+                return;
+            }
+        }
+        dataWatcher.add(newWatcher);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void modifyDataWatchers(List<?> dataWatchers, Component entityNameComponent, boolean visible) {
+        try {
+            List<DataWatcher.Item<?>> dataWatcher = (List<DataWatcher.Item<?>>) dataWatchers;
+
+            dataWatcherCustomNameField.setAccessible(true);
+            dataWatcherCustomNameVisibleField.setAccessible(true);
+
+            Optional<IChatBaseComponent> name = entityNameComponent == null ? Optional.empty() : Optional.of(CraftChatMessage.fromJSON(GsonComponentSerializer.gson().serialize(entityNameComponent)));
+            addOrReplaceDataWatcher(dataWatcher, new DataWatcher.Item<>((DataWatcherObject<Optional<IChatBaseComponent>>) dataWatcherCustomNameField.get(null), name));
+            addOrReplaceDataWatcher(dataWatcher, new DataWatcher.Item<>((DataWatcherObject<Boolean>) dataWatcherCustomNameVisibleField.get(null), visible));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public PacketContainer createModifiedMetadataPacket(PacketContainer packet, List<?> dataWatchers) {
+        PacketPlayOutEntityMetadata nmsPacket = (PacketPlayOutEntityMetadata) packet.getHandle();
+        return createEntityMetadataPacket(nmsPacket.c(), dataWatchers);
+    }
 }

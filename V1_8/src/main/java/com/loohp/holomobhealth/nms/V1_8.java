@@ -369,4 +369,56 @@ public class V1_8 extends NMSWrapper {
             throw new RuntimeException(e);
         }
     }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<WatchableObject> readDataWatchersFromMetadataPacket(PacketContainer packet) {
+        try {
+            PacketPlayOutEntityMetadata nmsPacket = (PacketPlayOutEntityMetadata) packet.getHandle();
+            entityMetadataPacketFields[1].setAccessible(true);
+            return (List<WatchableObject>) entityMetadataPacketFields[1].get(packet);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private <T> void addOrReplaceDataWatcher(List<WatchableObject> dataWatcher, WatchableObject newWatcher) {
+        for (int i = 0; i < dataWatcher.size(); i++) {
+            WatchableObject watcher = dataWatcher.get(i);
+            if (newWatcher.a() == watcher.a() && newWatcher.c() == watcher.c()) {
+                dataWatcher.set(i, newWatcher);
+                return;
+            }
+        }
+        dataWatcher.add(newWatcher);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void modifyDataWatchers(List<?> dataWatchers, Component entityNameComponent, boolean visible) {
+        try {
+            List<WatchableObject> dataWatcher = (List<WatchableObject>) dataWatchers;
+
+            dataWatcherTypeMapField.setAccessible(true);
+            Map<Class<?>, Integer> typeMap = (Map<Class<?>, Integer>) dataWatcherTypeMapField.get(null);
+
+            String name = entityNameComponent == null ? "" : LegacyComponentSerializer.legacySection().serialize(entityNameComponent);
+            addOrReplaceDataWatcher(dataWatcher, new WatchableObject(typeMap.get(String.class), dataWatcherCustomNameIndex, name));
+            addOrReplaceDataWatcher(dataWatcher, new WatchableObject(typeMap.get(Byte.class), dataWatcherCustomNameVisibleIndex, (byte) 1));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public PacketContainer createModifiedMetadataPacket(PacketContainer packet, List<?> dataWatchers) {
+        try {
+            PacketPlayOutEntityMetadata nmsPacket = (PacketPlayOutEntityMetadata) packet.getHandle();
+            entityMetadataPacketFields[0].setAccessible(true);
+            int id = entityMetadataPacketFields[0].getInt(packet);
+            return createEntityMetadataPacket(id, dataWatchers);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

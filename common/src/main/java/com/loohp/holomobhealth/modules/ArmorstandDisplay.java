@@ -25,10 +25,6 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-import com.comphenix.protocol.wrappers.WrappedDataWatcher.Registry;
-import com.comphenix.protocol.wrappers.WrappedDataWatcher.Serializer;
-import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObject;
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.holders.HoloMobArmorStand;
 import com.loohp.holomobhealth.holders.MultilineStands;
@@ -38,7 +34,6 @@ import com.loohp.holomobhealth.protocol.EntityMetadata;
 import com.loohp.holomobhealth.utils.ChatColorUtils;
 import com.loohp.holomobhealth.utils.CitizensUtils;
 import com.loohp.holomobhealth.utils.CustomNameUtils;
-import com.loohp.holomobhealth.utils.DataWatcherUtils;
 import com.loohp.holomobhealth.utils.EntityTypeUtils;
 import com.loohp.holomobhealth.utils.MCVersion;
 import com.loohp.holomobhealth.utils.MyPetUtils;
@@ -67,7 +62,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -124,10 +118,10 @@ public class ArmorstandDisplay implements Listener {
         }, 0, 5);
     }
 
+    @SuppressWarnings("deprecation")
     public static void entityMetadataPacketListener() {
         Bukkit.getPluginManager().registerEvents(new ArmorstandDisplay(), HoloMobHealth.plugin);
         HoloMobHealth.protocolManager.addPacketListener(new PacketAdapter(HoloMobHealth.plugin, ListenerPriority.HIGHEST, PacketType.Play.Server.ENTITY_METADATA) {
-            @SuppressWarnings("deprecation")
             @Override
             public void onPacketSending(PacketEvent event) {
                 try {
@@ -169,14 +163,15 @@ public class ArmorstandDisplay implements Listener {
 
                     if (data != null) {
                         if (data.use()) {
-                            DataWatcherUtils.writeMetadataPacket(packet, data.getWatcher());
+                            packet = NMS.getInstance().createModifiedMetadataPacket(packet, data.getWatcher());
+                            event.setPacket(packet);
 
                             Entity entity = data.getEntity();
                             String customName = data.getCustomName();
 
                             if (EntityTypeUtils.getMobsTypesSet().contains(EntityTypeUtils.getEntityType(entity))) {
                                 if (entity.getPassenger() != null || isInvisible(entity) || (!HoloMobHealth.applyToNamed && customName != null) || (HoloMobHealth.useAlterHealth && !HoloMobHealth.idleUse && !HoloMobHealth.altShowHealth.containsKey(entity.getUniqueId())) || (HoloMobHealth.rangeEnabled && !RangeModule.isEntityInRangeOfPlayer(player, entity))) {
-                                    Component name = customName != null && !customName.equals("") ? LegacyComponentSerializer.legacySection().deserialize(customName) : Component.empty();
+                                    Component name = customName != null && !customName.isEmpty() ? LegacyComponentSerializer.legacySection().deserialize(customName) : Component.empty();
                                     boolean visible = entity.isCustomNameVisible();
                                     EntityMetadata.sendMetadataPacket(entity, name, visible, Collections.singletonList(player), true);
                                     MultilineStands multi = mapping.remove(entity.getUniqueId());
@@ -185,7 +180,6 @@ public class ArmorstandDisplay implements Listener {
                                     }
                                     multi.getStands().forEach(each -> ArmorStandPacket.removeArmorStand(HoloMobHealth.playersEnabled, each, true, false));
                                     multi.remove();
-                                    return;
                                 } else if (entity.isValid()) {
                                     MultilineStands multi = mapping.get(entity.getUniqueId());
                                     if (multi == null) {
@@ -227,7 +221,7 @@ public class ArmorstandDisplay implements Listener {
                             }, 1);
                         }
                     }
-                } catch (UnsupportedOperationException e) {
+                } catch (UnsupportedOperationException ignored) {
                 }
             }
         });
@@ -252,7 +246,7 @@ public class ArmorstandDisplay implements Listener {
                             return;
                         }
                         Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(player, entity), 5);
-                    } catch (UnsupportedOperationException e) {
+                    } catch (UnsupportedOperationException ignored) {
                     }
                 }
             });
@@ -277,7 +271,7 @@ public class ArmorstandDisplay implements Listener {
                         return;
                     }
                     Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(player, entity), 5);
-                } catch (UnsupportedOperationException e) {
+                } catch (UnsupportedOperationException ignored) {
                 }
             }
         });
@@ -306,7 +300,7 @@ public class ArmorstandDisplay implements Listener {
                     }
                     multi.setLocation(entity.getLocation());
                     multi.getStands().forEach(each -> ArmorStandPacket.updateArmorStandLocation(entity, each));
-                } catch (UnsupportedOperationException e) {
+                } catch (UnsupportedOperationException ignored) {
                 }
             }
         });
@@ -335,7 +329,7 @@ public class ArmorstandDisplay implements Listener {
                     }
                     multi.setLocation(entity.getLocation());
                     multi.getStands().forEach(each -> ArmorStandPacket.updateArmorStandLocation(entity, each));
-                } catch (UnsupportedOperationException e) {
+                } catch (UnsupportedOperationException ignored) {
                 }
             }
         });
@@ -364,18 +358,13 @@ public class ArmorstandDisplay implements Listener {
                     }
                     multi.setLocation(entity.getLocation());
                     multi.getStands().forEach(each -> ArmorStandPacket.updateArmorStandLocation(entity, each));
-                } catch (UnsupportedOperationException e) {
+                } catch (UnsupportedOperationException ignored) {
                 }
             }
         });
     }
 
     public static ArmorStandDisplayData getData(Player player, UUID entityUUID, World world, PacketContainer packet) {
-        //ArmorStandDisplayCache cahcedData = cache.get(entityUUID);
-        //if (cahcedData != null) {
-        //	return cahcedData;
-        //}
-
         Entity entity = NMS.getInstance().getEntityFromUUID(entityUUID);
 
         if (entity == null || !EntityTypeUtils.getMobsTypesSet().contains(EntityTypeUtils.getEntityType(entity))) {
@@ -442,7 +431,7 @@ public class ArmorstandDisplay implements Listener {
                 }
             }
 
-            WrappedDataWatcher watcher = DataWatcherUtils.fromMetadataPacket(packet);
+            List<?> watcher = NMS.getInstance().readDataWatchersFromMetadataPacket(packet);
 
             List<Component> components;
             if (useIdle) {
@@ -451,29 +440,9 @@ public class ArmorstandDisplay implements Listener {
                 components = HoloMobHealth.displayText.stream().map(each -> ParsePlaceholders.parse(player, (LivingEntity) entity, each)).collect(Collectors.toList());
             }
 
-            if (HoloMobHealth.version.isOld()) {
-                watcher.setObject(2, "");
-            } else if (HoloMobHealth.version.isLegacy()) {
-                Serializer serializer = Registry.get(String.class);
-                WrappedDataWatcherObject object = new WrappedDataWatcherObject(2, serializer);
-                watcher.setObject(object, "");
-            } else {
-                Optional<?> opt = Optional.empty();
-                watcher.setObject(new WrappedDataWatcherObject(2, Registry.getChatComponentSerializer(true)), opt);
-            }
+            NMS.getInstance().modifyDataWatchers(watcher, null, false);
 
-            if (HoloMobHealth.version.isOld()) {
-                watcher.setObject(3, (byte) 0);
-            } else {
-                watcher.setObject(new WrappedDataWatcherObject(3, Registry.get(Boolean.class)), false);
-            }
-
-            ArmorStandDisplayData newData = new ArmorStandDisplayData(watcher, components, customName, entity);
-
-            //cache.put(entityUUID, newData);
-            //Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> cache.remove(entityUUID), 1);
-
-            return newData;
+            return new ArmorStandDisplayData(watcher, components, customName, entity);
         }
         return null;
     }
@@ -519,15 +488,15 @@ public class ArmorstandDisplay implements Listener {
         }, 2);
     }
 
-    private static class ArmorStandDisplayData {
+    public static class ArmorStandDisplayData {
 
         private final boolean use;
-        private WrappedDataWatcher watcher;
+        private List<?> watcher;
         private List<Component> components;
         private String customName;
         private Entity entity;
 
-        public ArmorStandDisplayData(WrappedDataWatcher watcher, List<Component> components, String customName, Entity entity) {
+        private ArmorStandDisplayData(List<?> watcher, List<Component> components, String customName, Entity entity) {
             this.watcher = watcher;
             this.components = components;
             this.customName = customName;
@@ -539,7 +508,7 @@ public class ArmorstandDisplay implements Listener {
             this.use = false;
         }
 
-        public WrappedDataWatcher getWatcher() {
+        public List<?> getWatcher() {
             return watcher;
         }
 

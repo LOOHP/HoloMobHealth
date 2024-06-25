@@ -25,7 +25,7 @@
 	<groupId>com.loohp</groupId>
 	<artifactId>HoloMobHealth</artifactId>
 	<name>HoloMobHealth</name>
-	<version>2.3.8.0</version>
+	<version>2.3.8.1</version>
 
 	<description>Customize how you would like to display mob health above its head!</description>
 	<url>https://github.com/LOOHP/HoloMobHealth</url>
@@ -401,7 +401,7 @@
 			<artifactId>ModelEngine</artifactId>
 			<scope>system</scope>
 			<version>1.0</version>
-			<systemPath>${basedir}/lib/ModelEngine-4.0.3F.jar</systemPath>
+			<systemPath>${basedir}/lib/ModelEngine-4.0.6.1F.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>com.nisovin.shopkeepers</groupId>

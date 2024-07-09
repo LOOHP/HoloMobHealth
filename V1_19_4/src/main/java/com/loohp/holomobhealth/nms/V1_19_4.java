@@ -37,6 +37,7 @@ import net.minecraft.server.level.WorldServer;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.animal.EntityTropicalFish;
 import net.minecraft.world.entity.decoration.EntityArmorStand;
+import net.minecraft.world.level.entity.LevelEntityGetter;
 import net.minecraft.world.phys.AxisAlignedBB;
 import net.minecraft.world.phys.Vec3D;
 import org.bukkit.Bukkit;
@@ -49,6 +50,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -68,6 +70,9 @@ public class V1_19_4 extends NMSWrapper {
     private final Field dataWatcherNoGravityField;
     private final Field[] entityTeleportPacketFields;
 
+    //paper
+    private Method worldServerEntityLookup;
+
     public V1_19_4() {
         try {
             entityCountField = net.minecraft.world.entity.Entity.class.getDeclaredField("d");
@@ -79,6 +84,12 @@ public class V1_19_4 extends NMSWrapper {
             entityTeleportPacketFields = PacketPlayOutEntityTeleport.class.getDeclaredFields();
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
+        }
+        try {
+            //paper
+            //noinspection JavaReflectionMemberAccess
+            worldServerEntityLookup = WorldServer.class.getMethod("getEntityLookup");
+        } catch (NoSuchMethodException ignore) {
         }
     }
 
@@ -161,11 +172,18 @@ public class V1_19_4 extends NMSWrapper {
         return fish.ge();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public UUID getEntityUUIDFromID(World world, int id) {
         try {
             WorldServer worldServer = ((CraftWorld) world).getHandle();
-            net.minecraft.world.entity.Entity entity = worldServer.L.d().a(id);
+            LevelEntityGetter<net.minecraft.world.entity.Entity> levelEntityGetter;
+            if (worldServerEntityLookup == null) {
+                levelEntityGetter = worldServer.L.d();
+            } else {
+                levelEntityGetter = (LevelEntityGetter<net.minecraft.world.entity.Entity>) worldServerEntityLookup.invoke(worldServer);
+            }
+            net.minecraft.world.entity.Entity entity = levelEntityGetter.a(id);
             return entity == null ? null : entity.cs();
         } catch (Exception e) {
             throw new RuntimeException(e);

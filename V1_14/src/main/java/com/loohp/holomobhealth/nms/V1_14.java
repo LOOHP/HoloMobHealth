@@ -411,7 +411,7 @@ public class V1_14 extends NMSWrapper {
         try {
             PacketPlayOutEntityMetadata nmsPacket = (PacketPlayOutEntityMetadata) packet.getHandle();
             entityMetadataPacketFields[1].setAccessible(true);
-            return (List<DataWatcher.Item<?>>) entityMetadataPacketFields[1].get(packet);
+            return (List<DataWatcher.Item<?>>) entityMetadataPacketFields[1].get(nmsPacket);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -450,7 +450,7 @@ public class V1_14 extends NMSWrapper {
         try {
             PacketPlayOutEntityMetadata nmsPacket = (PacketPlayOutEntityMetadata) packet.getHandle();
             entityMetadataPacketFields[0].setAccessible(true);
-            int id = entityMetadataPacketFields[0].getInt(packet);
+            int id = entityMetadataPacketFields[0].getInt(nmsPacket);
             return createEntityMetadataPacket(id, dataWatchers);
         } catch (Exception e) {
             throw new RuntimeException(e);

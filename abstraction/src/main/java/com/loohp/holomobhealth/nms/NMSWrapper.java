@@ -33,11 +33,13 @@ import org.bukkit.util.Vector;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Future;
+import java.util.function.Function;
 
 public abstract class NMSWrapper {
 
     private static Plugin plugin;
     private static NMSWrapper instance;
+    private static Function<Component, Component> legacyTranslatableConversion;
 
     @Deprecated
     public static Plugin getPlugin() {
@@ -50,13 +52,18 @@ public abstract class NMSWrapper {
     }
 
     @Deprecated
-    public static void setup(NMSWrapper instance, Plugin plugin) {
+    public static void setup(NMSWrapper instance, Plugin plugin, Function<Component, Component> legacyTranslatableConversion) {
         NMSWrapper.instance = instance;
         NMSWrapper.plugin = plugin;
+        NMSWrapper.legacyTranslatableConversion = legacyTranslatableConversion;
     }
 
     static PacketContainer p(Object packet) {
         return PacketContainer.fromPacket(packet);
+    }
+
+    static Component t(Component legacyComponent) {
+        return legacyTranslatableConversion.apply(legacyComponent);
     }
 
     public abstract PacketContainer[] createEntityDestroyPacket(int... entityIds);

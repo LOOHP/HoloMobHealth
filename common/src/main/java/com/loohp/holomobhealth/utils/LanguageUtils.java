@@ -25,6 +25,7 @@ import com.loohp.holomobhealth.nms.NMS;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.TranslatableComponent;
+import net.kyori.adventure.text.TranslationArgument;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
@@ -337,8 +338,8 @@ public class LanguageUtils {
             if (current instanceof TranslatableComponent) {
                 TranslatableComponent trans = (TranslatableComponent) current;
                 Component translated = Component.text(getTranslation(trans.key(), language)).style(trans.style());
-                for (Component arg : trans.args()) {
-                    translated = translated.replaceText(TextReplacementConfig.builder().matchLiteral("%s").replacement(convert(arg, language)).once().build());
+                for (TranslationArgument arg : trans.arguments()) {
+                    translated = translated.replaceText(TextReplacementConfig.builder().matchLiteral("%s").replacement(convert(arg.asComponent(), language)).once().build());
                 }
                 children.set(i, translated);
             }

@@ -21,6 +21,7 @@
 package com.loohp.holomobhealth.nms;
 
 import com.loohp.holomobhealth.HoloMobHealth;
+import com.loohp.holomobhealth.utils.LanguageUtils;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -36,7 +37,7 @@ public class NMS {
         try {
             Class<NMSWrapper> nmsImplClass = (Class<NMSWrapper>) Class.forName("com.loohp.holomobhealth.nms." + HoloMobHealth.version.name());
             instance = nmsImplClass.getConstructor().newInstance();
-            NMSWrapper.setup(instance, HoloMobHealth.plugin);
+            NMSWrapper.setup(instance, HoloMobHealth.plugin, c -> LanguageUtils.convert(c, HoloMobHealth.language));
             return instance;
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
             if (HoloMobHealth.version.isSupported()) {

@@ -245,7 +245,7 @@ public class V1_9 extends NMSWrapper {
             dataWatcherCustomNameField.setAccessible(true);
             dataWatcherCustomNameVisibleField.setAccessible(true);
 
-            String name = entityNameComponent == null ? "" : LegacyComponentSerializer.legacySection().serialize(entityNameComponent);
+            String name = entityNameComponent == null ? "" : LegacyComponentSerializer.legacySection().serialize(t(entityNameComponent));
             dataWatcher.add(new DataWatcher.Item<>((DataWatcherObject<String>) dataWatcherCustomNameField.get(null), name));
             dataWatcher.add(new DataWatcher.Item<>((DataWatcherObject<Boolean>) dataWatcherCustomNameVisibleField.get(null), visible));
 
@@ -268,7 +268,7 @@ public class V1_9 extends NMSWrapper {
             byte bitmask = 0x20;
             dataWatcher.add(new DataWatcher.Item<>((DataWatcherObject<Byte>) dataWatcherByteField.get(null), bitmask));
 
-            String name = entityNameComponent == null ? "" : LegacyComponentSerializer.legacySection().serialize(entityNameComponent);
+            String name = entityNameComponent == null ? "" : LegacyComponentSerializer.legacySection().serialize(t(entityNameComponent));
             dataWatcher.add(new DataWatcher.Item<>((DataWatcherObject<String>) dataWatcherCustomNameField.get(null), name));
             dataWatcher.add(new DataWatcher.Item<>((DataWatcherObject<Boolean>) dataWatcherCustomNameVisibleField.get(null), visible));
 
@@ -383,7 +383,7 @@ public class V1_9 extends NMSWrapper {
             byte bitmask = 0x20;
             dataWatcher.add(new DataWatcher.Item<>((DataWatcherObject<Byte>) dataWatcherByteField.get(null), bitmask));
 
-            String name = entityNameComponent == null ? "" : LegacyComponentSerializer.legacySection().serialize(entityNameComponent);
+            String name = entityNameComponent == null ? "" : LegacyComponentSerializer.legacySection().serialize(t(entityNameComponent));
             dataWatcher.add(new DataWatcher.Item<>((DataWatcherObject<String>) dataWatcherCustomNameField.get(null), name));
             dataWatcher.add(new DataWatcher.Item<>((DataWatcherObject<Boolean>) dataWatcherCustomNameVisibleField.get(null), true));
 
@@ -432,7 +432,7 @@ public class V1_9 extends NMSWrapper {
             dataWatcherCustomNameField.setAccessible(true);
             dataWatcherCustomNameVisibleField.setAccessible(true);
 
-            String name = entityNameComponent == null ? "" : LegacyComponentSerializer.legacySection().serialize(entityNameComponent);
+            String name = entityNameComponent == null ? "" : LegacyComponentSerializer.legacySection().serialize(t(entityNameComponent));
             addOrReplaceDataWatcher(dataWatcher, new DataWatcher.Item<>((DataWatcherObject<String>) dataWatcherCustomNameField.get(null), name));
             addOrReplaceDataWatcher(dataWatcher, new DataWatcher.Item<>((DataWatcherObject<Boolean>) dataWatcherCustomNameVisibleField.get(null), visible));
         } catch (Exception e) {

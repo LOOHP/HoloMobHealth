@@ -224,7 +224,7 @@ public class V1_8 extends NMSWrapper {
             dataWatcherTypeMapField.setAccessible(true);
             Map<Class<?>, Integer> typeMap = (Map<Class<?>, Integer>) dataWatcherTypeMapField.get(null);
 
-            String name = entityNameComponent == null ? "" : LegacyComponentSerializer.legacySection().serialize(entityNameComponent);
+            String name = entityNameComponent == null ? "" : LegacyComponentSerializer.legacySection().serialize(t(entityNameComponent));
             dataWatcher.add(new WatchableObject(typeMap.get(String.class), dataWatcherCustomNameIndex, name));
             dataWatcher.add(new WatchableObject(typeMap.get(Byte.class), dataWatcherCustomNameVisibleIndex, visible));
 
@@ -246,7 +246,7 @@ public class V1_8 extends NMSWrapper {
             byte bitmask = 0x20;
             dataWatcher.add(new WatchableObject(typeMap.get(Byte.class), dataWatcherByteIndex, bitmask));
 
-            String name = entityNameComponent == null ? "" : LegacyComponentSerializer.legacySection().serialize(entityNameComponent);
+            String name = entityNameComponent == null ? "" : LegacyComponentSerializer.legacySection().serialize(t(entityNameComponent));
             dataWatcher.add(new WatchableObject(typeMap.get(String.class), dataWatcherCustomNameIndex, name));
             dataWatcher.add(new WatchableObject(typeMap.get(Byte.class), dataWatcherCustomNameVisibleIndex, visible));
 
@@ -355,7 +355,7 @@ public class V1_8 extends NMSWrapper {
             byte bitmask = 0x20;
             dataWatcher.add(new WatchableObject(typeMap.get(Byte.class), dataWatcherByteIndex, bitmask));
 
-            String name = entityNameComponent == null ? "" : LegacyComponentSerializer.legacySection().serialize(entityNameComponent);
+            String name = entityNameComponent == null ? "" : LegacyComponentSerializer.legacySection().serialize(t(entityNameComponent));
             dataWatcher.add(new WatchableObject(typeMap.get(String.class), dataWatcherCustomNameIndex, name));
             dataWatcher.add(new WatchableObject(typeMap.get(Byte.class), dataWatcherCustomNameVisibleIndex, (byte) 1));
 
@@ -402,7 +402,7 @@ public class V1_8 extends NMSWrapper {
             dataWatcherTypeMapField.setAccessible(true);
             Map<Class<?>, Integer> typeMap = (Map<Class<?>, Integer>) dataWatcherTypeMapField.get(null);
 
-            String name = entityNameComponent == null ? "" : LegacyComponentSerializer.legacySection().serialize(entityNameComponent);
+            String name = entityNameComponent == null ? "" : LegacyComponentSerializer.legacySection().serialize(t(entityNameComponent));
             addOrReplaceDataWatcher(dataWatcher, new WatchableObject(typeMap.get(String.class), dataWatcherCustomNameIndex, name));
             addOrReplaceDataWatcher(dataWatcher, new WatchableObject(typeMap.get(Byte.class), dataWatcherCustomNameVisibleIndex, (byte) 1));
         } catch (Exception e) {

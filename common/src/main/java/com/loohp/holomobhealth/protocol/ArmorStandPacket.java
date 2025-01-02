@@ -1,8 +1,8 @@
 /*
  * This file is part of HoloMobHealth.
  *
- * Copyright (C) 2022. LoohpJames <jamesloohp@gmail.com>
- * Copyright (C) 2022. Contributors
+ * Copyright (C) 2020 - 2025. LoohpJames <jamesloohp@gmail.com>
+ * Copyright (C) 2020 - 2025. Contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.holders.HoloMobArmorStand;
 import com.loohp.holomobhealth.nms.NMS;
+import com.loohp.holomobhealth.utils.PacketSender;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -136,11 +137,7 @@ public class ArmorStandPacket implements Listener {
 
         PacketContainer[] packets = NMS.getInstance().createArmorStandSpawnPackets(entity, component, visible);
 
-        for (Player player : playersInRange) {
-            for (PacketContainer packet : packets) {
-                protocolManager.sendServerPacket(player, packet);
-            }
-        }
+        PacketSender.sendServerPackets(playersInRange, packets);
     }
 
     public static void updateArmorStand(Collection<? extends Player> players, HoloMobArmorStand entity, Component component, boolean visible) {
@@ -154,11 +151,7 @@ public class ArmorStandPacket implements Listener {
 
             PacketContainer[] packets = NMS.getInstance().createUpdateArmorStandPackets(entity, component, visible);
 
-            for (Player player : playersInRange) {
-                for (PacketContainer packet : packets) {
-                    protocolManager.sendServerPacket(player, packet);
-                }
-            }
+            PacketSender.sendServerPackets(playersInRange, packets);
         });
     }
 
@@ -170,11 +163,7 @@ public class ArmorStandPacket implements Listener {
             PacketContainer[] packets = NMS.getInstance().createUpdateArmorStandPackets(entity, component, visible);
 
             Bukkit.getScheduler().runTask(plugin, () -> {
-                for (Player player : playersInRange) {
-                    for (PacketContainer packet : packets) {
-                        protocolManager.sendServerPacket(player, packet);
-                    }
-                }
+                PacketSender.sendServerPackets(playersInRange, packets);
             });
         });
     }
@@ -191,11 +180,7 @@ public class ArmorStandPacket implements Listener {
             PacketContainer[] packets = NMS.getInstance().createUpdateArmorStandLocationPackets(entity);
 
             Bukkit.getScheduler().runTask(plugin, () -> {
-                for (Player player : playersInRange) {
-                    for (PacketContainer packet : packets) {
-                        protocolManager.sendServerPacket(player, packet);
-                    }
-                }
+                PacketSender.sendServerPackets(playersInRange, packets);
             });
         });
     }
@@ -210,7 +195,7 @@ public class ArmorStandPacket implements Listener {
             Bukkit.getScheduler().runTask(plugin, () -> {
                 for (Player player : playersInRange) {
                     for (PacketContainer packet : packets) {
-                        protocolManager.sendServerPacket(player, packet, false);
+                        PacketSender.sendServerPacket(player, packet, false);
                     }
                 }
             });
@@ -257,11 +242,7 @@ public class ArmorStandPacket implements Listener {
             PacketContainer[] packets = NMS.getInstance().createEntityDestroyPacket(entity.getEntityId());
 
             Bukkit.getScheduler().runTask(plugin, () -> {
-                for (Player player : playersInRange) {
-                    for (PacketContainer packet : packets) {
-                        protocolManager.sendServerPacket(player, packet);
-                    }
-                }
+                PacketSender.sendServerPackets(playersInRange, packets);
             });
         });
     }

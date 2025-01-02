@@ -1,8 +1,8 @@
 /*
  * This file is part of HoloMobHealth.
  *
- * Copyright (C) 2022. LoohpJames <jamesloohp@gmail.com>
- * Copyright (C) 2022. Contributors
+ * Copyright (C) 2020 - 2025. LoohpJames <jamesloohp@gmail.com>
+ * Copyright (C) 2020 - 2025. Contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.nms.NMS;
 import com.loohp.holomobhealth.utils.EntityTypeUtils;
+import com.loohp.holomobhealth.utils.PacketSender;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -64,7 +65,7 @@ public class EntityMetadata {
             for (Player player : players) {
                 if (player.getWorld().equals(entity.getWorld())) {
                     try {
-                        HoloMobHealth.protocolManager.sendServerPacket(player, packet);
+                        PacketSender.sendServerPacket(player, packet);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -80,7 +81,7 @@ public class EntityMetadata {
 
             for (Player player : players) {
                 if (player.hasPermission("holomobhealth.use")) {
-                    HoloMobHealth.protocolManager.sendServerPacket(player, packet, !quiet);
+                    PacketSender.sendServerPacket(player, packet, !quiet);
                 }
             }
         });

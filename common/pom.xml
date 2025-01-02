@@ -1,8 +1,8 @@
 <!--
   ~ This file is part of HoloMobHealth.
   ~
-  ~ Copyright (C) 2022. LoohpJames <jamesloohp@gmail.com>
-  ~ Copyright (C) 2022. Contributors
+  ~ Copyright (C) 2020 - 2025. LoohpJames <jamesloohp@gmail.com>
+  ~ Copyright (C) 2020 - 2025. Contributors
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 	<groupId>com.loohp</groupId>
 	<artifactId>HoloMobHealth</artifactId>
 	<name>HoloMobHealth</name>
-	<version>2.3.12.0</version>
+	<version>2.3.12.1</version>
 
 	<description>Customize how you would like to display mob health above its head!</description>
 	<url>https://github.com/LOOHP/HoloMobHealth</url>
@@ -301,31 +301,31 @@
 		<dependency>
 			<groupId>net.kyori</groupId>
 			<artifactId>adventure-text-serializer-gson</artifactId>
-			<version>4.16.0</version>
+			<version>4.18.0</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.kyori</groupId>
 			<artifactId>adventure-text-serializer-legacy</artifactId>
-			<version>4.16.0</version>
+			<version>4.18.0</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.kyori</groupId>
 			<artifactId>adventure-text-serializer-plain</artifactId>
-			<version>4.16.0</version>
+			<version>4.18.0</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.kyori</groupId>
 			<artifactId>adventure-api</artifactId>
-			<version>4.16.0</version>
+			<version>4.18.0</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.kyori</groupId>
 			<artifactId>adventure-nbt</artifactId>
-			<version>4.16.0</version>
+			<version>4.18.0</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>

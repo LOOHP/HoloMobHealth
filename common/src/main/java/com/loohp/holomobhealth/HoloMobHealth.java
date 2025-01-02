@@ -1,8 +1,8 @@
 /*
  * This file is part of HoloMobHealth.
  *
- * Copyright (C) 2022. LoohpJames <jamesloohp@gmail.com>
- * Copyright (C) 2022. Contributors
+ * Copyright (C) 2020 - 2025. LoohpJames <jamesloohp@gmail.com>
+ * Copyright (C) 2020 - 2025. Contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@ import com.loohp.holomobhealth.utils.LanguageUtils;
 import com.loohp.holomobhealth.utils.LegacyPlaceholdersConverter;
 import com.loohp.holomobhealth.utils.MCVersion;
 import com.loohp.holomobhealth.utils.ModelEngineUtils;
+import com.loohp.holomobhealth.utils.PacketSender;
 import com.loohp.holomobhealth.utils.WorldGuardUtils;
 import com.loohp.yamlconfiguration.YamlConfiguration;
 import net.kyori.adventure.text.Component;
@@ -176,6 +177,7 @@ public class HoloMobHealth extends JavaPlugin {
 
     public static boolean updaterEnabled = true;
     public static String language = "en_us";
+    public static boolean sendPacketsOnMainThread = false;
 
     public static YamlConfiguration getConfiguration() {
         return Config.getConfig(CONFIG_ID).getConfiguration();
@@ -305,6 +307,8 @@ public class HoloMobHealth extends JavaPlugin {
         updaterEnabled = config.getConfiguration().getBoolean("Updater.Enable");
 
         language = config.getConfiguration().getString("Options.Language");
+
+        sendPacketsOnMainThread = config.getConfiguration().getBoolean("Settings.SendPacketsOnMainThread");
 
         CustomPlaceholderScripts.clearScripts();
         CustomPlaceholderScripts.loadScriptsFromFolder(new File(plugin.getDataFolder(), "placeholder_scripts"));
@@ -529,11 +533,7 @@ public class HoloMobHealth extends JavaPlugin {
                 int[] entityIdArray = ArmorStandPacket.active.stream().mapToInt(each -> each.getEntityId()).toArray();
                 PacketContainer[] packets = NMS.getInstance().createEntityDestroyPacket(entityIdArray);
 
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    for (PacketContainer packet : packets) {
-                        protocolManager.sendServerPacket(player, packet);
-                    }
-                }
+                PacketSender.sendServerPackets(Bukkit.getOnlinePlayers(), packets);
             }
         }
 

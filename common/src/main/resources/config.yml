@@ -197,5 +197,8 @@ Database:
     Username: mysql
     Password: password
 
+Settings:
+  SendPacketsOnMainThread: false
+
 Updater:
   Enable: true

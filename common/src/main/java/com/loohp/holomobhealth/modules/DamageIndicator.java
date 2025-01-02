@@ -1,8 +1,8 @@
 /*
  * This file is part of HoloMobHealth.
  *
- * Copyright (C) 2022. LoohpJames <jamesloohp@gmail.com>
- * Copyright (C) 2022. Contributors
+ * Copyright (C) 2020 - 2025. LoohpJames <jamesloohp@gmail.com>
+ * Copyright (C) 2020 - 2025. Contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ import com.loohp.holomobhealth.utils.EntityTypeUtils;
 import com.loohp.holomobhealth.utils.MathUtils;
 import com.loohp.holomobhealth.utils.MyPetUtils;
 import com.loohp.holomobhealth.utils.MythicMobsUtils;
+import com.loohp.holomobhealth.utils.PacketSender;
 import com.loohp.holomobhealth.utils.ParsePlaceholders;
 import com.loohp.holomobhealth.utils.ShopkeepersUtils;
 import com.loohp.holomobhealth.utils.WorldGuardUtils;
@@ -349,11 +350,7 @@ public class DamageIndicator implements Listener {
                 return loc.getWorld().equals(location.getWorld()) && loc.distance(location) <= range * range && HoloMobHealth.playersEnabled.contains(each);
             }).collect(Collectors.toList());
 
-            for (Player player : players) {
-                for (PacketContainer packet : packets) {
-                    HoloMobHealth.protocolManager.sendServerPacket(player, packet);
-                }
-            }
+            PacketSender.sendServerPackets(players, packets);
 
             Vector downwardAccel = new Vector(0, -0.05, 0);
 
@@ -373,18 +370,12 @@ public class DamageIndicator implements Listener {
 
                         PacketContainer packet = NMS.getInstance().createEntityTeleportPacket(entityId, location);
 
-                        for (Player player : players) {
-                            HoloMobHealth.protocolManager.sendServerPacket(player, packet);
-                        }
+                        PacketSender.sendServerPacket(players, packet);
                     } else if (tick >= HoloMobHealth.damageIndicatorTimeout) {
                         this.cancel();
                         PacketContainer[] packets = NMS.getInstance().createEntityDestroyPacket(entityId);
                         Bukkit.getScheduler().runTaskLaterAsynchronously(HoloMobHealth.plugin, () -> {
-                            for (Player player : players) {
-                                for (PacketContainer packet : packets) {
-                                    HoloMobHealth.protocolManager.sendServerPacket(player, packet);
-                                }
-                            }
+                            PacketSender.sendServerPackets(players, packets);
                         }, 3);
                     }
                 }

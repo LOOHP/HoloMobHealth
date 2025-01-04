@@ -38,29 +38,39 @@ public class PacketSender {
     }
 
     public static void sendServerPacket(Player receiver, PacketContainer packet) {
-        schedule(() -> HoloMobHealth.protocolManager.sendServerPacket(receiver, packet));
+        schedule(() -> {
+            if (receiver.isOnline()) {
+                HoloMobHealth.protocolManager.sendServerPacket(receiver, packet);
+            }
+        });
     }
 
     public static void sendServerPacket(Collection<? extends Player> receivers, PacketContainer packet) {
         schedule(() -> {
             for (Player receiver : receivers) {
-                HoloMobHealth.protocolManager.sendServerPacket(receiver, packet);
+                if (receiver.isOnline()) {
+                    HoloMobHealth.protocolManager.sendServerPacket(receiver, packet);
+                }
             }
         });
     }
 
     public static void sendServerPackets(Player receiver, PacketContainer... packets) {
         schedule(() -> {
-            for (PacketContainer packet : packets) {
-                HoloMobHealth.protocolManager.sendServerPacket(receiver, packet);
+            if (receiver.isOnline()) {
+                for (PacketContainer packet : packets) {
+                    HoloMobHealth.protocolManager.sendServerPacket(receiver, packet);
+                }
             }
         });
     }
 
     public static void sendServerPackets(Player receiver, Collection<? extends PacketContainer> packets) {
         schedule(() -> {
-            for (PacketContainer packet : packets) {
-                HoloMobHealth.protocolManager.sendServerPacket(receiver, packet);
+            if (receiver.isOnline()) {
+                for (PacketContainer packet : packets) {
+                    HoloMobHealth.protocolManager.sendServerPacket(receiver, packet);
+                }
             }
         });
     }
@@ -68,8 +78,10 @@ public class PacketSender {
     public static void sendServerPackets(Collection<? extends Player> receivers, PacketContainer... packets) {
         schedule(() -> {
             for (Player receiver : receivers) {
-                for (PacketContainer packet : packets) {
-                    HoloMobHealth.protocolManager.sendServerPacket(receiver, packet);
+                if (receiver.isOnline()) {
+                    for (PacketContainer packet : packets) {
+                        HoloMobHealth.protocolManager.sendServerPacket(receiver, packet);
+                    }
                 }
             }
         });
@@ -78,15 +90,21 @@ public class PacketSender {
     public static void sendServerPackets(Collection<? extends Player> receivers, Collection<? extends PacketContainer> packets) {
         schedule(() -> {
             for (Player receiver : receivers) {
-                for (PacketContainer packet : packets) {
-                    HoloMobHealth.protocolManager.sendServerPacket(receiver, packet);
+                if (receiver.isOnline()) {
+                    for (PacketContainer packet : packets) {
+                        HoloMobHealth.protocolManager.sendServerPacket(receiver, packet);
+                    }
                 }
             }
         });
     }
 
     public static void sendServerPacket(Player receiver, PacketContainer packet, boolean filters) {
-        schedule(() -> HoloMobHealth.protocolManager.sendServerPacket(receiver, packet, filters));
+        schedule(() -> {
+            if (receiver.isOnline()) {
+                HoloMobHealth.protocolManager.sendServerPacket(receiver, packet, filters);
+            }
+        });
     }
 
 }

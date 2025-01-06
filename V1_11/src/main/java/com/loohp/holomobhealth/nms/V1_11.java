@@ -24,7 +24,6 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.loohp.holomobhealth.holders.IHoloMobArmorStand;
 import com.loohp.holomobhealth.utils.BoundingBox;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.minecraft.server.v1_11_R1.PacketPlayOutEntityDestroy;
 import net.minecraft.server.v1_11_R1.PacketPlayOutEntityMetadata;
@@ -49,11 +48,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressWarnings("unused")
 public class V1_11 extends NMSWrapper {
@@ -148,15 +144,19 @@ public class V1_11 extends NMSWrapper {
         return LegacyComponentSerializer.legacySection().deserialize(customName);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public Future<Integer> getNextEntityId() {
-        try {
-            entityCountField.setAccessible(true);
-            AtomicInteger counter = (AtomicInteger) entityCountField.get(null);
-            return CompletableFuture.completedFuture(counter.incrementAndGet());
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        entityCountField.setAccessible(true);
+        return Bukkit.getScheduler().callSyncMethod(getPlugin(), () -> {
+            try {
+                int counter = entityCountField.getInt(null);
+                entityCountField.setInt(null, counter + 1);
+                return counter;
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     @Override

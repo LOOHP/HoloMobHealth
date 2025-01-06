@@ -49,9 +49,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressWarnings("unused")
 public class V1_8_4 extends NMSWrapper {
@@ -123,15 +121,19 @@ public class V1_8_4 extends NMSWrapper {
         return LegacyComponentSerializer.legacySection().deserialize(customName);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public Future<Integer> getNextEntityId() {
-        try {
-            entityCountField.setAccessible(true);
-            AtomicInteger counter = (AtomicInteger) entityCountField.get(null);
-            return CompletableFuture.completedFuture(counter.incrementAndGet());
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        entityCountField.setAccessible(true);
+        return Bukkit.getScheduler().callSyncMethod(getPlugin(), () -> {
+            try {
+                int counter = entityCountField.getInt(null);
+                entityCountField.setInt(null, counter + 1);
+                return counter;
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     @Override

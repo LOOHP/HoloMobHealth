@@ -1,6 +1,9 @@
 [![Build Status](https://ci.loohpjames.com/job/HoloMobHealth/badge/icon)](https://ci.loohpjames.com/job/HoloMobHealth/)
 # HoloMobHealth
-https://www.spigotmc.org/resources/75975/
+
+https://www.spigotmc.org/resources/75975/<br>
+https://modrinth.com/plugin/holomobhealth<br>
+https://hangar.papermc.io/LOOHP/HoloMobHealth
 
 Customize how you would like to display mob health above its head!
 

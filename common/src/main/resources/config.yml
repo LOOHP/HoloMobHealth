@@ -103,6 +103,7 @@ Options:
     #20 ticks = 1 second
     UpdateRate: 20
   #The default language
+  #List of languages: https://loohpjames.com/minecraft/languages/
   #Doesn't do anything on Minecraft 1.13+
   Language: en_us
 

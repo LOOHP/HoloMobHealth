@@ -283,6 +283,7 @@ public class LanguageUtils {
         return null;
     }
 
+    @SuppressWarnings("ConstantValue")
     private static String getModernTranslationKey(Entity entity) {
         EntityType type = EntityTypeUtils.getEntityType(entity);
         String path = NMS.getInstance().getEntityTranslationKey(entity);
@@ -304,7 +305,11 @@ public class LanguageUtils {
                         break;
                 }
             } else {
-                path += "." + villager.getProfession().toString().toLowerCase();
+                if (villager.getProfession() instanceof Enum<?>) {
+                    path += "." + villager.getProfession().toString().toLowerCase();
+                } else {
+                    path += "." + villager.getProfession().getKey().getKey();
+                }
             }
         }
         return path;

@@ -21,6 +21,9 @@
 package com.loohp.holomobhealth.nms;
 
 import com.comphenix.protocol.events.PacketContainer;
+import com.loohp.holomobhealth.holders.DataWatcherField;
+import com.loohp.holomobhealth.holders.DataWatcherFieldType;
+import com.loohp.holomobhealth.holders.DataWatcherFields;
 import com.loohp.holomobhealth.holders.IHoloMobArmorStand;
 import com.loohp.holomobhealth.utils.BoundingBox;
 import com.loohp.holomobhealth.utils.ReflectionUtils;
@@ -173,26 +176,34 @@ public class V1_21_1 extends NMSWrapper {
     }
 
     @SuppressWarnings("unchecked")
-    @Override
-    public UUID getEntityUUIDFromID(World world, int id) {
+    private LevelEntityGetter<net.minecraft.world.entity.Entity> getLevelEntityGetter(World world) {
         try {
             WorldServer worldServer = ((CraftWorld) world).getHandle();
-            LevelEntityGetter<net.minecraft.world.entity.Entity> levelEntityGetter;
             if (worldServerEntityLookup == null) {
-                levelEntityGetter = worldServer.N.d();
+                return worldServer.N.d();
             } else {
-                levelEntityGetter = (LevelEntityGetter<net.minecraft.world.entity.Entity>) worldServerEntityLookup.invoke(worldServer);
+                return (LevelEntityGetter<net.minecraft.world.entity.Entity>) worldServerEntityLookup.invoke(worldServer);
             }
-            net.minecraft.world.entity.Entity entity = levelEntityGetter.a(id);
-            return entity == null ? null : entity.cz();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
+    public UUID getEntityUUIDFromID(World world, int id) {
+        net.minecraft.world.entity.Entity entity = getLevelEntityGetter(world).a(id);
+        return entity == null ? null : entity.cz();
+    }
+
+    @Override
     public Entity getEntityFromUUID(UUID uuid) {
-        return Bukkit.getEntity(uuid);
+        for (World world : Bukkit.getWorlds()) {
+            net.minecraft.world.entity.Entity entity = getLevelEntityGetter(world).a(uuid);
+            if (entity != null) {
+                return entity.getBukkitEntity();
+            }
+        }
+        return null;
     }
 
     @Override
@@ -385,5 +396,27 @@ public class V1_21_1 extends NMSWrapper {
     public PacketContainer createModifiedMetadataPacket(PacketContainer packet, List<?> dataWatchers) {
         PacketPlayOutEntityMetadata nmsPacket = (PacketPlayOutEntityMetadata) packet.getHandle();
         return createEntityMetadataPacket(nmsPacket.b(), dataWatchers);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public DataWatcherFields getDataWatcherFields() {
+        try {
+            dataWatcherByteField.setAccessible(true);
+            dataWatcherCustomNameField.setAccessible(true);
+            dataWatcherCustomNameVisibleField.setAccessible(true);
+            dataWatcherSilentField.setAccessible(true);
+            dataWatcherNoGravityField.setAccessible(true);
+            return new DataWatcherFields(
+                    new DataWatcherField(((DataWatcherObject<Byte>) dataWatcherByteField.get(null)).a(), DataWatcherFieldType.BYTE),
+                    new DataWatcherField(((DataWatcherObject<Optional<IChatBaseComponent>>) dataWatcherCustomNameField.get(null)).a(), DataWatcherFieldType.OPTIONAL_CHAT),
+                    new DataWatcherField(((DataWatcherObject<Boolean>) dataWatcherCustomNameVisibleField.get(null)).a(), DataWatcherFieldType.BOOLEAN),
+                    new DataWatcherField(((DataWatcherObject<Boolean>) dataWatcherSilentField.get(null)).a(), DataWatcherFieldType.BOOLEAN),
+                    new DataWatcherField(((DataWatcherObject<Boolean>) dataWatcherNoGravityField.get(null)).a(), DataWatcherFieldType.BOOLEAN),
+                    new DataWatcherField(EntityArmorStand.bJ.a(), DataWatcherFieldType.BYTE)
+            );
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

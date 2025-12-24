@@ -20,9 +20,6 @@
 
 package com.loohp.holomobhealth;
 
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.PacketContainer;
 import com.loohp.holomobhealth.api.HoloMobHealthAPI;
 import com.loohp.holomobhealth.config.Config;
 import com.loohp.holomobhealth.database.Database;
@@ -34,8 +31,10 @@ import com.loohp.holomobhealth.modules.ArmorstandDisplay;
 import com.loohp.holomobhealth.modules.DamageIndicator;
 import com.loohp.holomobhealth.modules.NameTagDisplay;
 import com.loohp.holomobhealth.modules.RangeModule;
-import com.loohp.holomobhealth.nms.NMS;
 import com.loohp.holomobhealth.placeholderapi.Placeholders;
+import com.loohp.holomobhealth.platform.ProtocolPlatform;
+import com.loohp.holomobhealth.platform.packets.PlatformPacket;
+import com.loohp.holomobhealth.platform.protocollib.ProtocolLibPlatform;
 import com.loohp.holomobhealth.protocol.ArmorStandPacket;
 import com.loohp.holomobhealth.registries.CustomPlaceholderScripts;
 import com.loohp.holomobhealth.registries.DisplayTextCacher;
@@ -50,6 +49,7 @@ import com.loohp.holomobhealth.utils.MCVersion;
 import com.loohp.holomobhealth.utils.ModelEngineUtils;
 import com.loohp.holomobhealth.utils.PacketSender;
 import com.loohp.holomobhealth.utils.WorldGuardUtils;
+import com.loohp.platformscheduler.Scheduler;
 import com.loohp.yamlconfiguration.YamlConfiguration;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -85,10 +85,6 @@ public class HoloMobHealth extends JavaPlugin {
 
     public static String exactMinecraftVersion;
     public static MCVersion version;
-
-    public static ProtocolManager protocolManager;
-
-    public static int activeShowHealthTaskID = -1;
 
     public static RoundingMode roundingMode = RoundingMode.UP;
 
@@ -179,6 +175,8 @@ public class HoloMobHealth extends JavaPlugin {
     public static String language = "en_us";
     public static boolean sendPacketsOnMainThread = false;
 
+    public static ProtocolPlatform<?, ?> protocolPlatform;
+
     public static YamlConfiguration getConfiguration() {
         return Config.getConfig(CONFIG_ID).getConfiguration();
     }
@@ -265,11 +263,6 @@ public class HoloMobHealth extends JavaPlugin {
             }
         }
 
-        if (activeShowHealthTaskID >= 0) {
-            Bukkit.getScheduler().cancelTask(activeShowHealthTaskID);
-        }
-
-        HoloMobHealth.protocolManager.removePacketListeners(plugin);
         if (!armorStandMode || version.isOld() || version.equals(MCVersion.V1_9) || version.equals(MCVersion.V1_9_4)) {
             NameTagDisplay.entityMetadataPacketListener();
             if (armorStandMode) {
@@ -279,7 +272,7 @@ public class HoloMobHealth extends JavaPlugin {
         } else {
             ArmorstandDisplay.entityMetadataPacketListener();
             if (modelEngineHook) {
-                Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> ModelEngineUtils.updateModelEngineNametags(), 0, 10);
+                Scheduler.runTaskTimerAsynchronously(plugin, () -> ModelEngineUtils.updateModelEngineNametags(), 0, 10);
             }
         }
 
@@ -385,10 +378,21 @@ public class HoloMobHealth extends JavaPlugin {
         Charts.setup(metrics);
 
         if (!version.isSupported()) {
-            getServer().getConsoleSender().sendMessage(ChatColor.RED + "This version of minecraft is unsupported!");
+            getServer().getConsoleSender().sendMessage(ChatColor.RED + "This version of Minecraft is unsupported!");
         }
 
-        protocolManager = ProtocolLibrary.getProtocolManager();
+        // Checks if ProtocolPlatform hasn't been initialised through another plugin
+        // Other plugins must do so during onload
+        if (protocolPlatform == null) {
+            if (isPluginEnabled("ProtocolLib")) {
+                getServer().getConsoleSender().sendMessage(org.bukkit.ChatColor.GREEN + "[HoloMobHealth] No custom ProtocolProvider provided, using default ProtocolLib provider.");
+                protocolPlatform = new ProtocolLibPlatform();
+            } else {
+                throw new IllegalStateException("Attempted to initialise HoloMobHealth when no protocol provider was found. Please install ProtocolLib.");
+            }
+        } else {
+            getServer().getConsoleSender().sendMessage(org.bukkit.ChatColor.YELLOW + "[HoloMobHealth] Using ProtocolProvider " + protocolPlatform.getClass().getName() + " in " + protocolPlatform.getRegisteredPlugin().getName());
+        }
 
         getServer().getPluginManager().registerEvents(new Events(), this);
 
@@ -492,9 +496,9 @@ public class HoloMobHealth extends JavaPlugin {
 
         getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "[HoloMobHealth] HoloMobHealth has been Enabled!");
 
-        Bukkit.getScheduler().runTask(this, () -> {
+        Scheduler.runTask(this, () -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
-                Bukkit.getScheduler().runTaskAsynchronously(HoloMobHealth.plugin, () -> {
+                Scheduler.runTaskAsynchronously(HoloMobHealth.plugin, () -> {
                     if (!Database.playerExists(player)) {
                         Database.createPlayer(player);
                     }
@@ -509,7 +513,7 @@ public class HoloMobHealth extends JavaPlugin {
             }
         });
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(this, () -> {
+        Scheduler.runTaskLaterAsynchronously(this, () -> {
             if (updaterEnabled) {
                 UpdaterResponse version = Updater.checkUpdate();
                 if (!version.getResult().equals("latest")) {
@@ -531,8 +535,7 @@ public class HoloMobHealth extends JavaPlugin {
             if (armorStandMode) {
                 getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "[HoloMobHealth] Plugin reload detected, attempting to despawn all visual entities. If anything went wrong, please restart! (Reloads are always not recommended)");
                 int[] entityIdArray = ArmorStandPacket.active.stream().mapToInt(each -> each.getEntityId()).toArray();
-                PacketContainer[] packets = NMS.getInstance().createEntityDestroyPacket(entityIdArray);
-
+                List<? extends PlatformPacket<?>> packets = HoloMobHealth.protocolPlatform.getPlatformPacketCreatorProvider().createEntityDestroyPackets(entityIdArray);
                 PacketSender.sendServerPackets(Bukkit.getOnlinePlayers(), packets);
             }
         }

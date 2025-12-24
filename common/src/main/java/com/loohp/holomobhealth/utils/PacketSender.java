@@ -20,8 +20,9 @@
 
 package com.loohp.holomobhealth.utils;
 
-import com.comphenix.protocol.events.PacketContainer;
 import com.loohp.holomobhealth.HoloMobHealth;
+import com.loohp.holomobhealth.platform.packets.PlatformPacket;
+import com.loohp.platformscheduler.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -31,78 +32,78 @@ public class PacketSender {
 
     private static void schedule(Runnable runnable) {
         if (HoloMobHealth.sendPacketsOnMainThread && !Bukkit.isPrimaryThread()) {
-            Bukkit.getScheduler().runTask(HoloMobHealth.plugin, runnable);
+            Scheduler.runTask(HoloMobHealth.plugin, runnable);
         } else {
             runnable.run();
         }
     }
 
-    public static void sendServerPacket(Player receiver, PacketContainer packet) {
+    public static void sendServerPacket(Player receiver, PlatformPacket<?> packet) {
         schedule(() -> {
             if (receiver.isOnline()) {
-                HoloMobHealth.protocolManager.sendServerPacket(receiver, packet);
+                HoloMobHealth.protocolPlatform.sendServerPacket(receiver, packet);
             }
         });
     }
 
-    public static void sendServerPacket(Collection<? extends Player> receivers, PacketContainer packet) {
+    public static void sendServerPacket(Collection<? extends Player> receivers, PlatformPacket<?> packet) {
         schedule(() -> {
             for (Player receiver : receivers) {
                 if (receiver.isOnline()) {
-                    HoloMobHealth.protocolManager.sendServerPacket(receiver, packet);
+                    HoloMobHealth.protocolPlatform.sendServerPacket(receiver, packet);
                 }
             }
         });
     }
 
-    public static void sendServerPackets(Player receiver, PacketContainer... packets) {
+    public static void sendServerPackets(Player receiver, Collection<? extends PlatformPacket<?>> packets) {
         schedule(() -> {
             if (receiver.isOnline()) {
-                for (PacketContainer packet : packets) {
-                    HoloMobHealth.protocolManager.sendServerPacket(receiver, packet);
+                for (PlatformPacket<?> packet : packets) {
+                    HoloMobHealth.protocolPlatform.sendServerPacket(receiver, packet);
                 }
             }
         });
     }
 
-    public static void sendServerPackets(Player receiver, Collection<? extends PacketContainer> packets) {
-        schedule(() -> {
-            if (receiver.isOnline()) {
-                for (PacketContainer packet : packets) {
-                    HoloMobHealth.protocolManager.sendServerPacket(receiver, packet);
-                }
-            }
-        });
-    }
-
-    public static void sendServerPackets(Collection<? extends Player> receivers, PacketContainer... packets) {
+    public static void sendServerPackets(Collection<? extends Player> receivers, Collection<? extends PlatformPacket<?>> packets) {
         schedule(() -> {
             for (Player receiver : receivers) {
                 if (receiver.isOnline()) {
-                    for (PacketContainer packet : packets) {
-                        HoloMobHealth.protocolManager.sendServerPacket(receiver, packet);
+                    for (PlatformPacket<?> packet : packets) {
+                        HoloMobHealth.protocolPlatform.sendServerPacket(receiver, packet);
                     }
                 }
             }
         });
     }
 
-    public static void sendServerPackets(Collection<? extends Player> receivers, Collection<? extends PacketContainer> packets) {
+    public static void sendServerPackets(Collection<? extends Player> receivers, Collection<? extends PlatformPacket<?>> packets, boolean filters) {
         schedule(() -> {
             for (Player receiver : receivers) {
                 if (receiver.isOnline()) {
-                    for (PacketContainer packet : packets) {
-                        HoloMobHealth.protocolManager.sendServerPacket(receiver, packet);
+                    for (PlatformPacket<?> packet : packets) {
+                        HoloMobHealth.protocolPlatform.sendServerPacket(receiver, packet, filters);
                     }
                 }
             }
         });
     }
 
-    public static void sendServerPacket(Player receiver, PacketContainer packet, boolean filters) {
+    public static void sendServerPackets(Player receiver, Collection<? extends PlatformPacket<?>> packets, boolean filters) {
         schedule(() -> {
             if (receiver.isOnline()) {
-                HoloMobHealth.protocolManager.sendServerPacket(receiver, packet, filters);
+                for (PlatformPacket<?> packet : packets) {
+                    HoloMobHealth.protocolPlatform.sendServerPacket(receiver, packet, filters);
+                }
+            }
+        });
+    }
+
+    public static void sendServerPacket(Player receiver, PlatformPacket<?> packet, boolean filters) {
+        schedule(() -> {
+            if (receiver.isOnline()) {
+                HoloMobHealth.protocolPlatform.sendServerPacket(receiver, packet, filters);
             }
         });
     }

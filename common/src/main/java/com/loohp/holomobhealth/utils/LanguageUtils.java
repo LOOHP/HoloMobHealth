@@ -22,6 +22,7 @@ package com.loohp.holomobhealth.utils;
 
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.nms.NMS;
+import com.loohp.platformscheduler.Scheduler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -65,7 +66,7 @@ public class LanguageUtils {
     @SuppressWarnings("unchecked")
     public static void loadTranslations(String language) {
         Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[HoloMobHealth] Loading languages...");
-        Bukkit.getScheduler().runTaskAsynchronously(HoloMobHealth.plugin, () -> {
+        Scheduler.runTaskAsynchronously(HoloMobHealth.plugin, () -> {
             while (lock.get()) {
                 try {
                     TimeUnit.MILLISECONDS.sleep(1);

@@ -21,6 +21,9 @@
 package com.loohp.holomobhealth.nms;
 
 import com.comphenix.protocol.events.PacketContainer;
+import com.loohp.holomobhealth.holders.DataWatcherField;
+import com.loohp.holomobhealth.holders.DataWatcherFieldType;
+import com.loohp.holomobhealth.holders.DataWatcherFields;
 import com.loohp.holomobhealth.holders.IHoloMobArmorStand;
 import com.loohp.holomobhealth.utils.BoundingBox;
 import net.kyori.adventure.text.Component;
@@ -149,29 +152,21 @@ public class V1_8_3 extends NMSWrapper {
 
     @Override
     public UUID getEntityUUIDFromID(World world, int id) {
-        try {
-            WorldServer worldServer = ((CraftWorld) world).getHandle();
-            net.minecraft.server.v1_8_R2.Entity entity = worldServer.a(id);
-            return entity == null ? null : entity.getUniqueID();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        WorldServer worldServer = ((CraftWorld) world).getHandle();
+        net.minecraft.server.v1_8_R2.Entity entity = worldServer.a(id);
+        return entity == null ? null : entity.getUniqueID();
     }
 
     @Override
     public Entity getEntityFromUUID(UUID uuid) {
-        try {
-            for (World world : Bukkit.getWorlds()) {
-                WorldServer worldServer = ((CraftWorld) world).getHandle();
-                net.minecraft.server.v1_8_R2.Entity entity = worldServer.getEntity(uuid);
-                if (entity != null) {
-                    return entity.getBukkitEntity();
-                }
+        for (World world : Bukkit.getWorlds()) {
+            WorldServer worldServer = ((CraftWorld) world).getHandle();
+            net.minecraft.server.v1_8_R2.Entity entity = worldServer.getEntity(uuid);
+            if (entity != null) {
+                return entity.getBukkitEntity();
             }
-            return null;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
+        return null;
     }
 
     @Override
@@ -421,5 +416,17 @@ public class V1_8_3 extends NMSWrapper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public DataWatcherFields getDataWatcherFields() {
+        return new DataWatcherFields(
+                new DataWatcherField(dataWatcherByteIndex, DataWatcherFieldType.BYTE),
+                new DataWatcherField(dataWatcherCustomNameIndex, DataWatcherFieldType.STRING),
+                new DataWatcherField(dataWatcherCustomNameVisibleIndex, DataWatcherFieldType.BYTE),
+                null,
+                null,
+                new DataWatcherField(dataWatcherArmorStandByteIndex, DataWatcherFieldType.BYTE)
+        );
     }
 }

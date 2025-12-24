@@ -22,6 +22,7 @@ package com.loohp.holomobhealth.modules;
 
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.protocol.EntityMetadata;
+import com.loohp.platformscheduler.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -61,7 +62,7 @@ public class RangeModule {
             }
         }
         playersPerTick = updateQueue.size() / rate;
-        Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> getEntitiesInRange(), 1);
+        Scheduler.runTaskLater(HoloMobHealth.plugin, () -> getEntitiesInRange(), 1);
     }
 
     private static void getEntitiesInRange() {
@@ -75,9 +76,9 @@ public class RangeModule {
             }
         }
         if (updateQueue.isEmpty()) {
-            Bukkit.getScheduler().runTaskAsynchronously(HoloMobHealth.plugin, () -> compareEntities());
+            Scheduler.runTaskAsynchronously(HoloMobHealth.plugin, () -> compareEntities());
         } else {
-            Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> getEntitiesInRange(), 1);
+            Scheduler.runTaskLater(HoloMobHealth.plugin, () -> getEntitiesInRange(), 1);
         }
     }
 
@@ -87,7 +88,7 @@ public class RangeModule {
             List<Entity> last = current.get(player);
             if (last == null) {
                 List<Entity> now1 = new ArrayList<>(entry.getValue());
-                Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {
+                Scheduler.runTaskLater(HoloMobHealth.plugin, () -> {
                     for (Entity entity : now1) {
                         EntityMetadata.updateEntity(player, entity);
                     }
@@ -97,23 +98,23 @@ public class RangeModule {
                 List<Entity> now1 = new ArrayList<>(entry.getValue());
                 List<Entity> now2 = new ArrayList<>(entry.getValue());
                 now1.removeAll(last1);
-                Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {
+                Scheduler.runTaskLater(HoloMobHealth.plugin, () -> {
                     for (Entity entity : now1) {
                         EntityMetadata.updateEntity(player, entity);
                     }
                 }, 1);
                 last1.removeAll(now2);
-                Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {
+                Scheduler.runTaskLater(HoloMobHealth.plugin, () -> {
                     for (Entity entity : last1) {
                         EntityMetadata.updateEntity(player, entity);
                     }
                 }, 1);
             }
         }
-        Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {
+        Scheduler.runTaskLater(HoloMobHealth.plugin, () -> {
             current = upcomming;
             upcomming = new HashMap<>();
-            Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> run(), 1);
+            Scheduler.runTaskLater(HoloMobHealth.plugin, () -> run(), 1);
         }, 1);
     }
 

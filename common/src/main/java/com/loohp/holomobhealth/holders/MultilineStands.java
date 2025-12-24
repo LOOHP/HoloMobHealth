@@ -24,6 +24,8 @@ import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.nms.NMS;
 import com.loohp.holomobhealth.protocol.ArmorStandPacket;
 import com.loohp.holomobhealth.utils.EntityTypeUtils;
+import com.loohp.platformscheduler.ScheduledTask;
+import com.loohp.platformscheduler.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -46,7 +48,7 @@ public class MultilineStands implements IMultilineStands {
     private final UUID uuid;
     private final int id;
     private int offset;
-    private int gctask;
+    private ScheduledTask gctask;
 
     public MultilineStands(Entity entity) {
         Location location = entity.getLocation().clone();
@@ -86,11 +88,11 @@ public class MultilineStands implements IMultilineStands {
     }
 
     private void gc() {
-        gctask = Bukkit.getScheduler().runTaskTimerAsynchronously(HoloMobHealth.plugin, () -> {
+        gctask = Scheduler.runTaskTimerAsynchronously(HoloMobHealth.plugin, () -> {
             if (!entity.isValid() || !entity.getUniqueId().equals(uuid)) {
                 remove();
             }
-        }, 0, 15).getTaskId();
+        }, 0, 15);
     }
 
     @Override
@@ -136,9 +138,9 @@ public class MultilineStands implements IMultilineStands {
     @Override
     public void remove() {
         for (HoloMobArmorStand stand : stands) {
-            Bukkit.getScheduler().runTask(HoloMobHealth.plugin, () -> ArmorStandPacket.removeArmorStand(Bukkit.getOnlinePlayers(), stand, true, false));
+            Scheduler.runTask(HoloMobHealth.plugin, () -> ArmorStandPacket.removeArmorStand(Bukkit.getOnlinePlayers(), stand, true, false));
         }
-        Bukkit.getScheduler().cancelTask(gctask);
+        gctask.cancel();
     }
 
 }

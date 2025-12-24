@@ -20,15 +20,17 @@
 
 package com.loohp.holomobhealth.modules;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.events.ListenerPriority;
-import com.comphenix.protocol.events.PacketAdapter;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.events.PacketEvent;
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.holders.HoloMobArmorStand;
 import com.loohp.holomobhealth.holders.MultilineStands;
 import com.loohp.holomobhealth.nms.NMS;
+import com.loohp.holomobhealth.platform.PlatformPacketListenerPriority;
+import com.loohp.holomobhealth.platform.packets.PlatformPlayClientEntityMetadataPacket;
+import com.loohp.holomobhealth.platform.packets.PlatformPlayClientEntityTeleportPacket;
+import com.loohp.holomobhealth.platform.packets.PlatformPlayClientRelativeEntityMoveLookPacket;
+import com.loohp.holomobhealth.platform.packets.PlatformPlayClientRelativeEntityMovePacket;
+import com.loohp.holomobhealth.platform.packets.PlatformPlayClientSpawnEntityLivingPacket;
+import com.loohp.holomobhealth.platform.packets.PlatformPlayClientSpawnEntityPacket;
 import com.loohp.holomobhealth.protocol.ArmorStandPacket;
 import com.loohp.holomobhealth.protocol.EntityMetadata;
 import com.loohp.holomobhealth.utils.ChatColorUtils;
@@ -42,6 +44,7 @@ import com.loohp.holomobhealth.utils.ParsePlaceholders;
 import com.loohp.holomobhealth.utils.RayTrace;
 import com.loohp.holomobhealth.utils.ShopkeepersUtils;
 import com.loohp.holomobhealth.utils.WorldGuardUtils;
+import com.loohp.platformscheduler.Scheduler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
@@ -73,7 +76,7 @@ public class ArmorstandDisplay implements Listener {
     private static final Map<Player, UUID> focusingEntities = new HashMap<>();
 
     public static void run() {
-        Bukkit.getScheduler().runTaskTimer(HoloMobHealth.plugin, () -> {
+        Scheduler.runTaskTimer(HoloMobHealth.plugin, () -> {
             if (HoloMobHealth.alwaysShow || !HoloMobHealth.armorStandMode) {
                 return;
             }
@@ -88,7 +91,7 @@ public class ArmorstandDisplay implements Listener {
                     current++;
                 }
                 count++;
-                Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {
+                Scheduler.runTaskLater(HoloMobHealth.plugin, () -> {
                     Player player = Bukkit.getPlayer(playerUUID);
                     if (player == null) {
                         return;
@@ -121,250 +124,206 @@ public class ArmorstandDisplay implements Listener {
     @SuppressWarnings("deprecation")
     public static void entityMetadataPacketListener() {
         Bukkit.getPluginManager().registerEvents(new ArmorstandDisplay(), HoloMobHealth.plugin);
-        HoloMobHealth.protocolManager.addPacketListener(new PacketAdapter(HoloMobHealth.plugin, ListenerPriority.HIGHEST, PacketType.Play.Server.ENTITY_METADATA) {
-            @Override
-            public void onPacketSending(PacketEvent event) {
-                try {
-                    if (!event.getPacketType().equals(PacketType.Play.Server.ENTITY_METADATA)) {
+
+        HoloMobHealth.protocolPlatform.getPlatformPacketListenerProvider().listenToPlayClientEntityMeta(HoloMobHealth.plugin, PlatformPacketListenerPriority.HIGHEST, event -> {
+            try {
+                Player player = event.getPlayer();
+                PlatformPlayClientEntityMetadataPacket<?> packet = event.getPacket();
+                World world = player.getWorld();
+                int entityId = packet.getEntityId();
+                UUID entityUUID = NMS.getInstance().getEntityUUIDFromID(world, entityId);
+                if (entityUUID == null) {
+                    return;
+                }
+                if (!player.hasPermission("holomobhealth.use") || !HoloMobHealth.playersEnabled.contains(player)) {
+                    MultilineStands multi = mapping.get(entityUUID);
+                    if (multi == null) {
                         return;
                     }
-
-                    Player player = event.getPlayer();
-
-                    PacketContainer packet = event.getPacket();
-
-                    World world = player.getWorld();
-                    int entityId = packet.getIntegers().read(0);
-
-                    UUID entityUUID = NMS.getInstance().getEntityUUIDFromID(world, entityId);
-
-                    if (entityUUID == null) {
-                        return;
-                    }
-
-                    if (!player.hasPermission("holomobhealth.use") || !HoloMobHealth.playersEnabled.contains(player)) {
-                        MultilineStands multi = mapping.get(entityUUID);
-                        if (multi == null) {
-                            return;
+                    List<Player> players = new ArrayList<>();
+                    players.add(player);
+                    Map<HoloMobArmorStand, Boolean> list = ArmorStandPacket.playerStatus.get(player);
+                    multi.getStands().forEach(each -> {
+                        ArmorStandPacket.removeArmorStand(players, each, false, false);
+                        if (list != null) {
+                            list.remove(each);
                         }
-                        List<Player> players = new ArrayList<>();
-                        players.add(player);
-                        Map<HoloMobArmorStand, Boolean> list = ArmorStandPacket.playerStatus.get(player);
-                        multi.getStands().forEach(each -> {
-                            ArmorStandPacket.removeArmorStand(players, each, false, false);
-                            if (list != null) {
-                                list.remove(each);
-                            }
-                        });
-                        return;
-                    }
+                    });
+                    return;
+                }
+                ArmorStandDisplayData data = getData(player, entityUUID, world, packet);
+                if (data != null) {
+                    if (data.use()) {
+                        packet.setEntityDataWatchers(data.getWatcher());
 
-                    ArmorStandDisplayData data = getData(player, entityUUID, world, packet);
+                        Entity entity = data.getEntity();
+                        String customName = data.getCustomName();
 
-                    if (data != null) {
-                        if (data.use()) {
-                            packet = NMS.getInstance().createModifiedMetadataPacket(packet, data.getWatcher());
-                            event.setPacket(packet);
-
-                            Entity entity = data.getEntity();
-                            String customName = data.getCustomName();
-
-                            if (EntityTypeUtils.getMobsTypesSet().contains(EntityTypeUtils.getEntityType(entity))) {
-                                if (entity.getPassenger() != null || isInvisible(entity) || (!HoloMobHealth.applyToNamed && customName != null) || (HoloMobHealth.useAlterHealth && !HoloMobHealth.idleUse && !HoloMobHealth.altShowHealth.containsKey(entity.getUniqueId())) || (HoloMobHealth.rangeEnabled && !RangeModule.isEntityInRangeOfPlayer(player, entity))) {
-                                    Component name = customName != null && !customName.isEmpty() ? LegacyComponentSerializer.legacySection().deserialize(customName) : Component.empty();
-                                    boolean visible = entity.isCustomNameVisible();
-                                    EntityMetadata.sendMetadataPacket(entity, name, visible, Collections.singletonList(player), true);
-                                    MultilineStands multi = mapping.remove(entity.getUniqueId());
-                                    if (multi == null) {
-                                        return;
-                                    }
-                                    multi.getStands().forEach(each -> ArmorStandPacket.removeArmorStand(HoloMobHealth.playersEnabled, each, true, false));
-                                    multi.remove();
-                                } else if (entity.isValid()) {
-                                    MultilineStands multi = mapping.get(entity.getUniqueId());
-                                    if (multi == null) {
-                                        multi = new MultilineStands(entity);
-                                        mapping.put(entity.getUniqueId(), multi);
-                                        List<HoloMobArmorStand> stands = new ArrayList<>(multi.getStands());
-                                        Collections.reverse(stands);
-                                        for (HoloMobArmorStand stand : stands) {
-                                            ArmorStandPacket.sendArmorStandSpawn(HoloMobHealth.playersEnabled, stand, Component.empty(), HoloMobHealth.alwaysShow);
-                                        }
-                                    } else {
-                                        List<Player> players = new ArrayList<>();
-                                        players.add(player);
-                                        for (HoloMobArmorStand stand : multi.getStands()) {
-                                            ArmorStandPacket.sendArmorStandSpawnIfNotAlready(players, stand, Component.empty(), HoloMobHealth.alwaysShow);
-                                        }
-                                    }
-                                    UUID focusing = focusingEntities.getOrDefault(player, EMPTY_UUID);
-                                    multi.setLocation(entity.getLocation());
-                                    for (int i = 0; i < data.getComponents().size(); i++) {
-                                        Component display = data.getComponents().get(i);
-                                        ArmorStandPacket.updateArmorStand(entity, multi.getStand(i), display, HoloMobHealth.alwaysShow || focusing.equals(entityUUID));
-                                    }
-                                }
-                            }
-                        } else {
-                            Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {
-                                MultilineStands multi = mapping.remove(entityUUID);
+                        if (EntityTypeUtils.getMobsTypesSet().contains(EntityTypeUtils.getEntityType(entity))) {
+                            if (entity.getPassenger() != null || isInvisible(entity) || (!HoloMobHealth.applyToNamed && customName != null) || (HoloMobHealth.useAlterHealth && !HoloMobHealth.idleUse && !HoloMobHealth.altShowHealth.containsKey(entity.getUniqueId())) || (HoloMobHealth.rangeEnabled && !RangeModule.isEntityInRangeOfPlayer(player, entity))) {
+                                Component name = customName != null && !customName.isEmpty() ? LegacyComponentSerializer.legacySection().deserialize(customName) : Component.empty();
+                                boolean visible = entity.isCustomNameVisible();
+                                EntityMetadata.sendMetadataPacket(entity, name, visible, Collections.singletonList(player), true);
+                                MultilineStands multi = mapping.remove(entity.getUniqueId());
                                 if (multi == null) {
                                     return;
                                 }
-                                Entity entity = data.getEntity();
-                                Component name = NMS.getInstance().getEntityCustomName(entity);
-                                boolean visible = entity.isCustomNameVisible();
-                                EntityMetadata.sendMetadataPacket(entity, name, visible, Collections.singletonList(player), true);
                                 multi.getStands().forEach(each -> ArmorStandPacket.removeArmorStand(HoloMobHealth.playersEnabled, each, true, false));
                                 multi.remove();
-                                EntityMetadata.sendMetadataPacket(entity, name, entity.isCustomNameVisible(), entity.getWorld().getPlayers(), true);
-                            }, 1);
+                            } else if (entity.isValid()) {
+                                MultilineStands multi = mapping.get(entity.getUniqueId());
+                                if (multi == null) {
+                                    multi = new MultilineStands(entity);
+                                    mapping.put(entity.getUniqueId(), multi);
+                                    List<HoloMobArmorStand> stands = new ArrayList<>(multi.getStands());
+                                    Collections.reverse(stands);
+                                    for (HoloMobArmorStand stand : stands) {
+                                        ArmorStandPacket.sendArmorStandSpawn(HoloMobHealth.playersEnabled, stand, Component.empty(), HoloMobHealth.alwaysShow);
+                                    }
+                                } else {
+                                    List<Player> players = new ArrayList<>();
+                                    players.add(player);
+                                    for (HoloMobArmorStand stand : multi.getStands()) {
+                                        ArmorStandPacket.sendArmorStandSpawnIfNotAlready(players, stand, Component.empty(), HoloMobHealth.alwaysShow);
+                                    }
+                                }
+                                UUID focusing = focusingEntities.getOrDefault(player, EMPTY_UUID);
+                                multi.setLocation(entity.getLocation());
+                                for (int i = 0; i < data.getComponents().size(); i++) {
+                                    Component display = data.getComponents().get(i);
+                                    ArmorStandPacket.updateArmorStand(entity, multi.getStand(i), display, HoloMobHealth.alwaysShow || focusing.equals(entityUUID));
+                                }
+                            }
                         }
+                    } else {
+                        Scheduler.runTaskLater(HoloMobHealth.plugin, () -> {
+                            MultilineStands multi = mapping.remove(entityUUID);
+                            if (multi == null) {
+                                return;
+                            }
+                            Entity entity = data.getEntity();
+                            Component name = NMS.getInstance().getEntityCustomName(entity);
+                            boolean visible = entity.isCustomNameVisible();
+                            EntityMetadata.sendMetadataPacket(entity, name, visible, Collections.singletonList(player), true);
+                            multi.getStands().forEach(each -> ArmorStandPacket.removeArmorStand(HoloMobHealth.playersEnabled, each, true, false));
+                            multi.remove();
+                            EntityMetadata.sendMetadataPacket(entity, name, entity.isCustomNameVisible(), entity.getWorld().getPlayers(), true);
+                        }, 1);
                     }
-                } catch (UnsupportedOperationException ignored) {
                 }
+            } catch (UnsupportedOperationException ignored) {
             }
         });
         if (HoloMobHealth.version.isOlderThan(MCVersion.V1_19)) {
-            HoloMobHealth.protocolManager.addPacketListener(new PacketAdapter(HoloMobHealth.plugin, ListenerPriority.HIGHEST, PacketType.Play.Server.SPAWN_ENTITY_LIVING) {
-                @Override
-                public void onPacketSending(PacketEvent event) {
-                    try {
-                        if (!event.getPacketType().equals(PacketType.Play.Server.SPAWN_ENTITY_LIVING)) {
-                            return;
-                        }
-                        PacketContainer packet = event.getPacket();
-                        Player player = event.getPlayer();
-                        World world = player.getWorld();
-                        int entityId = packet.getIntegers().read(0);
-                        UUID entityUUID = NMS.getInstance().getEntityUUIDFromID(world, entityId);
-                        if (entityUUID == null) {
-                            return;
-                        }
-                        Entity entity = NMS.getInstance().getEntityFromUUID(entityUUID);
-                        if (entity == null) {
-                            return;
-                        }
-                        Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(player, entity), 5);
-                    } catch (UnsupportedOperationException ignored) {
+            HoloMobHealth.protocolPlatform.getPlatformPacketListenerProvider().listenToPlayClientSpawnEntityLiving(HoloMobHealth.plugin, PlatformPacketListenerPriority.HIGHEST, event -> {
+                try {
+                    PlatformPlayClientSpawnEntityLivingPacket<?> packet = event.getPacket();
+                    Player player = event.getPlayer();
+                    World world = player.getWorld();
+                    int entityId = packet.getEntityId();
+                    UUID entityUUID = NMS.getInstance().getEntityUUIDFromID(world, entityId);
+                    if (entityUUID == null) {
+                        return;
                     }
+                    Entity entity = NMS.getInstance().getEntityFromUUID(entityUUID);
+                    if (entity == null) {
+                        return;
+                    }
+                    Scheduler.runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(player, entity), 5);
+                } catch (UnsupportedOperationException ignored) {
                 }
             });
         }
-        HoloMobHealth.protocolManager.addPacketListener(new PacketAdapter(HoloMobHealth.plugin, ListenerPriority.HIGHEST, PacketType.Play.Server.SPAWN_ENTITY) {
-            @Override
-            public void onPacketSending(PacketEvent event) {
-                try {
-                    if (!event.getPacketType().equals(PacketType.Play.Server.SPAWN_ENTITY)) {
-                        return;
-                    }
-                    PacketContainer packet = event.getPacket();
-                    Player player = event.getPlayer();
-                    World world = player.getWorld();
-                    int entityId = packet.getIntegers().read(0);
-                    UUID entityUUID = NMS.getInstance().getEntityUUIDFromID(world, entityId);
-                    if (entityUUID == null) {
-                        return;
-                    }
-                    Entity entity = NMS.getInstance().getEntityFromUUID(entityUUID);
-                    if (entity == null) {
-                        return;
-                    }
-                    Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(player, entity), 5);
-                } catch (UnsupportedOperationException ignored) {
+        HoloMobHealth.protocolPlatform.getPlatformPacketListenerProvider().listenToPlayClientSpawnEntity(HoloMobHealth.plugin, PlatformPacketListenerPriority.HIGHEST, event -> {
+            try {
+                PlatformPlayClientSpawnEntityPacket<?> packet = event.getPacket();
+                Player player = event.getPlayer();
+                World world = player.getWorld();
+                int entityId = packet.getEntityId();
+                UUID entityUUID = NMS.getInstance().getEntityUUIDFromID(world, entityId);
+                if (entityUUID == null) {
+                    return;
                 }
+                Entity entity = NMS.getInstance().getEntityFromUUID(entityUUID);
+                if (entity == null) {
+                    return;
+                }
+                Scheduler.runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(player, entity), 5);
+            } catch (UnsupportedOperationException ignored) {
             }
         });
-        HoloMobHealth.protocolManager.addPacketListener(new PacketAdapter(HoloMobHealth.plugin, ListenerPriority.HIGHEST, PacketType.Play.Server.ENTITY_TELEPORT) {
-            @Override
-            public void onPacketSending(PacketEvent event) {
-                try {
-                    if (!event.getPacketType().equals(PacketType.Play.Server.ENTITY_TELEPORT)) {
-                        return;
-                    }
-                    PacketContainer packet = event.getPacket();
-                    Player player = event.getPlayer();
-                    World world = player.getWorld();
-                    int entityId = packet.getIntegers().read(0);
-                    UUID entityUUID = NMS.getInstance().getEntityUUIDFromID(world, entityId);
-                    if (entityUUID == null) {
-                        return;
-                    }
-                    Entity entity = NMS.getInstance().getEntityFromUUID(entityUUID);
-                    if (entity == null) {
-                        return;
-                    }
-                    MultilineStands multi = mapping.get(entityUUID);
-                    if (multi == null) {
-                        return;
-                    }
-                    multi.setLocation(entity.getLocation());
-                    multi.getStands().forEach(each -> ArmorStandPacket.updateArmorStandLocation(entity, each));
-                } catch (UnsupportedOperationException ignored) {
+        HoloMobHealth.protocolPlatform.getPlatformPacketListenerProvider().listenToPlayClientEntityTeleport(HoloMobHealth.plugin, PlatformPacketListenerPriority.HIGHEST, event -> {
+            try {
+                PlatformPlayClientEntityTeleportPacket<?> packet = event.getPacket();
+                Player player = event.getPlayer();
+                World world = player.getWorld();
+                int entityId = packet.getEntityId();
+                UUID entityUUID = NMS.getInstance().getEntityUUIDFromID(world, entityId);
+                if (entityUUID == null) {
+                    return;
                 }
+                Entity entity = NMS.getInstance().getEntityFromUUID(entityUUID);
+                if (entity == null) {
+                    return;
+                }
+                MultilineStands multi = mapping.get(entityUUID);
+                if (multi == null) {
+                    return;
+                }
+                multi.setLocation(entity.getLocation());
+                multi.getStands().forEach(each -> ArmorStandPacket.updateArmorStandLocation(entity, each));
+            } catch (UnsupportedOperationException ignored) {
             }
         });
-        HoloMobHealth.protocolManager.addPacketListener(new PacketAdapter(HoloMobHealth.plugin, ListenerPriority.HIGHEST, PacketType.Play.Server.REL_ENTITY_MOVE) {
-            @Override
-            public void onPacketSending(PacketEvent event) {
-                try {
-                    if (!event.getPacketType().equals(PacketType.Play.Server.REL_ENTITY_MOVE)) {
-                        return;
-                    }
-                    PacketContainer packet = event.getPacket();
-                    Player player = event.getPlayer();
-                    World world = player.getWorld();
-                    int entityId = packet.getIntegers().read(0);
-                    UUID entityUUID = NMS.getInstance().getEntityUUIDFromID(world, entityId);
-                    if (entityUUID == null) {
-                        return;
-                    }
-                    Entity entity = NMS.getInstance().getEntityFromUUID(entityUUID);
-                    if (entity == null) {
-                        return;
-                    }
-                    MultilineStands multi = mapping.get(entityUUID);
-                    if (multi == null) {
-                        return;
-                    }
-                    multi.setLocation(entity.getLocation());
-                    multi.getStands().forEach(each -> ArmorStandPacket.updateArmorStandLocation(entity, each));
-                } catch (UnsupportedOperationException ignored) {
+        HoloMobHealth.protocolPlatform.getPlatformPacketListenerProvider().listenToPlayClientRelativeEntityMove(HoloMobHealth.plugin, PlatformPacketListenerPriority.HIGHEST, event -> {
+            try {
+                PlatformPlayClientRelativeEntityMovePacket<?> packet = event.getPacket();
+                Player player = event.getPlayer();
+                World world = player.getWorld();
+                int entityId = packet.getEntityId();
+                UUID entityUUID = NMS.getInstance().getEntityUUIDFromID(world, entityId);
+                if (entityUUID == null) {
+                    return;
                 }
+                Entity entity = NMS.getInstance().getEntityFromUUID(entityUUID);
+                if (entity == null) {
+                    return;
+                }
+                MultilineStands multi = mapping.get(entityUUID);
+                if (multi == null) {
+                    return;
+                }
+                multi.setLocation(entity.getLocation());
+                multi.getStands().forEach(each -> ArmorStandPacket.updateArmorStandLocation(entity, each));
+            } catch (UnsupportedOperationException ignored) {
             }
         });
-        HoloMobHealth.protocolManager.addPacketListener(new PacketAdapter(HoloMobHealth.plugin, ListenerPriority.HIGHEST, PacketType.Play.Server.REL_ENTITY_MOVE_LOOK) {
-            @Override
-            public void onPacketSending(PacketEvent event) {
-                try {
-                    if (!event.getPacketType().equals(PacketType.Play.Server.REL_ENTITY_MOVE_LOOK)) {
-                        return;
-                    }
-                    PacketContainer packet = event.getPacket();
-                    Player player = event.getPlayer();
-                    World world = player.getWorld();
-                    int entityId = packet.getIntegers().read(0);
-                    UUID entityUUID = NMS.getInstance().getEntityUUIDFromID(world, entityId);
-                    if (entityUUID == null) {
-                        return;
-                    }
-                    Entity entity = NMS.getInstance().getEntityFromUUID(entityUUID);
-                    if (entity == null) {
-                        return;
-                    }
-                    MultilineStands multi = mapping.get(entityUUID);
-                    if (multi == null) {
-                        return;
-                    }
-                    multi.setLocation(entity.getLocation());
-                    multi.getStands().forEach(each -> ArmorStandPacket.updateArmorStandLocation(entity, each));
-                } catch (UnsupportedOperationException ignored) {
+        HoloMobHealth.protocolPlatform.getPlatformPacketListenerProvider().listenToPlayClientRelativeEntityMoveLook(HoloMobHealth.plugin, PlatformPacketListenerPriority.HIGHEST, event -> {
+            try {
+                PlatformPlayClientRelativeEntityMoveLookPacket<?> packet = event.getPacket();
+                Player player = event.getPlayer();
+                World world = player.getWorld();
+                int entityId = packet.getEntityId();
+                UUID entityUUID = NMS.getInstance().getEntityUUIDFromID(world, entityId);
+                if (entityUUID == null) {
+                    return;
                 }
+                Entity entity = NMS.getInstance().getEntityFromUUID(entityUUID);
+                if (entity == null) {
+                    return;
+                }
+                MultilineStands multi = mapping.get(entityUUID);
+                if (multi == null) {
+                    return;
+                }
+                multi.setLocation(entity.getLocation());
+                multi.getStands().forEach(each -> ArmorStandPacket.updateArmorStandLocation(entity, each));
+            } catch (UnsupportedOperationException ignored) {
             }
         });
     }
 
-    public static ArmorStandDisplayData getData(Player player, UUID entityUUID, World world, PacketContainer packet) {
+    public static ArmorStandDisplayData getData(Player player, UUID entityUUID, World world, PlatformPlayClientEntityMetadataPacket<?> packet) {
         Entity entity = NMS.getInstance().getEntityFromUUID(entityUUID);
 
         if (entity == null || !EntityTypeUtils.getMobsTypesSet().contains(EntityTypeUtils.getEntityType(entity))) {
@@ -431,7 +390,7 @@ public class ArmorstandDisplay implements Listener {
                 }
             }
 
-            List<?> watcher = NMS.getInstance().readDataWatchersFromMetadataPacket(packet);
+            List<?> watcher = packet.getEntityDataWatchers();
 
             List<Component> components;
             if (useIdle) {
@@ -440,9 +399,9 @@ public class ArmorstandDisplay implements Listener {
                 components = HoloMobHealth.displayText.stream().map(each -> ParsePlaceholders.parse(player, (LivingEntity) entity, each)).collect(Collectors.toList());
             }
 
-            NMS.getInstance().modifyDataWatchers(watcher, null, false);
+            HoloMobHealth.protocolPlatform.getPlatformPacketCreatorProvider().modifyDataWatchers(watcher, null, false);
 
-            return new ArmorStandDisplayData(watcher, components, customName, entity);
+            return new ArmorStandDisplayData(watcher, components, customName, entity); //TODO Fix this
         }
         return null;
     }
@@ -463,7 +422,7 @@ public class ArmorstandDisplay implements Listener {
                 int range = HoloMobHealth.getUpdateRange(vehicle.getWorld());
                 List<Player> nearby = vehicle.getNearbyEntities(range, range, range).stream().filter(each -> each instanceof Player).map(each -> (Player) each).collect(Collectors.toList());
                 for (Entity passenger : passengers) {
-                    Bukkit.getScheduler().runTask(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(nearby, passenger));
+                    Scheduler.runTask(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(nearby, passenger));
                 }
             }
         }
@@ -483,7 +442,7 @@ public class ArmorstandDisplay implements Listener {
         multi.getStands().forEach(each -> ArmorStandPacket.removeArmorStand(HoloMobHealth.playersEnabled, each, true, false));
         multi.remove();
 
-        Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {
+        Scheduler.runTaskLater(HoloMobHealth.plugin, () -> {
             EntityMetadata.updateEntity(HoloMobHealth.playersEnabled, entity);
         }, 2);
     }

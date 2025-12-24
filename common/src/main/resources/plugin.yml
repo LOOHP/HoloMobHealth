@@ -2,9 +2,11 @@ name: HoloMobHealth
 author: loohp
 version: ${project.version}
 api-version: 1.13
+folia-supported: true
 main: com.loohp.holomobhealth.HoloMobHealth
 description: Show Mob Health with packets
 softdepend:
+  - ProtocolLib
   - MythicMobs
   - Citizens
   - Shopkeepers
@@ -14,7 +16,6 @@ softdepend:
   - UltimateStacker
   - WorldGuard
   - ModelEngine
-depend: [ProtocolLib]
 prefix: HoloMobHealth
 
 commands:

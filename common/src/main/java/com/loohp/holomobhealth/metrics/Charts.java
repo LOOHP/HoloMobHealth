@@ -21,11 +21,13 @@
 package com.loohp.holomobhealth.metrics;
 
 import com.loohp.holomobhealth.HoloMobHealth;
+import com.loohp.holomobhealth.platform.ProtocolPlatform;
 import com.loohp.holomobhealth.registries.CustomPlaceholderScripts;
 import org.bukkit.Bukkit;
 
 import java.util.concurrent.Callable;
 
+@SuppressWarnings({"Convert2Lambda", "RedundantThrows"})
 public class Charts {
 
     public static void setup(Metrics metrics) {
@@ -63,6 +65,14 @@ public class Charts {
                     string = "Enabled";
                 }
                 return string;
+            }
+        }));
+
+        metrics.addCustomChart(new Metrics.SimplePie("protocol_platform", new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                ProtocolPlatform<?, ?> platform = HoloMobHealth.protocolPlatform;
+                return platform.getProtocolPlatformPlugin().getName() + " (Registered by " + platform.getRegisteredPlugin().getName() + ")";
             }
         }));
     }

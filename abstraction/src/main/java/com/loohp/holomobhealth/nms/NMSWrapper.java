@@ -21,6 +21,7 @@
 package com.loohp.holomobhealth.nms;
 
 import com.comphenix.protocol.events.PacketContainer;
+import com.loohp.holomobhealth.holders.DataWatcherFields;
 import com.loohp.holomobhealth.holders.IHoloMobArmorStand;
 import com.loohp.holomobhealth.utils.BoundingBox;
 import net.kyori.adventure.text.Component;
@@ -111,5 +112,7 @@ public abstract class NMSWrapper {
     public abstract void modifyDataWatchers(List<?> dataWatchers, Component entityNameComponent, boolean visible);
 
     public abstract PacketContainer createModifiedMetadataPacket(PacketContainer packet, List<?> dataWatchers);
+
+    public abstract DataWatcherFields getDataWatcherFields();
 
 }

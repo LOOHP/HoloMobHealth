@@ -23,6 +23,7 @@ package com.loohp.holomobhealth.listeners;
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.database.Database;
 import com.loohp.holomobhealth.protocol.EntityMetadata;
+import com.loohp.platformscheduler.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -43,7 +44,7 @@ public class Events implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        Bukkit.getScheduler().runTaskAsynchronously(HoloMobHealth.plugin, () -> {
+        Scheduler.runTaskAsynchronously(HoloMobHealth.plugin, () -> {
             if (!Database.playerExists(player)) {
                 Database.createPlayer(player);
             }
@@ -60,7 +61,7 @@ public class Events implements Listener {
     @EventHandler
     public void onCreatureSpawn(CreatureSpawnEvent event) {
         Entity entity = event.getEntity();
-        Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(entity.getWorld().getPlayers(), entity), 5);
+        Scheduler.runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(entity.getWorld().getPlayers(), entity), 5);
     }
 
     @EventHandler
@@ -81,7 +82,7 @@ public class Events implements Listener {
         UUID uuid = entity.getUniqueId();
         HoloMobHealth.altShowHealth.put(uuid, System.currentTimeMillis() + HoloMobHealth.altHealthDisplayTime * 1000);
         EntityMetadata.updateEntity(entity.getWorld().getPlayers(), entity);
-        Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {
+        Scheduler.runTaskLater(HoloMobHealth.plugin, () -> {
             Long timeout = HoloMobHealth.altShowHealth.get(uuid);
             if (timeout != null && System.currentTimeMillis() > timeout) {
                 HoloMobHealth.altShowHealth.remove(uuid);
@@ -123,7 +124,7 @@ public class Events implements Listener {
         UUID uuid = entity.getUniqueId();
         HoloMobHealth.altShowHealth.put(uuid, System.currentTimeMillis() + HoloMobHealth.altHealthDisplayTime * 1000);
         EntityMetadata.updateEntity(entity.getWorld().getPlayers(), entity);
-        Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> {
+        Scheduler.runTaskLater(HoloMobHealth.plugin, () -> {
             Long timeout = HoloMobHealth.altShowHealth.get(uuid);
             if (timeout != null && System.currentTimeMillis() > timeout) {
                 HoloMobHealth.altShowHealth.remove(uuid);

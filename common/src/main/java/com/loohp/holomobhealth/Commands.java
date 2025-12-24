@@ -26,6 +26,7 @@ import com.loohp.holomobhealth.protocol.EntityMetadata;
 import com.loohp.holomobhealth.updater.Updater;
 import com.loohp.holomobhealth.updater.Updater.UpdaterResponse;
 import com.loohp.holomobhealth.utils.ChatColorUtils;
+import com.loohp.platformscheduler.Scheduler;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -108,7 +109,7 @@ public class Commands implements CommandExecutor, TabCompleter {
             if (sender.hasPermission("holomobhealth.update")) {
                 sender.sendMessage(ChatColor.AQUA + "[HoloMobHealth] HoloMobHealth written by LOOHP!");
                 sender.sendMessage(ChatColor.GOLD + "[HoloMobHealth] You are running HoloMobHealth version: " + HoloMobHealth.plugin.getDescription().getVersion());
-                Bukkit.getScheduler().runTaskAsynchronously(HoloMobHealth.plugin, () -> {
+                Scheduler.runTaskAsynchronously(HoloMobHealth.plugin, () -> {
                     UpdaterResponse version = Updater.checkUpdate();
                     if (version.getResult().equals("latest")) {
                         if (version.isDevBuildLatest()) {

@@ -20,12 +20,11 @@
 
 package com.loohp.holomobhealth.protocol;
 
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.PacketContainer;
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.holders.HoloMobArmorStand;
-import com.loohp.holomobhealth.nms.NMS;
+import com.loohp.holomobhealth.platform.packets.PlatformPacket;
 import com.loohp.holomobhealth.utils.PacketSender;
+import com.loohp.platformscheduler.Scheduler;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -53,13 +52,12 @@ import java.util.stream.Collectors;
 
 public class ArmorStandPacket implements Listener {
 
-    private static final ProtocolManager protocolManager = HoloMobHealth.protocolManager;
     private static final Plugin plugin = HoloMobHealth.plugin;
     public static final Set<HoloMobArmorStand> active = Collections.synchronizedSet(new LinkedHashSet<>());
     public static final Map<Player, Map<HoloMobArmorStand, Boolean>> playerStatus = new ConcurrentHashMap<>();
 
     public static void update() {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+        Scheduler.runTaskTimerAsynchronously(plugin, () -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 Map<HoloMobArmorStand, Boolean> activeList = playerStatus.get(player);
                 if (activeList == null) {
@@ -95,7 +93,7 @@ public class ArmorStandPacket implements Listener {
                 }
 
                 for (Entity entity : entitiesUpdated) {
-                    Bukkit.getScheduler().runTask(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(player, entity));
+                    Scheduler.runTask(HoloMobHealth.plugin, () -> EntityMetadata.updateEntity(player, entity));
                 }
             }
         }, 0, 20);
@@ -133,10 +131,7 @@ public class ArmorStandPacket implements Listener {
             }
         }
 
-        NMS.getInstance().createArmorStandSpawnPackets(entity, component, visible);
-
-        PacketContainer[] packets = NMS.getInstance().createArmorStandSpawnPackets(entity, component, visible);
-
+        List<? extends PlatformPacket<?>> packets = HoloMobHealth.protocolPlatform.getPlatformPacketCreatorProvider().createArmorStandSpawnPackets(entity, component, visible);
         PacketSender.sendServerPackets(playersInRange, packets);
     }
 
@@ -145,26 +140,22 @@ public class ArmorStandPacket implements Listener {
             return;
         }
 
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        Scheduler.runTaskAsynchronously(plugin, () -> {
             World world = entity.getWorld();
             List<Player> playersInRange = players.stream().filter(each -> (each.getWorld().equals(world)) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.getUpdateRange(world) * HoloMobHealth.getUpdateRange(world)))).collect(Collectors.toList());
 
-            PacketContainer[] packets = NMS.getInstance().createUpdateArmorStandPackets(entity, component, visible);
-
+            List<? extends PlatformPacket<?>> packets = HoloMobHealth.protocolPlatform.getPlatformPacketCreatorProvider().createUpdateArmorStandPackets(entity, component, visible);
             PacketSender.sendServerPackets(playersInRange, packets);
         });
     }
 
     public static void updateArmorStand(Entity host, HoloMobArmorStand entity, Component component, boolean visible) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        Scheduler.runTaskAsynchronously(plugin, () -> {
             World world = entity.getWorld();
             List<Player> playersInRange = Bukkit.getOnlinePlayers().stream().filter(each -> (each.getWorld().equals(world)) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.getUpdateRange(world) * HoloMobHealth.getUpdateRange(world)))).collect(Collectors.toList());
 
-            PacketContainer[] packets = NMS.getInstance().createUpdateArmorStandPackets(entity, component, visible);
-
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                PacketSender.sendServerPackets(playersInRange, packets);
-            });
+            List<? extends PlatformPacket<?>> packets = HoloMobHealth.protocolPlatform.getPlatformPacketCreatorProvider().createUpdateArmorStandPackets(entity, component, visible);
+            Scheduler.runTask(plugin, () -> PacketSender.sendServerPackets(playersInRange, packets));
         });
     }
 
@@ -173,28 +164,24 @@ public class ArmorStandPacket implements Listener {
             return;
         }
 
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        Scheduler.runTaskAsynchronously(plugin, () -> {
             World world = entity.getWorld();
             List<Player> playersInRange = players.stream().filter(each -> (each.getWorld().equals(world)) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.getUpdateRange(world) * HoloMobHealth.getUpdateRange(world)))).collect(Collectors.toList());
 
-            PacketContainer[] packets = NMS.getInstance().createUpdateArmorStandLocationPackets(entity);
-
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                PacketSender.sendServerPackets(playersInRange, packets);
-            });
+            List<? extends PlatformPacket<?>> packets = HoloMobHealth.protocolPlatform.getPlatformPacketCreatorProvider().createUpdateArmorStandLocationPackets(entity);
+            Scheduler.runTask(plugin, () -> PacketSender.sendServerPackets(playersInRange, packets));
         });
     }
 
     public static void updateArmorStandLocation(Entity host, HoloMobArmorStand entity) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        Scheduler.runTaskAsynchronously(plugin, () -> {
             World world = entity.getWorld();
             List<Player> playersInRange = Bukkit.getOnlinePlayers().stream().filter(each -> (each.getWorld().equals(world)) && (each.getLocation().distanceSquared(entity.getLocation()) <= (HoloMobHealth.getUpdateRange(world) * HoloMobHealth.getUpdateRange(world)))).collect(Collectors.toList());
 
-            PacketContainer[] packets = NMS.getInstance().createUpdateArmorStandLocationPackets(entity);
-
-            Bukkit.getScheduler().runTask(plugin, () -> {
+            List<? extends PlatformPacket<?>> packets = HoloMobHealth.protocolPlatform.getPlatformPacketCreatorProvider().createUpdateArmorStandLocationPackets(entity);
+            Scheduler.runTask(plugin, () -> {
                 for (Player player : playersInRange) {
-                    for (PacketContainer packet : packets) {
+                    for (PlatformPacket<?> packet : packets) {
                         PacketSender.sendServerPacket(player, packet, false);
                     }
                 }
@@ -210,7 +197,7 @@ public class ArmorStandPacket implements Listener {
             active.remove(entity);
         }
 
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        Scheduler.runTaskAsynchronously(plugin, () -> {
             World world = entity.getWorld();
             List<Player> playersInRange;
             if (bypassFilter) {
@@ -239,11 +226,8 @@ public class ArmorStandPacket implements Listener {
                 }
             }
 
-            PacketContainer[] packets = NMS.getInstance().createEntityDestroyPacket(entity.getEntityId());
-
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                PacketSender.sendServerPackets(playersInRange, packets);
-            });
+            List<? extends PlatformPacket<?>> packets = HoloMobHealth.protocolPlatform.getPlatformPacketCreatorProvider().createEntityDestroyPackets(entity.getEntityId());
+            Scheduler.runTask(plugin, () -> PacketSender.sendServerPackets(playersInRange, packets));
         });
     }
 

@@ -22,6 +22,7 @@ package com.loohp.holomobhealth.database;
 
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.protocol.EntityMetadata;
+import com.loohp.platformscheduler.Scheduler;
 import com.loohp.yamlconfiguration.YamlConfiguration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -224,7 +225,7 @@ public class Database {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updatePlayer(player), 10);
+            Scheduler.runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updatePlayer(player), 10);
             return newvalue;
         }
     }
@@ -280,7 +281,7 @@ public class Database {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            Bukkit.getScheduler().runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updatePlayer(player), 10);
+            Scheduler.runTaskLater(HoloMobHealth.plugin, () -> EntityMetadata.updatePlayer(player), 10);
             try {
                 connection.close();
             } catch (SQLException e) {

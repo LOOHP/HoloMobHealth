@@ -21,6 +21,7 @@
 package com.loohp.holomobhealth.debug;
 
 import com.loohp.holomobhealth.HoloMobHealth;
+import com.loohp.platformscheduler.Scheduler;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
@@ -41,7 +42,7 @@ public class Debug implements Listener {
         if (HoloMobHealth.version.isOld()) {
             return;
         }
-        Bukkit.getScheduler().runTaskTimer(HoloMobHealth.plugin, () -> {
+        Scheduler.runTaskTimer(HoloMobHealth.plugin, () -> {
             if (player != null) {
                 player.getWorld().spawnParticle(Particle.HEART, player.getLocation().add(0.0, player.getHeight() / 2, 0.0), 1, 0.5, 0.5, 0.5, 1);
             }

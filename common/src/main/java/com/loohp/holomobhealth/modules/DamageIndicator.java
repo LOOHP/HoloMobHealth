@@ -20,9 +20,9 @@
 
 package com.loohp.holomobhealth.modules;
 
-import com.comphenix.protocol.events.PacketContainer;
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.nms.NMS;
+import com.loohp.holomobhealth.platform.packets.PlatformPacket;
 import com.loohp.holomobhealth.utils.ChatColorUtils;
 import com.loohp.holomobhealth.utils.CitizensUtils;
 import com.loohp.holomobhealth.utils.CustomNameUtils;
@@ -34,8 +34,8 @@ import com.loohp.holomobhealth.utils.PacketSender;
 import com.loohp.holomobhealth.utils.ParsePlaceholders;
 import com.loohp.holomobhealth.utils.ShopkeepersUtils;
 import com.loohp.holomobhealth.utils.WorldGuardUtils;
+import com.loohp.platformscheduler.Scheduler;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
@@ -331,7 +331,7 @@ public class DamageIndicator implements Listener {
     }
 
     public void playIndicator(Component entityNameComponent, Location location, Vector velocity, boolean gravity, double fallHeight) {
-        Bukkit.getScheduler().runTaskAsynchronously(HoloMobHealth.plugin, () -> {
+        Scheduler.runTaskAsynchronously(HoloMobHealth.plugin, () -> {
             int entityId;
             try {
                 entityId = NMS.getInstance().getNextEntityId().get();
@@ -342,7 +342,7 @@ public class DamageIndicator implements Listener {
             UUID uuid = UUID.randomUUID();
             Location originalLocation = location.clone();
 
-            PacketContainer[] packets = NMS.getInstance().createSpawnDamageIndicatorPackets(entityId, uuid, entityNameComponent, location, velocity, gravity);
+            List<? extends PlatformPacket<?>> packets = HoloMobHealth.protocolPlatform.getPlatformPacketCreatorProvider().createSpawnDamageIndicatorPackets(entityId, uuid, entityNameComponent, location, velocity, gravity);
 
             int range = HoloMobHealth.damageIndicatorVisibleRange;
             List<Player> players = location.getWorld().getPlayers().stream().filter(each -> {
@@ -368,13 +368,13 @@ public class DamageIndicator implements Listener {
                         velocity.add(drag);
                         location.add(velocity);
 
-                        PacketContainer packet = NMS.getInstance().createEntityTeleportPacket(entityId, location);
+                        List<? extends PlatformPacket<?>> packet = HoloMobHealth.protocolPlatform.getPlatformPacketCreatorProvider().createEntityTeleportPackets(entityId, location);
 
-                        PacketSender.sendServerPacket(players, packet);
+                        PacketSender.sendServerPackets(players, packet);
                     } else if (tick >= HoloMobHealth.damageIndicatorTimeout) {
                         this.cancel();
-                        PacketContainer[] packets = NMS.getInstance().createEntityDestroyPacket(entityId);
-                        Bukkit.getScheduler().runTaskLaterAsynchronously(HoloMobHealth.plugin, () -> {
+                        List<? extends PlatformPacket<?>> packets = HoloMobHealth.protocolPlatform.getPlatformPacketCreatorProvider().createEntityDestroyPackets(entityId);
+                        Scheduler.runTaskLaterAsynchronously(HoloMobHealth.plugin, () -> {
                             PacketSender.sendServerPackets(players, packets);
                         }, 3);
                     }

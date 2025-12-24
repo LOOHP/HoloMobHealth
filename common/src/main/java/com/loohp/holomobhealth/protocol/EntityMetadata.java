@@ -20,13 +20,12 @@
 
 package com.loohp.holomobhealth.protocol;
 
-import com.comphenix.protocol.events.PacketContainer;
 import com.loohp.holomobhealth.HoloMobHealth;
-import com.loohp.holomobhealth.nms.NMS;
+import com.loohp.holomobhealth.platform.packets.PlatformPacket;
 import com.loohp.holomobhealth.utils.EntityTypeUtils;
 import com.loohp.holomobhealth.utils.PacketSender;
+import com.loohp.platformscheduler.Scheduler;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -59,13 +58,13 @@ public class EntityMetadata {
             return;
         }
 
-        PacketContainer packet = NMS.getInstance().createUpdateEntityPacket(entity);
+        List<? extends PlatformPacket<?>> packet = HoloMobHealth.protocolPlatform.getPlatformPacketCreatorProvider().createUpdateEntityPackets(entity);
 
-        Bukkit.getScheduler().runTaskAsynchronously(HoloMobHealth.plugin, () -> {
+        Scheduler.runTaskAsynchronously(HoloMobHealth.plugin, () -> {
             for (Player player : players) {
                 if (player.getWorld().equals(entity.getWorld())) {
                     try {
-                        PacketSender.sendServerPacket(player, packet);
+                        PacketSender.sendServerPackets(player, packet);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -75,13 +74,12 @@ public class EntityMetadata {
     }
 
     public static void sendMetadataPacket(Entity entity, Component entityNameComponent, boolean visible, List<Player> players, boolean quiet) {
-        Bukkit.getScheduler().runTask(HoloMobHealth.plugin, () -> {
+        Scheduler.runTask(HoloMobHealth.plugin, () -> {
 
-            PacketContainer packet = NMS.getInstance().createUpdateEntityMetadataPacket(entity, entityNameComponent, visible);
-
+            List<? extends PlatformPacket<?>> packet = HoloMobHealth.protocolPlatform.getPlatformPacketCreatorProvider().createUpdateEntityMetadataPackets(entity, entityNameComponent, visible);
             for (Player player : players) {
                 if (player.hasPermission("holomobhealth.use")) {
-                    PacketSender.sendServerPacket(player, packet, !quiet);
+                    PacketSender.sendServerPackets(player, packet, !quiet);
                 }
             }
         });

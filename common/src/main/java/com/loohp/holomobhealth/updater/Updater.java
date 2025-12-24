@@ -22,6 +22,7 @@ package com.loohp.holomobhealth.updater;
 
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.utils.HTTPRequestUtils;
+import com.loohp.platformscheduler.Scheduler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -98,7 +99,7 @@ public class Updater implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        Bukkit.getScheduler().runTaskLaterAsynchronously(HoloMobHealth.plugin, () -> {
+        Scheduler.runTaskLaterAsynchronously(HoloMobHealth.plugin, () -> {
             if (HoloMobHealth.updaterEnabled) {
                 Player player = event.getPlayer();
                 if (player.hasPermission("HoloMobHealth.update")) {

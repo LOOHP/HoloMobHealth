@@ -21,6 +21,9 @@
 package com.loohp.holomobhealth.nms;
 
 import com.comphenix.protocol.events.PacketContainer;
+import com.loohp.holomobhealth.holders.DataWatcherField;
+import com.loohp.holomobhealth.holders.DataWatcherFieldType;
+import com.loohp.holomobhealth.holders.DataWatcherFields;
 import com.loohp.holomobhealth.holders.IHoloMobArmorStand;
 import com.loohp.holomobhealth.utils.BoundingBox;
 import com.loohp.holomobhealth.utils.UnsafeAccessor;
@@ -176,18 +179,21 @@ public class V1_17 extends NMSWrapper {
 
     @Override
     public UUID getEntityUUIDFromID(World world, int id) {
-        try {
-            WorldServer worldServer = ((CraftWorld) world).getHandle();
-            net.minecraft.world.entity.Entity entity = worldServer.G.d().a(id);
-            return entity == null ? null : entity.getUniqueID();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        WorldServer worldServer = ((CraftWorld) world).getHandle();
+        net.minecraft.world.entity.Entity entity = worldServer.G.d().a(id);
+        return entity == null ? null : entity.getUniqueID();
     }
 
     @Override
     public Entity getEntityFromUUID(UUID uuid) {
-        return Bukkit.getEntity(uuid);
+        for (World world : Bukkit.getWorlds()) {
+            WorldServer worldServer = ((CraftWorld) world).getHandle();
+            net.minecraft.world.entity.Entity entity = worldServer.G.d().a(uuid);
+            if (entity != null) {
+                return entity.getBukkitEntity();
+            }
+        }
+        return null;
     }
 
     @Override
@@ -434,5 +440,27 @@ public class V1_17 extends NMSWrapper {
     public PacketContainer createModifiedMetadataPacket(PacketContainer packet, List<?> dataWatchers) {
         PacketPlayOutEntityMetadata nmsPacket = (PacketPlayOutEntityMetadata) packet.getHandle();
         return createEntityMetadataPacket(nmsPacket.c(), dataWatchers);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public DataWatcherFields getDataWatcherFields() {
+        try {
+            dataWatcherByteField.setAccessible(true);
+            dataWatcherCustomNameField.setAccessible(true);
+            dataWatcherCustomNameVisibleField.setAccessible(true);
+            dataWatcherSilentField.setAccessible(true);
+            dataWatcherNoGravityField.setAccessible(true);
+            return new DataWatcherFields(
+                    new DataWatcherField(((DataWatcherObject<Byte>) dataWatcherByteField.get(null)).a(), DataWatcherFieldType.BYTE),
+                    new DataWatcherField(((DataWatcherObject<Optional<IChatBaseComponent>>) dataWatcherCustomNameField.get(null)).a(), DataWatcherFieldType.OPTIONAL_CHAT),
+                    new DataWatcherField(((DataWatcherObject<Boolean>) dataWatcherCustomNameVisibleField.get(null)).a(), DataWatcherFieldType.BOOLEAN),
+                    new DataWatcherField(((DataWatcherObject<Boolean>) dataWatcherSilentField.get(null)).a(), DataWatcherFieldType.BOOLEAN),
+                    new DataWatcherField(((DataWatcherObject<Boolean>) dataWatcherNoGravityField.get(null)).a(), DataWatcherFieldType.BOOLEAN),
+                    new DataWatcherField(EntityArmorStand.bG.a(), DataWatcherFieldType.BYTE)
+            );
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -21,31 +21,35 @@
 package com.loohp.holomobhealth.utils;
 
 import com.loohp.holomobhealth.HoloMobHealth;
+import com.loohp.holomobhealth.nms.NMS;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import de.Keyle.MyPet.api.entity.MyPet;
 import de.Keyle.MyPet.api.entity.MyPetBukkitEntity;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.entity.Entity;
 
 public class CustomNameUtils {
 
-    public static String getMobCustomName(Entity entity) {
+    public static Component getMobCustomName(Entity entity) {
         if (HoloMobHealth.mythicHook) {
             String customName = MythicMobsUtils.getMobCustomName(entity);
-            String vanillaCustomName = entity.getCustomName();
+            Component vanillaCustomName = getMinecraftCustomName(entity);
             if (HoloMobHealth.useMythicMobCustomNamesFirst) {
-                return customName == null || customName.isEmpty() ? vanillaCustomName : customName;
+                return customName == null || customName.isEmpty() ? vanillaCustomName : LegacyComponentSerializer.legacySection().deserialize(customName);
             } else {
-                return vanillaCustomName == null || vanillaCustomName.isEmpty() ? customName : vanillaCustomName;
+                return vanillaCustomName == null || PlainTextComponentSerializer.plainText().serialize(vanillaCustomName).isEmpty() ? LegacyComponentSerializer.legacySection().deserialize(customName) : vanillaCustomName;
             }
         }
         if (HoloMobHealth.citizensHook) {
             NPC npc = CitizensAPI.getNPCRegistry().getNPC(entity);
             if (npc != null) {
                 try {
-                    return npc.getFullName();
+                    return LegacyComponentSerializer.legacySection().deserialize(npc.getFullName());
                 } catch (Exception ignore) {
                 }
             }
@@ -53,21 +57,29 @@ public class CustomNameUtils {
         if (HoloMobHealth.shopkeepersHook) {
             Shopkeeper keeper = ShopkeepersAPI.getShopkeeperRegistry().getShopkeeperByEntity(entity);
             if (keeper != null) {
-                return keeper.getName();
+                return LegacyComponentSerializer.legacySection().deserialize(keeper.getName());
             }
         }
         if (HoloMobHealth.myPetHook) {
             if (entity instanceof MyPetBukkitEntity) {
                 MyPet mypet = ((MyPetBukkitEntity) entity).getMyPet();
-                return mypet.getPetName();
+                return LegacyComponentSerializer.legacySection().deserialize(mypet.getPetName());
             }
         }
 
-        String bukkitCustomName = entity.getCustomName();
-        if (bukkitCustomName == null || bukkitCustomName.isEmpty()) {
+        Component bukkitCustomName = getMinecraftCustomName(entity);
+        if (bukkitCustomName == null || PlainTextComponentSerializer.plainText().serialize(bukkitCustomName).isEmpty()) {
             return null;
         }
         return bukkitCustomName;
+    }
+
+    private static Component getMinecraftCustomName(Entity entity) {
+        if (HoloMobHealth.version.isNewerOrEqualTo(MCVersion.V1_13)) {
+            return NMS.getInstance().getEntityName(entity);
+        } else {
+            return NMS.getInstance().getEntityCustomName(entity);
+        }
     }
 
 }

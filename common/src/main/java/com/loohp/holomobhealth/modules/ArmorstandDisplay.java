@@ -47,6 +47,7 @@ import com.loohp.holomobhealth.utils.WorldGuardUtils;
 import com.loohp.platformscheduler.Scheduler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -131,10 +132,11 @@ public class ArmorstandDisplay implements Listener {
                 PlatformPlayClientEntityMetadataPacket<?> packet = event.getPacket();
                 World world = player.getWorld();
                 int entityId = packet.getEntityId();
-                UUID entityUUID = NMS.getInstance().getEntityUUIDFromID(world, entityId);
-                if (entityUUID == null) {
+                Entity entity = NMS.getInstance().getEntityFromID(world, entityId);
+                if (entity == null) {
                     return;
                 }
+                UUID entityUUID = entity.getUniqueId();
                 if (!player.hasPermission("holomobhealth.use") || !HoloMobHealth.playersEnabled.contains(player)) {
                     MultilineStands multi = mapping.get(entityUUID);
                     if (multi == null) {
@@ -151,17 +153,15 @@ public class ArmorstandDisplay implements Listener {
                     });
                     return;
                 }
-                ArmorStandDisplayData data = getData(player, entityUUID, world, packet);
+                ArmorStandDisplayData data = getData(player, entity, world, packet);
                 if (data != null) {
                     if (data.use()) {
                         packet.setEntityDataWatchers(data.getWatcher());
 
-                        Entity entity = data.getEntity();
-                        String customName = data.getCustomName();
-
+                        Component customName = data.getCustomName();
                         if (EntityTypeUtils.getMobsTypesSet().contains(EntityTypeUtils.getEntityType(entity))) {
                             if (entity.getPassenger() != null || isInvisible(entity) || (!HoloMobHealth.applyToNamed && customName != null) || (HoloMobHealth.useAlterHealth && !HoloMobHealth.idleUse && !HoloMobHealth.altShowHealth.containsKey(entity.getUniqueId())) || (HoloMobHealth.rangeEnabled && !RangeModule.isEntityInRangeOfPlayer(player, entity))) {
-                                Component name = customName != null && !customName.isEmpty() ? LegacyComponentSerializer.legacySection().deserialize(customName) : Component.empty();
+                                Component name = customName == null ? Component.empty() : customName;
                                 boolean visible = entity.isCustomNameVisible();
                                 EntityMetadata.sendMetadataPacket(entity, name, visible, Collections.singletonList(player), true);
                                 MultilineStands multi = mapping.remove(entity.getUniqueId());
@@ -201,8 +201,7 @@ public class ArmorstandDisplay implements Listener {
                             if (multi == null) {
                                 return;
                             }
-                            Entity entity = data.getEntity();
-                            Component name = NMS.getInstance().getEntityCustomName(entity);
+                            Component name = NMS.getInstance().getEntityName(entity);
                             boolean visible = entity.isCustomNameVisible();
                             EntityMetadata.sendMetadataPacket(entity, name, visible, Collections.singletonList(player), true);
                             multi.getStands().forEach(each -> ArmorStandPacket.removeArmorStand(HoloMobHealth.playersEnabled, each, true, false));
@@ -221,11 +220,7 @@ public class ArmorstandDisplay implements Listener {
                     Player player = event.getPlayer();
                     World world = player.getWorld();
                     int entityId = packet.getEntityId();
-                    UUID entityUUID = NMS.getInstance().getEntityUUIDFromID(world, entityId);
-                    if (entityUUID == null) {
-                        return;
-                    }
-                    Entity entity = NMS.getInstance().getEntityFromUUID(entityUUID);
+                    Entity entity = NMS.getInstance().getEntityFromID(world, entityId);
                     if (entity == null) {
                         return;
                     }
@@ -240,11 +235,7 @@ public class ArmorstandDisplay implements Listener {
                 Player player = event.getPlayer();
                 World world = player.getWorld();
                 int entityId = packet.getEntityId();
-                UUID entityUUID = NMS.getInstance().getEntityUUIDFromID(world, entityId);
-                if (entityUUID == null) {
-                    return;
-                }
-                Entity entity = NMS.getInstance().getEntityFromUUID(entityUUID);
+                Entity entity = NMS.getInstance().getEntityFromID(world, entityId);
                 if (entity == null) {
                     return;
                 }
@@ -258,15 +249,11 @@ public class ArmorstandDisplay implements Listener {
                 Player player = event.getPlayer();
                 World world = player.getWorld();
                 int entityId = packet.getEntityId();
-                UUID entityUUID = NMS.getInstance().getEntityUUIDFromID(world, entityId);
-                if (entityUUID == null) {
-                    return;
-                }
-                Entity entity = NMS.getInstance().getEntityFromUUID(entityUUID);
+                Entity entity = NMS.getInstance().getEntityFromID(world, entityId);
                 if (entity == null) {
                     return;
                 }
-                MultilineStands multi = mapping.get(entityUUID);
+                MultilineStands multi = mapping.get(entity.getUniqueId());
                 if (multi == null) {
                     return;
                 }
@@ -281,15 +268,11 @@ public class ArmorstandDisplay implements Listener {
                 Player player = event.getPlayer();
                 World world = player.getWorld();
                 int entityId = packet.getEntityId();
-                UUID entityUUID = NMS.getInstance().getEntityUUIDFromID(world, entityId);
-                if (entityUUID == null) {
-                    return;
-                }
-                Entity entity = NMS.getInstance().getEntityFromUUID(entityUUID);
+                Entity entity = NMS.getInstance().getEntityFromID(world, entityId);
                 if (entity == null) {
                     return;
                 }
-                MultilineStands multi = mapping.get(entityUUID);
+                MultilineStands multi = mapping.get(entity.getUniqueId());
                 if (multi == null) {
                     return;
                 }
@@ -304,15 +287,11 @@ public class ArmorstandDisplay implements Listener {
                 Player player = event.getPlayer();
                 World world = player.getWorld();
                 int entityId = packet.getEntityId();
-                UUID entityUUID = NMS.getInstance().getEntityUUIDFromID(world, entityId);
-                if (entityUUID == null) {
-                    return;
-                }
-                Entity entity = NMS.getInstance().getEntityFromUUID(entityUUID);
+                Entity entity = NMS.getInstance().getEntityFromID(world, entityId);
                 if (entity == null) {
                     return;
                 }
-                MultilineStands multi = mapping.get(entityUUID);
+                MultilineStands multi = mapping.get(entity.getUniqueId());
                 if (multi == null) {
                     return;
                 }
@@ -323,9 +302,7 @@ public class ArmorstandDisplay implements Listener {
         });
     }
 
-    public static ArmorStandDisplayData getData(Player player, UUID entityUUID, World world, PlatformPlayClientEntityMetadataPacket<?> packet) {
-        Entity entity = NMS.getInstance().getEntityFromUUID(entityUUID);
-
+    public static ArmorStandDisplayData getData(Player player, Entity entity, World world, PlatformPlayClientEntityMetadataPacket<?> packet) {
         if (entity == null || !EntityTypeUtils.getMobsTypesSet().contains(EntityTypeUtils.getEntityType(entity))) {
             return null;
         }
@@ -334,7 +311,7 @@ public class ArmorstandDisplay implements Listener {
             return new ArmorStandDisplayData();
         }
 
-        String customName = CustomNameUtils.getMobCustomName(entity);
+        Component customName = CustomNameUtils.getMobCustomName(entity);
 
         if (!HoloMobHealth.disabledWorlds.contains(world.getName())) {
 
@@ -366,12 +343,12 @@ public class ArmorstandDisplay implements Listener {
 
             if (customName != null) {
                 for (String each : HoloMobHealth.disabledMobNamesAbsolute) {
-                    if (customName.equals(ChatColorUtils.translateAlternateColorCodes('&', each))) {
+                    if (LegacyComponentSerializer.legacySection().serialize(customName).equals(ChatColorUtils.translateAlternateColorCodes('&', each))) {
                         return new ArmorStandDisplayData();
                     }
                 }
                 for (String each : HoloMobHealth.disabledMobNamesContains) {
-                    if (ChatColorUtils.stripColor(customName.toLowerCase()).contains(ChatColorUtils.stripColor(ChatColorUtils.translateAlternateColorCodes('&', each).toLowerCase()))) {
+                    if (PlainTextComponentSerializer.plainText().serialize(customName).toLowerCase().contains(ChatColorUtils.stripColor(ChatColorUtils.translateAlternateColorCodes('&', each).toLowerCase()))) {
                         return new ArmorStandDisplayData();
                     }
                 }
@@ -384,7 +361,7 @@ public class ArmorstandDisplay implements Listener {
             }
 
             boolean useIdle = false;
-            if (HoloMobHealth.useAlterHealth && !HoloMobHealth.altShowHealth.containsKey(entityUUID)) {
+            if (HoloMobHealth.useAlterHealth && !HoloMobHealth.altShowHealth.containsKey(entity.getUniqueId())) {
                 if (HoloMobHealth.idleUse) {
                     useIdle = true;
                 }
@@ -401,7 +378,7 @@ public class ArmorstandDisplay implements Listener {
 
             HoloMobHealth.protocolPlatform.getPlatformPacketCreatorProvider().modifyDataWatchers(watcher, null, false);
 
-            return new ArmorStandDisplayData(watcher, components, customName, entity); //TODO Fix this
+            return new ArmorStandDisplayData(watcher, components, customName);
         }
         return null;
     }
@@ -452,15 +429,13 @@ public class ArmorstandDisplay implements Listener {
         private final boolean use;
         private List<?> watcher;
         private List<Component> components;
-        private String customName;
-        private Entity entity;
+        private Component customName;
 
-        private ArmorStandDisplayData(List<?> watcher, List<Component> components, String customName, Entity entity) {
+        private ArmorStandDisplayData(List<?> watcher, List<Component> components, Component customName) {
             this.watcher = watcher;
             this.components = components;
             this.customName = customName;
             this.use = true;
-            this.entity = entity;
         }
 
         public ArmorStandDisplayData() {
@@ -475,16 +450,12 @@ public class ArmorstandDisplay implements Listener {
             return components;
         }
 
-        public String getCustomName() {
+        public Component getCustomName() {
             return customName;
         }
 
         public boolean use() {
             return use;
-        }
-
-        public Entity getEntity() {
-            return entity;
         }
 
     }

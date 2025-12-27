@@ -36,6 +36,8 @@ import com.loohp.holomobhealth.utils.ShopkeepersUtils;
 import com.loohp.holomobhealth.utils.WorldGuardUtils;
 import com.loohp.platformscheduler.Scheduler;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
@@ -95,15 +97,15 @@ public class DamageIndicator implements Listener {
                     return;
                 }
             }
-            String customName = CustomNameUtils.getMobCustomName(entity);
+            Component customName = CustomNameUtils.getMobCustomName(entity);
             if (customName != null) {
                 for (String each : HoloMobHealth.disabledMobNamesAbsolute) {
-                    if (customName.equals(ChatColorUtils.translateAlternateColorCodes('&', each))) {
+                    if (LegacyComponentSerializer.legacySection().serialize(customName).equals(ChatColorUtils.translateAlternateColorCodes('&', each))) {
                         return;
                     }
                 }
                 for (String each : HoloMobHealth.disabledMobNamesContains) {
-                    if (ChatColorUtils.stripColor(customName.toLowerCase()).contains(ChatColorUtils.stripColor(ChatColorUtils.translateAlternateColorCodes('&', each).toLowerCase()))) {
+                    if (PlainTextComponentSerializer.plainText().serialize(customName).toLowerCase().contains(ChatColorUtils.stripColor(ChatColorUtils.translateAlternateColorCodes('&', each).toLowerCase()))) {
                         return;
                     }
                 }
@@ -150,15 +152,15 @@ public class DamageIndicator implements Listener {
                     return;
                 }
             }
-            String customName = CustomNameUtils.getMobCustomName(entity);
+            Component customName = CustomNameUtils.getMobCustomName(entity);
             if (customName != null) {
                 for (String each : HoloMobHealth.disabledMobNamesAbsolute) {
-                    if (customName.equals(ChatColorUtils.translateAlternateColorCodes('&', each))) {
+                    if (LegacyComponentSerializer.legacySection().serialize(customName).equals(ChatColorUtils.translateAlternateColorCodes('&', each))) {
                         return;
                     }
                 }
                 for (String each : HoloMobHealth.disabledMobNamesContains) {
-                    if (ChatColorUtils.stripColor(customName.toLowerCase()).contains(ChatColorUtils.stripColor(ChatColorUtils.translateAlternateColorCodes('&', each).toLowerCase()))) {
+                    if (PlainTextComponentSerializer.plainText().serialize(customName).toLowerCase().contains(ChatColorUtils.stripColor(ChatColorUtils.translateAlternateColorCodes('&', each).toLowerCase()))) {
                         return;
                     }
                 }
@@ -218,15 +220,15 @@ public class DamageIndicator implements Listener {
                     return;
                 }
             }
-            String customName = CustomNameUtils.getMobCustomName(entity);
+            Component customName = CustomNameUtils.getMobCustomName(entity);
             if (customName != null) {
                 for (String each : HoloMobHealth.disabledMobNamesAbsolute) {
-                    if (customName.equals(ChatColorUtils.translateAlternateColorCodes('&', each))) {
+                    if (LegacyComponentSerializer.legacySection().serialize(customName).equals(ChatColorUtils.translateAlternateColorCodes('&', each))) {
                         return;
                     }
                 }
                 for (String each : HoloMobHealth.disabledMobNamesContains) {
-                    if (ChatColorUtils.stripColor(customName.toLowerCase()).contains(ChatColorUtils.stripColor(ChatColorUtils.translateAlternateColorCodes('&', each).toLowerCase()))) {
+                    if (PlainTextComponentSerializer.plainText().serialize(customName).toLowerCase().contains(ChatColorUtils.stripColor(ChatColorUtils.translateAlternateColorCodes('&', each).toLowerCase()))) {
                         return;
                     }
                 }

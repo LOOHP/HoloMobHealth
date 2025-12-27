@@ -23,6 +23,8 @@ package com.loohp.holomobhealth.registries;
 import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.utils.CustomNameUtils;
 import com.loohp.holomobhealth.utils.EntityTypeUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang3.JavaVersion;
 import org.apache.commons.lang3.SystemUtils;
@@ -37,19 +39,16 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptException;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class CustomPlaceholderScripts {
 
-    public static final String PLACEHOLDER_FUNCTION = "placeholder";
-    public static final Pattern PATTERN = Pattern.compile("//.*|/\\*[\\S\\s]*?\\*/|%([^%]+)%");
     private static final Map<String, JavaScriptPlaceholder> scripts = new ConcurrentHashMap<>();
     private static final Map<String, Class<?>> scriptDataTypes = new ConcurrentHashMap<>();
     private static ScriptEngineFactory scriptEngineFactory;
@@ -93,7 +92,7 @@ public class CustomPlaceholderScripts {
         if (engine == null) {
             throw new RuntimeException("JavaScript ScriptEngine isn't supported on your JVM! Is your version of Java too new?");
         }
-        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(Files.newInputStream(file.toPath()), StandardCharsets.UTF_8));
         String script = reader.lines().collect(Collectors.joining("\n"));
         reader.close();
         engine.put("BukkitServer", Bukkit.getServer());
@@ -129,7 +128,7 @@ public class CustomPlaceholderScripts {
     }
 
     @SuppressWarnings("deprecation")
-    public static String runScripts(String text, LivingEntity entity, double healthchange) throws Exception {
+    public static String runScripts(String text, LivingEntity entity, double healthchange) {
         double health = entity.getHealth();
         double maxhealth = 0.0;
         if (!HoloMobHealth.version.isLegacy()) {
@@ -137,7 +136,8 @@ public class CustomPlaceholderScripts {
         } else {
             maxhealth = entity.getMaxHealth();
         }
-        String customname = CustomNameUtils.getMobCustomName(entity);
+        Component customnameComponent = CustomNameUtils.getMobCustomName(entity);
+        String customname = customnameComponent == null ? null : LegacyComponentSerializer.legacySection().serialize(customnameComponent);
         String mobtype = EntityTypeUtils.getEntityType(entity).toString();
 
         for (Entry<String, JavaScriptPlaceholder> entry : scripts.entrySet()) {

@@ -77,7 +77,11 @@ public abstract class NMSWrapper {
 
     public abstract String getEntityTranslationKey(Entity entity);
 
+    public abstract Component getEntityName(Entity entity);
+
     public abstract Component getEntityCustomName(Entity entity);
+
+    public abstract Component getEntityDisplayName(Entity entity);
 
     public abstract Future<Integer> getNextEntityId();
 
@@ -85,7 +89,7 @@ public abstract class NMSWrapper {
 
     public abstract int getTropicalFishVariant(Entity entity);
 
-    public abstract UUID getEntityUUIDFromID(World world, int id);
+    public abstract Entity getEntityFromID(World world, int id);
 
     public abstract Entity getEntityFromUUID(UUID uuid);
 

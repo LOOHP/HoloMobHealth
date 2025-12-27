@@ -108,8 +108,8 @@ public class ParsePlaceholders {
 
         text = ChatColorUtils.translateAlternateColorCodes('&', text);
 
-        String rawName = CustomNameUtils.getMobCustomName(entity);
-        Component customName = rawName == null ? Component.empty() : LegacyComponentSerializer.legacySection().deserialize(rawName);
+        Component rawName = CustomNameUtils.getMobCustomName(entity);
+        Component customName = rawName == null ? Component.empty() : rawName;
 
         Component displayComponent = LegacyComponentSerializer.legacySection().deserialize(text);
 

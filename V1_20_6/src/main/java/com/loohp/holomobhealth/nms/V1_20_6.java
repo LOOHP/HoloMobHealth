@@ -147,8 +147,20 @@ public class V1_20_6 extends NMSWrapper {
     }
 
     @Override
+    public Component getEntityName(Entity entity) {
+        IChatBaseComponent customName = ((CraftEntity) entity).getHandle().af();
+        return GsonComponentSerializer.gson().deserialize(CraftChatMessage.toJSON(customName));
+    }
+
+    @Override
     public Component getEntityCustomName(Entity entity) {
         IChatBaseComponent customName = ((CraftEntity) entity).getHandle().ah();
+        return customName == null ? null : GsonComponentSerializer.gson().deserialize(CraftChatMessage.toJSON(customName));
+    }
+
+    @Override
+    public Component getEntityDisplayName(Entity entity) {
+        IChatBaseComponent customName = ((CraftEntity) entity).getHandle().O_();
         return GsonComponentSerializer.gson().deserialize(CraftChatMessage.toJSON(customName));
     }
 
@@ -190,9 +202,9 @@ public class V1_20_6 extends NMSWrapper {
     }
 
     @Override
-    public UUID getEntityUUIDFromID(World world, int id) {
+    public Entity getEntityFromID(World world, int id) {
         net.minecraft.world.entity.Entity entity = getLevelEntityGetter(world).a(id);
-        return entity == null ? null : entity.cz();
+        return entity == null ? null : entity.getBukkitEntity();
     }
 
     @Override

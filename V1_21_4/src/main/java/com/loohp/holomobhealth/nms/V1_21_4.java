@@ -125,8 +125,20 @@ public class V1_21_4 extends NMSWrapper {
     }
 
     @Override
-    public Component getEntityCustomName(Entity entity) {
+    public Component getEntityName(Entity entity) {
         IChatBaseComponent customName = ((CraftEntity) entity).getHandle().al();
+        return GsonComponentSerializer.gson().deserialize(CraftChatMessage.toJSON(customName));
+    }
+
+    @Override
+    public Component getEntityCustomName(Entity entity) {
+        IChatBaseComponent customName = ((CraftEntity) entity).getHandle().an();
+        return customName == null ? null : GsonComponentSerializer.gson().deserialize(CraftChatMessage.toJSON(customName));
+    }
+
+    @Override
+    public Component getEntityDisplayName(Entity entity) {
+        IChatBaseComponent customName = ((CraftEntity) entity).getHandle().p_();
         return GsonComponentSerializer.gson().deserialize(CraftChatMessage.toJSON(customName));
     }
 
@@ -154,26 +166,34 @@ public class V1_21_4 extends NMSWrapper {
     }
 
     @SuppressWarnings("unchecked")
-    @Override
-    public UUID getEntityUUIDFromID(World world, int id) {
+    private LevelEntityGetter<net.minecraft.world.entity.Entity> getLevelEntityGetter(World world) {
         try {
             WorldServer worldServer = ((CraftWorld) world).getHandle();
-            LevelEntityGetter<net.minecraft.world.entity.Entity> levelEntityGetter;
             if (worldServerEntityLookup == null) {
-                levelEntityGetter = worldServer.O.d();
+                return worldServer.O.d();
             } else {
-                levelEntityGetter = (LevelEntityGetter<net.minecraft.world.entity.Entity>) worldServerEntityLookup.invoke(worldServer);
+                return (LevelEntityGetter<net.minecraft.world.entity.Entity>) worldServerEntityLookup.invoke(worldServer);
             }
-            net.minecraft.world.entity.Entity entity = levelEntityGetter.a(id);
-            return entity == null ? null : entity.cG();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
+    public Entity getEntityFromID(World world, int id) {
+        net.minecraft.world.entity.Entity entity = getLevelEntityGetter(world).a(id);
+        return entity == null ? null : entity.getBukkitEntity();
+    }
+
+    @Override
     public Entity getEntityFromUUID(UUID uuid) {
-        return Bukkit.getEntity(uuid);
+        for (World world : Bukkit.getWorlds()) {
+            net.minecraft.world.entity.Entity entity = getLevelEntityGetter(world).a(uuid);
+            if (entity != null) {
+                return entity.getBukkitEntity();
+            }
+        }
+        return null;
     }
 
     @Override

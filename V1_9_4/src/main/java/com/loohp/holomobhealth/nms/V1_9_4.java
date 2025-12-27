@@ -27,12 +27,14 @@ import com.loohp.holomobhealth.holders.DataWatcherFields;
 import com.loohp.holomobhealth.holders.IHoloMobArmorStand;
 import com.loohp.holomobhealth.utils.BoundingBox;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.minecraft.server.v1_9_R2.AxisAlignedBB;
 import net.minecraft.server.v1_9_R2.DataWatcher;
 import net.minecraft.server.v1_9_R2.DataWatcherObject;
 import net.minecraft.server.v1_9_R2.EntityArmorStand;
 import net.minecraft.server.v1_9_R2.EntityTypes;
+import net.minecraft.server.v1_9_R2.IChatBaseComponent;
 import net.minecraft.server.v1_9_R2.MathHelper;
 import net.minecraft.server.v1_9_R2.PacketPlayOutEntityDestroy;
 import net.minecraft.server.v1_9_R2.PacketPlayOutEntityMetadata;
@@ -142,9 +144,21 @@ public class V1_9_4 extends NMSWrapper {
     }
 
     @Override
+    public Component getEntityName(Entity entity) {
+        String customName = ((CraftEntity) entity).getHandle().getName();
+        return LegacyComponentSerializer.legacySection().deserialize(customName);
+    }
+
+    @Override
     public Component getEntityCustomName(Entity entity) {
         String customName = ((CraftEntity) entity).getHandle().getCustomName();
-        return LegacyComponentSerializer.legacySection().deserialize(customName);
+        return customName == null ? null : LegacyComponentSerializer.legacySection().deserialize(customName);
+    }
+
+    @Override
+    public Component getEntityDisplayName(Entity entity) {
+        IChatBaseComponent customName = ((CraftEntity) entity).getHandle().getScoreboardDisplayName();
+        return GsonComponentSerializer.gson().deserialize(IChatBaseComponent.ChatSerializer.a(customName));
     }
 
     @SuppressWarnings("deprecation")
@@ -173,10 +187,10 @@ public class V1_9_4 extends NMSWrapper {
     }
 
     @Override
-    public UUID getEntityUUIDFromID(World world, int id) {
+    public Entity getEntityFromID(World world, int id) {
         WorldServer worldServer = ((CraftWorld) world).getHandle();
         net.minecraft.server.v1_9_R2.Entity entity = worldServer.getEntity(id);
-        return entity == null ? null : entity.getUniqueID();
+        return entity == null ? null : entity.getBukkitEntity();
     }
 
     @Override

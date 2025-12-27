@@ -39,13 +39,14 @@ import com.loohp.holomobhealth.utils.ShopkeepersUtils;
 import com.loohp.holomobhealth.utils.WorldGuardUtils;
 import com.loohp.platformscheduler.Scheduler;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import java.util.List;
-import java.util.UUID;
 
 public class NameTagDisplay {
 
@@ -59,11 +60,11 @@ public class NameTagDisplay {
                 PlatformPlayClientEntityMetadataPacket<?> packet = event.getPacket();
                 World world = player.getWorld();
                 int entityId = packet.getEntityId();
-                UUID entityUUID = NMS.getInstance().getEntityUUIDFromID(world, entityId);
-                if (entityUUID == null) {
+                Entity entity = NMS.getInstance().getEntityFromID(world, entityId);
+                if (entity == null) {
                     return;
                 }
-                List<?> watcher = getWatcher(player, entityUUID, world, packet);
+                List<?> watcher = getWatcher(player, entity, world, packet);
                 if (watcher != null) {
                     boolean readOnly = event.isReadOnly();
                     event.setReadOnly(false);
@@ -80,11 +81,7 @@ public class NameTagDisplay {
                     Player player = event.getPlayer();
                     World world = player.getWorld();
                     int entityId = packet.getEntityId();
-                    UUID entityUUID = NMS.getInstance().getEntityUUIDFromID(world, entityId);
-                    if (entityUUID == null) {
-                        return;
-                    }
-                    Entity entity = NMS.getInstance().getEntityFromUUID(entityUUID);
+                    Entity entity = NMS.getInstance().getEntityFromID(world, entityId);
                     if (entity == null) {
                         return;
                     }
@@ -99,11 +96,7 @@ public class NameTagDisplay {
                 Player player = event.getPlayer();
                 World world = player.getWorld();
                 int entityId = packet.getEntityId();
-                UUID entityUUID = NMS.getInstance().getEntityUUIDFromID(world, entityId);
-                if (entityUUID == null) {
-                    return;
-                }
-                Entity entity = NMS.getInstance().getEntityFromUUID(entityUUID);
+                Entity entity = NMS.getInstance().getEntityFromID(world, entityId);
                 if (entity == null) {
                     return;
                 }
@@ -113,9 +106,7 @@ public class NameTagDisplay {
         });
     }
 
-    public static List<?> getWatcher(Player player, UUID entityUUID, World world, PlatformPlayClientEntityMetadataPacket<?> packet) {
-        Entity entity = NMS.getInstance().getEntityFromUUID(entityUUID);
-
+    public static List<?> getWatcher(Player player, Entity entity, World world, PlatformPlayClientEntityMetadataPacket<?> packet) {
         if (entity == null || !EntityTypeUtils.getMobsTypesSet().contains(EntityTypeUtils.getEntityType(entity))) {
             return null;
         }
@@ -124,14 +115,14 @@ public class NameTagDisplay {
             return null;
         }
 
-        String customName = CustomNameUtils.getMobCustomName(entity);
+        Component customName = CustomNameUtils.getMobCustomName(entity);
 
         if (HoloMobHealth.rangeEnabled && !RangeModule.isEntityInRangeOfPlayer(player, entity)) {
             return null;
         }
 
         boolean useIdle = false;
-        if (HoloMobHealth.useAlterHealth && !HoloMobHealth.altShowHealth.containsKey(entityUUID)) {
+        if (HoloMobHealth.useAlterHealth && !HoloMobHealth.altShowHealth.containsKey(entity.getUniqueId())) {
             if (!HoloMobHealth.idleUse) {
                 return null;
             }
@@ -168,12 +159,12 @@ public class NameTagDisplay {
 
             if (customName != null) {
                 for (String each : HoloMobHealth.disabledMobNamesAbsolute) {
-                    if (customName.equals(ChatColorUtils.translateAlternateColorCodes('&', each))) {
+                    if (LegacyComponentSerializer.legacySection().serialize(customName).equals(ChatColorUtils.translateAlternateColorCodes('&', each))) {
                         return null;
                     }
                 }
                 for (String each : HoloMobHealth.disabledMobNamesContains) {
-                    if (ChatColorUtils.stripColor(customName.toLowerCase()).contains(ChatColorUtils.stripColor(ChatColorUtils.translateAlternateColorCodes('&', each).toLowerCase()))) {
+                    if (PlainTextComponentSerializer.plainText().serialize(customName).toLowerCase().contains(ChatColorUtils.stripColor(ChatColorUtils.translateAlternateColorCodes('&', each).toLowerCase()))) {
                         return null;
                     }
                 }

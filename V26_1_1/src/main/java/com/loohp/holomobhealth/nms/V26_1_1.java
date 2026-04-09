@@ -64,7 +64,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
 @SuppressWarnings("unused")
-public class V26_1 extends NMSWrapper {
+public class V26_1_1 extends NMSWrapper {
 
     private final Field entityCountField;
     private final Field dataWatcherByteField;
@@ -76,7 +76,7 @@ public class V26_1 extends NMSWrapper {
     //paper
     private Method worldServerEntityLookup;
 
-    public V26_1() {
+    public V26_1_1() {
         try {
             entityCountField = ReflectionUtils.findDeclaredField(net.minecraft.world.entity.Entity.class, AtomicInteger.class, "ENTITY_COUNTER");
             dataWatcherByteField = ReflectionUtils.findDeclaredField(net.minecraft.world.entity.Entity.class, EntityDataAccessor.class, "DATA_SHARED_FLAGS_ID");

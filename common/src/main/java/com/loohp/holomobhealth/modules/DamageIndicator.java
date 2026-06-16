@@ -336,7 +336,7 @@ public class DamageIndicator implements Listener {
         Scheduler.runTaskAsynchronously(HoloMobHealth.plugin, () -> {
             int entityId;
             try {
-                entityId = NMS.getInstance().getNextEntityId().get();
+                entityId = NMS.getInstance().getNextEntityId(location.getWorld()).get();
             } catch (Exception e) {
                 e.printStackTrace();
                 return;

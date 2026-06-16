@@ -36,7 +36,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicInteger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
@@ -47,6 +46,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.entity.animal.fish.TropicalFish;
 import net.minecraft.world.entity.decoration.ArmorStand;
@@ -64,9 +64,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
 @SuppressWarnings("unused")
-public class V26_1_2 extends NMSWrapper {
+public class V26_2 extends NMSWrapper {
 
-    private final Field entityCountField;
     private final Field dataWatcherByteField;
     private final Field dataWatcherCustomNameField;
     private final Field dataWatcherCustomNameVisibleField;
@@ -76,9 +75,8 @@ public class V26_1_2 extends NMSWrapper {
     //paper
     private Method worldServerEntityLookup;
 
-    public V26_1_2() {
+    public V26_2() {
         try {
-            entityCountField = ReflectionUtils.findDeclaredField(net.minecraft.world.entity.Entity.class, AtomicInteger.class, "ENTITY_COUNTER");
             dataWatcherByteField = ReflectionUtils.findDeclaredField(net.minecraft.world.entity.Entity.class, EntityDataAccessor.class, "DATA_SHARED_FLAGS_ID");
             dataWatcherCustomNameField = ReflectionUtils.findDeclaredField(net.minecraft.world.entity.Entity.class, EntityDataAccessor.class, "DATA_CUSTOM_NAME");
             dataWatcherCustomNameVisibleField = ReflectionUtils.findDeclaredField(net.minecraft.world.entity.Entity.class, EntityDataAccessor.class, "DATA_CUSTOM_NAME_VISIBLE");
@@ -142,13 +140,8 @@ public class V26_1_2 extends NMSWrapper {
 
     @Override
     public Future<Integer> getNextEntityId(World world) {
-        try {
-            entityCountField.setAccessible(true);
-            AtomicInteger counter = (AtomicInteger) entityCountField.get(null);
-            return CompletableFuture.completedFuture(counter.incrementAndGet());
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        ServerLevel level = ((CraftWorld) world).getHandle();
+        return CompletableFuture.completedFuture(level.getNextEntityId());
     }
 
     @Override
@@ -313,7 +306,7 @@ public class V26_1_2 extends NMSWrapper {
     @Override
     public PacketContainer[] createSpawnDamageIndicatorPackets(int entityId, UUID uuid, Component entityNameComponent, Location location, Vector velocity, boolean gravity) {
         try {
-            EntityType<ArmorStand> type = EntityType.ARMOR_STAND;
+            EntityType<ArmorStand> type = EntityTypes.ARMOR_STAND;
             Vec3 vec = new Vec3(velocity.getX(), velocity.getY(), velocity.getZ());
             ClientboundAddEntityPacket packet1 = new ClientboundAddEntityPacket(entityId, uuid, location.getX(), location.getY(), location.getZ(), 0, 0, type, 0, vec, 0);
 

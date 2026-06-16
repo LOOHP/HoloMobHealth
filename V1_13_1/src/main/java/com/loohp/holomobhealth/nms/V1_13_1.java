@@ -170,7 +170,7 @@ public class V1_13_1 extends NMSWrapper {
     }
 
     @Override
-    public Future<Integer> getNextEntityId() {
+    public Future<Integer> getNextEntityId(World world) {
         try {
             entityCountField.setAccessible(true);
             AtomicInteger counter = (AtomicInteger) entityCountField.get(null);

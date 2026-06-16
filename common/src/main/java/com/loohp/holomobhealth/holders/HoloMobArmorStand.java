@@ -40,7 +40,7 @@ public class HoloMobArmorStand implements IHoloMobArmorStand {
 
     @SuppressWarnings("deprecation")
     public HoloMobArmorStand(Location location, EntityType type, MultilineStands host) {
-        this.entityIdFuture = NMSWrapper.getInstance().getNextEntityId();
+        this.entityIdFuture = NMSWrapper.getInstance().getNextEntityId(location.getWorld());
         this.id = Integer.MIN_VALUE;
         this.uuid = UUID.randomUUID();
         this.location = location.clone();

@@ -140,7 +140,7 @@ public class V1_8_4 extends NMSWrapper {
 
     @SuppressWarnings("deprecation")
     @Override
-    public Future<Integer> getNextEntityId() {
+    public Future<Integer> getNextEntityId(World world) {
         entityCountField.setAccessible(true);
         return Bukkit.getScheduler().callSyncMethod(getPlugin(), () -> {
             try {

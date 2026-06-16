@@ -83,7 +83,7 @@ public abstract class NMSWrapper {
 
     public abstract Component getEntityDisplayName(Entity entity);
 
-    public abstract Future<Integer> getNextEntityId();
+    public abstract Future<Integer> getNextEntityId(World world);
 
     public abstract List<Entity> getPassengers(Entity entity);
 

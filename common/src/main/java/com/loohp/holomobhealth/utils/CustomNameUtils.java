@@ -24,8 +24,6 @@ import com.loohp.holomobhealth.HoloMobHealth;
 import com.loohp.holomobhealth.nms.NMS;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
-import de.Keyle.MyPet.api.entity.MyPet;
-import de.Keyle.MyPet.api.entity.MyPetBukkitEntity;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import net.kyori.adventure.text.Component;
@@ -61,10 +59,7 @@ public class CustomNameUtils {
             }
         }
         if (HoloMobHealth.myPetHook) {
-            if (entity instanceof MyPetBukkitEntity) {
-                MyPet mypet = ((MyPetBukkitEntity) entity).getMyPet();
-                return LegacyComponentSerializer.legacySection().deserialize(mypet.getPetName());
-            }
+            return MyPetUtils.getMyPetName(entity);
         }
 
         Component bukkitCustomName = getMinecraftCustomName(entity);

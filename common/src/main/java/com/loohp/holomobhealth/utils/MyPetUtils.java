@@ -20,27 +20,50 @@
 
 package com.loohp.holomobhealth.utils;
 
-import de.Keyle.MyPet.api.entity.MyPetBukkitEntity;
+import de.Keyle.MyPet.MyPetApi;
+import de.Keyle.MyPet.api.entity.Pet;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
 public class MyPetUtils {
 
+    private static final MiniMessage SANITIZED_MINIMESSAGE = MiniMessage.builder()
+            .tags(TagResolver.resolver(
+                    StandardTags.color(),
+                    StandardTags.decorations(),
+                    StandardTags.reset(),
+                    StandardTags.gradient(),
+                    StandardTags.rainbow()
+            ))
+            .build();
+
     public static boolean isMyPet(Entity entity) {
-        return entity instanceof MyPetBukkitEntity;
+        return MyPetApi.getPlugin().getPetManager().getPetFromEntity(entity) != null;
+    }
+
+    public static Component getMyPetName(Entity entity) {
+        Pet pet = MyPetApi.getPlugin().getPetManager().getPetFromEntity(entity);
+        if (pet == null) {
+            return null;
+        }
+        return SANITIZED_MINIMESSAGE.deserialize(pet.getPetName());
     }
 
     public static EntityType getMyPetEntityType(Entity entity) {
-        if (isMyPet(entity)) {
-            MyPetBukkitEntity myPetEntity = (MyPetBukkitEntity) entity;
-            String typeName = myPetEntity.getPetType().getBukkitName();
-            try {
-                return EntityType.valueOf(typeName);
-            } catch (IllegalArgumentException e) {
-                return EntityType.UNKNOWN;
-            }
+        Pet pet = MyPetApi.getPlugin().getPetManager().getPetFromEntity(entity);
+        if (pet == null) {
+            return entity.getType();
         }
-        return entity.getType();
+        String typeName = pet.getPetType().getBukkitName();
+        try {
+            return EntityType.valueOf(typeName);
+        } catch (IllegalArgumentException e) {
+            return EntityType.UNKNOWN;
+        }
     }
 
 }
